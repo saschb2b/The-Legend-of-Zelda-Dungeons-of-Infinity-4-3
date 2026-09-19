@@ -15,7 +15,7 @@ if (global.Users[global.UserIndex].Prefs[2] && !_nova_modal)
     draw_surface_part_ext(application_surface, 0, 304, 288, 592, 16, 436, 0.75, 0.75, c_white, 0.9);
     draw_surface_part_ext(application_surface, 1312, 0, 288, 896, 792, 208, 0.75, 0.75, c_white, 0.9);
 }
-if (instance_exists(oHUD) && !_nova_modal && !global.ArcadeVP_Show)
+if (instance_exists(oHUD) && (!_nova_modal || global.NovaInventoryHUD()) && !global.ArcadeVP_Show)
 {
     if (!surface_exists(NovaHUD)) NovaHUD = surface_create(256, 224);
     surface_set_target(NovaHUD);
@@ -44,24 +44,41 @@ else
 {
     draw_surface_stretched(NovaFrame, 0, 0, _nova_w, _nova_h);
 }
-// Screen resolution preserves the lettering in the supplied controller glyph.
-if (instance_exists(oHUD) && !_nova_modal && !global.ArcadeVP_Show && !global.Users[global.UserIndex].Prefs[2])
-{
-    var _nova_hint_scale = _nova_h / 960;
-    var _nova_hint_size = 96 * _nova_hint_scale;
-    var _nova_hint_right = _nova_w - 40 * _nova_hint_scale;
-    var _nova_hint_y = _nova_h - 64 * _nova_hint_scale;
+// Render glyphs after CRT scaling so their letters remain readable.
+if (instance_exists(oInventory) && !instance_exists(oDialogueBox)) global.NovaInventoryPrompts(oInventory);
+if (global.NovaInventoryInfo()) {
+    var sx = _nova_w / 256;
+    var sy = _nova_h / 224;
+    var size = 18 * min(sx, sy);
     draw_set_font(global.HUDFont2);
-    draw_set_halign(fa_right);
-    draw_set_valign(fa_middle);
+    var close_binding = global.NovaBinding("action");
+    var close_width = global.NovaPromptWidth(close_binding, "CLOSE", sx, size);
+    var more_binding = global.NovaBinding("sword");
+    var more_width = global.DB_Inst.LinesLeft > 3 ? global.NovaPromptWidth(more_binding, "MORE", sx, size) + 8 * sx : 0;
+    var px = 128 * sx - (more_width + close_width) / 2;
+    var py = (oInventory.Y - oCamera.Y + 116) * sy;
+    if (more_width > 0) global.NovaPromptDraw(more_binding, "MORE", px, py, sx, sy, size);
+    global.NovaPromptDraw(close_binding, "CLOSE", px + more_width, py, sx, sy, size);
+}
+if (instance_exists(oMap) && !oMap.Close) {
+    var sx = _nova_w / 256;
+    var sy = _nova_h / 224;
+    var size = 18 * min(sx, sy);
+    draw_set_font(global.HUDFont2);
+    draw_set_alpha(oMap.Alpha);
+    var binding = global.NovaBinding("action");
+    var width = global.NovaPromptWidth(binding, "CLOSE", sx, size);
+    global.NovaPromptDraw(binding, "CLOSE", 222 * sx - width, 200 * sy, sx, sy, size);
+    draw_set_alpha(1);
+}
+if (instance_exists(oHUD) && !_nova_modal && !global.ArcadeVP_Show && !global.Users[global.UserIndex].Prefs[2]) {
+    var sx = _nova_w / 256;
+    var sy = _nova_h / 224;
+    var size = 96 * _nova_h / 960;
+    draw_set_font(global.HUDFont2);
     draw_set_alpha(oHUD.MainAlpha);
-    var _nova_label_width = string_width("STATUS") * _nova_w / 256;
-    draw_set_color(c_black);
-    draw_text_transformed(_nova_hint_right + 2 * _nova_hint_scale, _nova_hint_y + 2 * _nova_hint_scale, "STATUS", _nova_w / 256, _nova_h / 224, 0);
-    draw_set_color(c_white);
-    draw_text_transformed(_nova_hint_right, _nova_hint_y, "STATUS", _nova_w / 256, _nova_h / 224, 0);
-    draw_sprite_stretched(sNovaPanelHint, 0, _nova_hint_right - _nova_label_width - _nova_hint_size - 8 * _nova_hint_scale, _nova_hint_y - _nova_hint_size / 2, _nova_hint_size, _nova_hint_size);
-    draw_set_halign(fa_left);
-    draw_set_valign(fa_top);
+    var binding = global.NovaBinding("hud");
+    var width = global.NovaPromptWidth(binding, "STATUS", sx, size);
+    global.NovaPromptDraw(binding, "STATUS", _nova_w - 40 * _nova_h / 960 - width, _nova_h - 64 * _nova_h / 960, sx, sy, size);
     draw_set_alpha(1);
 }

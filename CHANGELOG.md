@@ -4,7 +4,19 @@ These versions identify the 4:3 patch, independently of the original game's vers
 
 ## Unreleased
 
-No unreleased game or installer changes.
+### Changed
+
+- Place a narrower inventory below the HUD, keeping health, magic, the active item, and counters visible while browsing or reading item information.
+- Switch inventory pages with remappable LB/RB controls, or Page Up/Page Down on a keyboard. D-pad navigation stays in the item grid.
+- Show current bindings with the supplied Retro controller glyphs and colored face buttons. The Status hint updates after remapping. Keyboard prompts show the bound key.
+- Replace the ambiguous Select hint with Actions, Open for bags, or the highlighted action's name. Show the Equip shortcut only when it applies.
+
+### Fixed
+
+- Close item actions, item information, inventory, and the map consistently with the action button or Escape. Closing consumes the input so it cannot also activate gameplay.
+- Preserve existing controller and keyboard bindings while adding defaults for the new page controls.
+- Keep all remapping rows inside the Controls window, including keyboard directions and the two bag controls.
+- Split large migrated inventories across additional overflow pages so every retained item remains reachable in the compact layout.
 
 ## [1.5.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.5.1) - 2026-09-19
 

@@ -10,15 +10,27 @@ if (DB_Started) {
     exit;
 }
 if (instance_exists(global.DB_Inst)) exit;
-if (input_check_pressed("menu_access") || input_check_pressed("inventory")) { Close = true; exit; }
+if (input_check_pressed("menu_access") || input_check_pressed("inventory") || keyboard_check_pressed(vk_escape)) { Close = true; input_clear_momentary(true); exit; }
 var left = input_check_pressed("left");
 var right = input_check_pressed("right");
 var up = input_check_pressed("up");
 var down = input_check_pressed("down");
 var confirm = input_check_pressed("sword");
-var back = input_check_pressed("action");
+var close_input = input_check_pressed("action");
+if (close_input) {
+    if (MenuEnable) MenuEnable = false;
+    else Close = true;
+    input_clear_momentary(true);
+    exit;
+}
+var previous = input_check_pressed("nova_bag_previous");
+var next = input_check_pressed("nova_bag_next");
+if (previous || next) {
+    if (previous != next) { MenuEnable = false; NovaTurnPage(next ? 1 : -1); }
+    input_clear_momentary(true);
+    exit;
+}
 if (MenuEnable) {
-    if (back) { MenuEnable = false; exit; }
     if (left || right) {
         var page_delta = right ? 1 : -1;
         repeat (MenuItems) {
@@ -43,6 +55,7 @@ if (MenuEnable) {
                 global.DB_Inst = instance_create_layer(0, 0, "System", oDialogueBox);
                 global.DB_Inst.depth = depth - 1;
                 global.DB_Inst.Y = Y_DialogueBox - oCamera.Y;
+                global.DB_Inst.ShowBox = false;
                 global.DB_Inst.Script = DBScript_Info;
                 DB_Started = true;
                 break;
@@ -52,14 +65,8 @@ if (MenuEnable) {
     }
     exit;
 }
-if (back) { Close = true; exit; }
-if (input_check_pressed("strafe")) { NovaTurnPage(1); exit; }
-if (NovaTabs) {
-    if (left || right) NovaTurnPage(right ? 1 : -1);
-    if (down || confirm) NovaTabs = false;
-} else {
-    if (up && NovaCell < NovaColumns) NovaTabs = true;
-    else if (up) NovaCell -= NovaColumns;
+{
+    if (up) NovaCell = max(0, NovaCell - NovaColumns);
     if (down) NovaCell = min(NovaCell + NovaColumns, array_length(NovaSlots) - 1);
     if (left) NovaCell = max(0, NovaCell - 1);
     if (right) NovaCell = min(array_length(NovaSlots) - 1, NovaCell + 1);

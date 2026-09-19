@@ -13,26 +13,27 @@ using UndertaleModLib.Util;
 Data.SetGMS2Version(2024, 6);
 Data.FORM.FUNC.CodeLocals ??= new UndertaleModLib.UndertaleSimpleList<UndertaleCodeLocals>();
 var patchDir = Directory.GetCurrentDirectory();
-var hintTexture = new UndertaleEmbeddedTexture();
-hintTexture.Name = new UndertaleString("Nova panel hint");
-hintTexture.TextureData.Image = GMImage.FromPng(File.ReadAllBytes(Path.Combine(patchDir, "assets", "right-stick-click.png")));
-Data.EmbeddedTextures.Add(hintTexture);
-var hintPage = new UndertaleTexturePageItem {
-    Name = new UndertaleString("Nova panel hint"),
-    SourceWidth = 128, SourceHeight = 128,
-    TargetWidth = 128, TargetHeight = 128,
-    BoundingWidth = 128, BoundingHeight = 128,
-    TexturePage = hintTexture
-};
-Data.TexturePageItems.Add(hintPage);
-var hintSprite = new UndertaleSprite {
-    Name = Data.Strings.MakeString("sNovaPanelHint"),
-    Width = 128, Height = 128,
+var buttons = new UndertaleSprite {
+    Name = Data.Strings.MakeString("sNovaButtons"), Width = 128, Height = 128,
     MarginRight = 127, MarginBottom = 127
 };
-hintSprite.Textures.Add(new UndertaleSprite.TextureEntry { Texture = hintPage });
-hintSprite.CollisionMasks.Add(hintSprite.NewMaskEntry(Data));
-Data.Sprites.Add(hintSprite);
+using (var icons = JsonDocument.Parse(File.ReadAllText(Path.Combine(patchDir, "assets/buttons/manifest.json")))) {
+    foreach (var icon in icons.RootElement.EnumerateArray()) {
+        var bytes = File.ReadAllBytes(Path.Combine(patchDir, "assets/buttons", icon.GetProperty("file").GetString()));
+        if (Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant() != icon.GetProperty("sha256").GetString())
+            throw new Exception("Controller glyph checksum mismatch");
+        var texture = new UndertaleEmbeddedTexture { Name = new UndertaleString("Nova controller glyph") };
+        texture.TextureData.Image = GMImage.FromPng(bytes);
+        Data.EmbeddedTextures.Add(texture);
+        var page = new UndertaleTexturePageItem {
+            SourceWidth = 128, SourceHeight = 128, TargetWidth = 128, TargetHeight = 128,
+            BoundingWidth = 128, BoundingHeight = 128, TexturePage = texture
+        };
+        Data.TexturePageItems.Add(page);
+        buttons.Textures.Add(new UndertaleSprite.TextureEntry { Texture = page });
+    }
+}
+Data.Sprites.Add(buttons);
 var group = new CodeImportGroup(Data) { AutoCreateAssets = true };
 string Read(string name) => GetDecompiledText(name, null, new Underanalyzer.Decompiler.DecompileSettings());
 string FlattenEnums(string code) {
@@ -58,6 +59,18 @@ Edit("gml_Object_oMenu_Step_0", "if (Menu_Active)",
     File.ReadAllText(Path.Combine(patchDir, "menu_cancel.gml")) + "\nif (Menu_Active)");
 Edit("gml_Object_oMenu_Game_Step_0", "if (input_check_pressed(\"menu_access\"))",
     File.ReadAllText(Path.Combine(patchDir, "pause_cancel.gml")) + "\nif (input_check_pressed(\"menu_access\"))");
+Edit("gml_Object_oGame_Step_1", "if (input_check_pressed(\"hud\"))",
+    "if (input_check_pressed(\"hud\") && !global.Paused && !instance_exists(oInventory) && !instance_exists(oMap) && !instance_exists(oMenu_Game) && !instance_exists(oDialogueBox))");
+group.QueueAppend("gml_Object_oMap_Step_0", "if (!Open && !Close && (input_check_pressed(\"action\") || input_check_pressed(\"menu_access\") || keyboard_check_pressed(vk_escape))) { Close = true; input_clear_momentary(true); }");
+Edit("gml_Object_oDialogueBox_Step_2", "if (CameraExists)", @"
+if (global.NovaInventoryInfo() && (input_check_pressed(""action"") || keyboard_check_pressed(vk_escape))) {
+    ScriptNext = false;
+    Status = 5;
+    input_clear_momentary(true);
+}
+if (CameraExists)");
+foreach (var modal in new[] { "oInventory", "oMap", "oMenu_Game" })
+    group.QueueAppend("gml_Object_" + modal + "_Destroy_0", "input_clear_momentary(true);");
 // A blocked alarm must stay armed so the Medusa can fire after the status ends.
 Edit("gml_Object_oEnemy_Medusa_Alarm_0", "if (StopWatch)\n{\n    exit;\n}",
     "if (global.Paused || StopWatch || Stoned || State == 15 || State == 17)\n{\n    alarm[0] = 1;\n    exit;\n}");
@@ -128,6 +141,48 @@ using (var backports = JsonDocument.Parse(File.ReadAllText(Path.Combine(patchDir
         Edit(fix.GetProperty("code").GetString(), fix.GetProperty("anchor").GetString(), fix.GetProperty("replacement").GetString());
     }
 }
+Edit("gml_GlobalScript___input_config_verbs", "hud: input_binding_key(112)",
+    "hud: input_binding_key(112), nova_bag_previous: input_binding_key(vk_pageup), nova_bag_next: input_binding_key(vk_pagedown)");
+Edit("gml_GlobalScript___input_config_verbs", "hud: input_binding_gamepad_button(32780)",
+    "hud: input_binding_gamepad_button(32780), nova_bag_previous: input_binding_gamepad_button(gp_shoulderl), nova_bag_next: input_binding_gamepad_button(gp_shoulderr)");
+Edit("gml_GlobalScript_input_profile_import", "    return _global.__players[arg2].__profile_import(arg0, arg1);", @"
+    var profile = is_string(arg0) ? json_parse(arg0) : arg0;
+    if (is_struct(profile) && (arg1 == ""gamepad"" || arg1 == ""keyboard"")) {
+        var pad = arg1 == ""gamepad"";
+        var verbs = [""nova_bag_previous"", ""nova_bag_next""];
+        var values = pad ? [gp_shoulderl, gp_shoulderr] : [vk_pageup, vk_pagedown];
+        for (var i = 0; i < 2; i++) {
+            if (!variable_struct_exists(profile, verbs[i]))
+                variable_struct_set(profile, verbs[i], [{__type: pad ? ""gamepad button"" : ""key"", __value: values[i]}, {}]);
+        }
+    }
+    return _global.__players[arg2].__profile_import(profile, arg1);");
+Edit("gml_GlobalScript___Input", "global.BindingVerbs[0] = [0, 1, 2, 3, 4, 5, 6, 7];",
+    "global.BindingVerbs[0] = [0, 1, 2, 3, 4, 5, 6, 7, 12, 13];");
+Edit("gml_GlobalScript___Input", "global.BindingVerbs[1] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];",
+    "global.BindingVerbs[1] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];");
+Edit("gml_GlobalScript___Input", "function GetInputVerbStr(arg0)\n{",
+    "function GetInputVerbStr(arg0)\n{\n    if (arg0 == 12) return \"nova_bag_previous\";\n    if (arg0 == 13) return \"nova_bag_next\";");
+edits["gml_GlobalScript___Input"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "controls.gml"));
+var remapDraw = edits["gml_Object_oMenu_Draw_0"];
+var remapStart = remapDraw.IndexOf("        case 13:");
+var remapEnd = remapDraw.IndexOf("            break;", remapDraw.IndexOf("        case 14:", remapStart)) + "            break;".Length;
+if (remapStart < 0 || remapEnd < remapStart) throw new Exception("Remap menu cases missing");
+edits["gml_Object_oMenu_Draw_0"] = remapDraw.Substring(0, remapStart) + @"
+        case 13:
+        case 14:
+            var device = Menu_ActiveIndex == 13 ? 0 : 1;
+            var labels = [""Sword"", ""Action"", ""Item"", ""Map"", ""Strafe"", ""Inventory"", ""Menu"", ""Status"", ""Up"", ""Down"", ""Left"", ""Right"", ""Previous bag"", ""Next bag""];
+            draw_set_halign(fa_left);
+            var text_scale = device == 0 ? 0.75 : 0.6;
+            for (var i = 0; i < global.BindingIconCount[device]; i++) {
+                var PosX = inst_100005.x + 82;
+                var PosY = inst_100005.y + 10 + i * (device == 0 ? 14 : 10);
+                draw_text_transformed(PosX, PosY, labels[global.BindingVerbs[device][i]] + "":"", text_scale, text_scale, 0);
+                if (Bindings_Remap && i == global.BindingRemap_VerbIndex) draw_rectangle(PosX + 66, PosY, PosX + 110, PosY + 9, false);
+                else draw_text_transformed(PosX + 66, PosY, global.BindingIcons[device][i], text_scale, text_scale, 0);
+            }
+            break;" + remapDraw.Substring(remapEnd);
 ApplyContent();
 using (var corrections = JsonDocument.Parse(File.ReadAllText(Path.Combine(patchDir, "dungeon_fixes.json")))) {
     var statements = "";

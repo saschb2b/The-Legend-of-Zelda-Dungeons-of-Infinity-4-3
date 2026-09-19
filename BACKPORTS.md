@@ -31,7 +31,7 @@ The references are the developer's bundled change log, manual, Gem Combo Poster,
 
 ## Adaptations for this patch
 
-Inventory uses pages sized for the 4:3 playfield. Strafe advances a page. Moving up from the first item row focuses the heading, where left/right changes pages. Slot upgrades use the heart-container price and treasure limiter. Their loot pools support incremental upgrades. This does not reproduce an undisclosed upstream probability table.
+Inventory uses pages sized for the 4:3 playfield. In the unreleased control update, LB/RB changes pages while D-pad navigation stays in the item grid. The narrower window sits below the HUD. Slot upgrades use the heart-container price and treasure limiter. Their loot pools support incremental upgrades. This does not reproduce an undisclosed upstream probability table.
 
 The candle occupies the light slot and the oil lamp replaces it when collected. Dropping either removes its light and prevents torch ignition until you recover a light source.
 

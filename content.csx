@@ -107,7 +107,7 @@ if (Menu_Active && Menu_ActiveIndex == 11 && Selector_Index_Options > 0 && (inpu
 }
 if (Menu_Active)");
 var drawName = "gml_Object_oMenu_Draw_0";
-var drawCode = FlattenEnums(Read(drawName));
+var drawCode = edits.ContainsKey(drawName) ? edits[drawName] : FlattenEnums(Read(drawName));
 var caseStart = drawCode.IndexOf("        case 11:");
 var caseEnd = drawCode.IndexOf("        case 13:", caseStart);
 if (caseStart < 0 || caseEnd < 0) throw new Exception("Challenge menu draw case missing");

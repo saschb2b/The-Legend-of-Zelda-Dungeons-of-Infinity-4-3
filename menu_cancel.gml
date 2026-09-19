@@ -41,5 +41,6 @@ if (Menu_Active && !Bindings_Remap && (keyboard_check_pressed(vk_escape) || (Men
             break;
     }
     audio_play_sound(Sound_Throw, 1, false);
+    input_clear_momentary(true);
     exit;
 }

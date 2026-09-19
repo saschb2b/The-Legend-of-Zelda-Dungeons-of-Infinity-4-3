@@ -8,19 +8,28 @@ Data.SetGMS2Version(2024, 6);
 Data.FORM.FUNC.CodeLocals ??= new UndertaleModLib.UndertaleSimpleList<UndertaleCodeLocals>();
 var root = Directory.GetCurrentDirectory();
 var group = new CodeImportGroup(Data) { AutoCreateAssets = true };
-group.QueueReplace("gml_Object_oNovaTests_Create_0", File.ReadAllText(Path.Combine(root, "tests/runtime/create.gml")) + "\n" + File.ReadAllText(Path.Combine(root, "tests/runtime/backports.gml")) + "\n" + File.ReadAllText(Path.Combine(root, "tests/runtime/inventory.gml")) + "\n" + File.ReadAllText(Path.Combine(root, "tests/runtime/capture.gml")) + "\n" + File.ReadAllText(Path.Combine(root, "tests/runtime/content.gml")));
+group.QueueReplace("gml_Object_oNovaTests_Create_0", File.ReadAllText(Path.Combine(root, "tests/runtime/create.gml")) + "\n" + File.ReadAllText(Path.Combine(root, "tests/runtime/backports.gml")) + "\n" + File.ReadAllText(Path.Combine(root, "tests/runtime/inventory.gml")) + "\n" + File.ReadAllText(Path.Combine(root, "tests/runtime/capture.gml")) + "\n" + File.ReadAllText(Path.Combine(root, "tests/runtime/content.gml")) + "\n" + File.ReadAllText(Path.Combine(root, "tests/runtime/controls.gml")));
 group.QueueReplace("gml_Object_oNovaTests_Step_0", File.ReadAllText(Path.Combine(root, "tests/runtime/step.gml")));
 group.QueueAppend("gml_Object_oTitle_Create_0", "if (!instance_exists(oNovaTests)) instance_create_depth(0, 0, -100000, oNovaTests);");
 var settings = new Underanalyzer.Decompiler.DecompileSettings();
 var inputName = "gml_GlobalScript_input_check_pressed";
 var input = GetDecompiledText(inputName, null, settings);
-var brace = input.IndexOf('{');
-group.QueueReplace(inputName, input.Insert(brace + 1, "\nif (variable_global_exists(\"NovaTestInput\")) return arg0 == global.NovaTestInput;\n"));
+var pressedBoundary = "return _global.__cleared ? false : _verb_struct.__press;";
+if (!input.Contains(pressedBoundary)) throw new Exception("Input press boundary missing");
+group.QueueReplace(inputName, input.Replace(pressedBoundary, @"
+if (variable_global_exists(""NovaTestInput"")) {
+    var pressed = false;
+    if (is_array(global.NovaTestInput)) {
+        for (var i = 0; i < array_length(global.NovaTestInput); i++) if (global.NovaTestInput[i] == arg0) pressed = true;
+    } else pressed = arg0 == global.NovaTestInput;
+    return _global.__cleared ? false : pressed;
+}
+" + pressedBoundary));
 var heldName = "gml_GlobalScript_input_check";
 var held = GetDecompiledText(heldName, null, settings);
 group.QueueReplace(heldName, held.Insert(held.IndexOf('{') + 1, "\nif (variable_global_exists(\"NovaTestHeld\")) { for (var i = 0; i < array_length(global.NovaTestHeld); i++) if (global.NovaTestHeld[i] == arg0) return true; return false; }\n"));
 // Only the instrumented build substitutes the keyboard boundary; the event bodies stay intact.
-foreach (var name in new[] { "gml_Object_oMenu_Step_0", "gml_Object_oMenu_Game_Step_0" }) {
+foreach (var name in new[] { "gml_Object_oMenu_Step_0", "gml_Object_oMenu_Game_Step_0", "gml_Object_oInventory_Step_0", "gml_Object_oMap_Step_0", "gml_Object_oDialogueBox_Step_2" }) {
     var code = GetDecompiledText(name, null, settings);
     code = System.Text.RegularExpressions.Regex.Replace(code, @"UnknownEnum\.Value_(\d+)", "$1");
     code = System.Text.RegularExpressions.Regex.Replace(code, @"\s*enum UnknownEnum\s*\{[^}]*\}\s*", "");

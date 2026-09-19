@@ -1,16 +1,20 @@
 # Dungeons of Infinity: 4:3 edition
 
-A 4:3 layout patch for the Retroid Nova running ROCKNIX, based on the PortMaster **1.1.6 VM** build.
+**The full dungeon on your Retroid Nova.**
 
-The title screen fills the display while keeping the logo's proportions. Profile menus use the full screen and keep every control visible. During gameplay, a persistent HUD shows health, magic, the equipped item, rupees, bombs, arrows, and keys. Compact side panels start hidden.
+Play Dungeons of Infinity fullscreen on ROCKNIX, with a classic Zelda HUD and a layout made for the Nova's 4:3 display. Keep health, magic, your active item, and supplies in view. Click the right stick when you need equipment, the map, or dungeon progress.
 
-Backports from the 1.2.x releases add inventory compartments, sword poke/spin, Topaz, revised gem recipes, variable challenges, and a Wallmaster mode. They also include crash, progression, and control fixes. [BACKPORTS.md](BACKPORTS.md) lists the implemented changes, adaptations, and remaining gaps.
+[**Download the installer**](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/latest) · [Installation](#install-on-the-nova) · [Controls](#controls) · [What's changed](CHANGELOG.md)
 
-[CHANGELOG.md](CHANGELOG.md) records changes between patch releases. Patch version numbers are independent of the original game's versions.
+![Dungeons of Infinity on the Nova, with the classic HUD and Status button hint](screenshots/playfield.png)
+
+- The complete playfield fills the display. Title screens and menus fit too.
+- Health and supplies stay visible while status panels open over the game.
+- Selected updates from the newer game include inventory bags, sword poke and spin, Topaz, adjustable challenges, and Wallmaster mode.
 
 ## Install on the Nova
 
-Install PortMaster on ROCKNIX and connect the Nova to Wi-Fi.
+You need ROCKNIX, PortMaster, Wi-Fi, and about 300 MiB of free space.
 
 1. Download the **Nova patch installer ZIP** from the [latest release](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/latest).
 2. Extract the ZIP and copy both items into `/storage/roms/ports/`:
@@ -24,65 +28,106 @@ Install PortMaster on ROCKNIX and connect the Nova to Wi-Fi.
 3. Refresh the game list and run **Install Zelda Dungeons of Infinity 4-3** from Ports.
 4. Wait for installation to finish, then launch **Zelda Dungeons of Infinity 4-3**.
 
-The download contains an installer and binary patches, including artwork changes. It contains no standalone game or runtime. The installer downloads the official PortMaster package, verifies its checksum, and applies the patch locally. Allow about 300 MiB of free space for installation.
+The installer downloads the official PortMaster package and applies the patch automatically. You do not need to download or patch game files yourself.
 
-Saves go in `zeldadoi-43/savedata/`. To update, close the game, replace the installer files with the latest release, and run the installer again. It preserves existing saves. Installation failures appear in `zeldadoi-43-installer/install.log`.
+**Updating:** close the game, replace the installer files with the newer download, and run the installer again. Your saves stay in `zeldadoi-43/savedata/`. The installer preserves them and keeps migration backups in `zeldadoi-43/save-backups/`.
 
-The installer keeps backups in `zeldadoi-43/save-backups/`. The first inventory update creates `before-inventory-v1.zip`. Updating to patch 1.5.0 also creates `before-content-v3.zip`, preserving the saves before Topaz and variable challenges. Reinstallation keeps both backups intact. Existing inventory migrates on load, with excess items available on an overflow page. Keep the backups to return to an earlier patch.
+If installation fails, check `zeldadoi-43-installer/install.log`. For another attempt, run the installer again.
 
-## Controls and layout
+## Controls
 
-The HUD follows the classic Zelda layout. The vertical magic meter sits beside the equipped item, counters align beneath their icons, and hearts sit beneath LIFE. It uses the game's icons, live values, item quantities, and low-health pulse. The layout keeps Dungeons of Infinity's four-digit rupee counter and its separate key counter.
+These are the default controller bindings. Change them under **Controls**. In the preview, each button hint follows your current mapping, including keyboard bindings.
 
-Click the **right stick** to show or hide equipment, attack/defence, the minimap, and dungeon progress. These panels sit below the HUD and start hidden for each run. A small **R3 STATUS** hint appears at the bottom right while the panels are hidden. Menus and dialogue hide the HUD, hint, and panels to keep their controls readable. **Select + Start** returns to Ports.
+| Button | During play | In the inventory |
+| --- | --- | --- |
+| D-pad / left stick | Move | Highlight an object or action |
+| A | Sword | Open Actions, open a bag, or confirm the highlighted action |
+| B | Interact | Close the current view |
+| X | Use the equipped item | Equip the highlighted object, when available |
+| Y | Open the map | |
+| Start | Open the inventory | Close the inventory |
+| Select | Pause | Close the inventory |
+| Right-stick click | Show or hide Status | |
+| LB / RB | | Previous / next inventory page (preview) |
+| Select + Start | Exit to Ports | Exit to Ports |
 
-Press the **action button** to back out of a menu, or **Escape** on a keyboard. In name entry, the action button still deletes a letter and Escape cancels the edit. From a pause submenu, cancel returns to the pause menu. From the pause menu itself, cancel resumes play.
+Press **B** to close the map, menus, item information, or inventory. Closing an action list or item information returns to the inventory. Closing a pause submenu returns to the pause menu. In name entry, B deletes a letter. On a keyboard, Escape closes or cancels the current view.
 
-Press **Start** or the confirm button to skip the opening title animation. To require the full animation, create `zeldadoi-43/savedata/options.ini` with `[Preferences]` and `CanSkipTitle=0`. Set it to `1` to allow skipping. If you already have that file, add the key to its Preferences section.
+**Actions** opens an object's choices. **Equip** assigns it to the active item button. **Use** activates or consumes it immediately. Gear in dedicated equipment slots is already active. Its action list provides information and, where allowed, Drop.
 
-The inventory separates equipment from the main bag. You start with five main slots and can add five more. Food and pendant bags each hold three items. The treasure bag also accepts wishstones. Press **Strafe** to advance pages, or move up to the heading and use left/right. Sword selects an item, Item equips it, and Action goes back.
+The preview uses **LB/RB** to switch inventory pages, or **Page Up/Page Down** on a keyboard. The D-pad stays in the item grid. Health and counters remain visible while browsing or reading item information.
 
-The starting candle occupies the light slot. Drop it for a darker challenge, or replace it with an oil lamp. Topaz joins the nine existing gems, with all 55 gem recipes from 1.2.1. Food bags, pendant bags, and the master key use the newer artwork.
-
-Before starting a run, open **Challenges** to adjust hearts, defence, darkness, starting slots, rupee limits, shop prices, enemy crowds, and curses. The last page offers **No map**, **No food**, and **Wall Master**. Confirm cycles a value, left/right cycles in either direction, and **Next page** moves between the three pages. Reduced starting inventory still upgrades to ten slots. Older saved runs keep their original challenge restrictions.
-
-Hold **Sword** after a swing to poke while moving. With a level-three sword or higher, keep holding until the blade flashes, then release for a spin. Level-two swords can break pots.
-
-Frozen or stoned Medusas and cannons cannot fire. Their attacks resume when the status ends. Pikits cannot steal items while Link falls into a pit or over an edge. Keyboard remapping includes Menu and all four directions. An aborted remap restores the previous bindings.
-
-The title screen uses a centered 300×225 view. Profile menus use a taller 400×300 view with a tiled background. Gameplay presents the complete 256×224 playfield at 4:3 with horizontal pixel aspect correction. The side panels use 75% scale and 90% opacity. The CRT option processes the playfield and HUD together.
-
-The renderer draws the control hint at screen resolution so its R3 glyph stays readable, including with CRT enabled.
-
-| Title screen | Profile menu |
+| Inventory below the HUD | Contextual item actions |
 | --- | --- |
-| ![4:3 title screen](screenshots/title.png) | ![4:3 profile menu](screenshots/profile.png) |
+| ![Compact bag inventory below health and counters, with shoulder and colored face-button hints](screenshots/inventory.png) | ![Item action list with a confirm hint that names the highlighted Info action](screenshots/inventory-actions.png) |
 
-Gameplay screenshots captured on Nova with patch 1.5.1.
+Inventory screenshots use a populated test inventory to show full counters and two rows of hearts. All screenshots come from the game running on a Nova.
 
-| Status hidden | Status visible |
+| Status at a stick-click | Menus that fit the screen |
 | --- | --- |
-| ![Fullscreen playfield with the R3 STATUS hint](screenshots/playfield.png) | ![Equipment, map, and dungeon progress over the playfield](screenshots/overlay.png) |
+| ![Equipment, map, and dungeon progress over the playfield](screenshots/overlay.png) | ![Profile menu within the Nova's 4:3 display](screenshots/profile.png) |
 
-The launcher selects Freedreno and SDL's evdev controller backend. Testing covers the Retroid Nova on ROCKNIX.
+## Playing and updating
 
-## Rebuild the patch
+Hold Sword after a swing to poke while moving. With a level-three sword or higher, hold until the blade flashes, then release to spin. Level-two swords can break pots.
 
-On Linux x86-64, use Python 3.11 or newer:
+Open **Challenges** before a run to adjust health, darkness, inventory space, shop prices, and other restrictions. The last page includes No map, No food, and Wall Master. Existing runs keep their original challenge restrictions.
+
+Press Start or confirm to skip the opening title animation. To require the full animation, set `CanSkipTitle=0` under `[Preferences]` in `zeldadoi-43/savedata/options.ini`.
+
+This is an unofficial patch of the PortMaster **1.1.6 VM** build with selected 1.2.x backports. It does not include every change from 1.2.1. Read the [backport audit](BACKPORTS.md) for coverage and the [changelog](CHANGELOG.md) for changes between patch releases.
+
+<details>
+<summary>Save migration and returning to an older patch</summary>
+
+Existing inventory migrates on load. Excess items remain available on overflow pages.
+
+The installer preserves saves before each format change:
+
+- `save-backups/before-inventory-v1.zip`: before the inventory update.
+- `save-backups/before-content-v3.zip`: before Topaz and variable challenges.
+
+Reinstallation preserves both backups. Keep them if you plan to return to an earlier patch, which may require the matching older saves.
+
+</details>
+
+## Development and testing
+
+The repository distributes patch code and binary deltas. Installer downloads contain no standalone game or runtime. Checksums verify the upstream package and patched output.
+
+[TESTING.md](TESTING.md) covers builds, GitHub CI, the isolated Nova regression suite, and the release procedure. Patch versions are independent of the original game's versions. Related fixes stay under Unreleased until the batch is ready.
+
+<details>
+<summary>Build the patch on Linux</summary>
+
+Use Linux x86-64 and Python 3.11 or newer:
 
 ```sh
 python3 -m unittest discover -v
 python3 build.py --check-release --runtime-tests
 ```
 
-The build downloads the pinned PortMaster package and UndertaleModTool CLI 0.9.2.0, checks both SHA-256 hashes, and compiles the patch. It then verifies the checked-in binary delta against the clean build and tests installation and reinstallation. Build inputs and full game archives stay in `.build/`, outside Git.
+The build downloads the pinned PortMaster package and UndertaleModTool CLI 0.9.2.0, checks their hashes, and compiles the patch. It verifies the checked-in delta against the clean build, then tests installation and reinstallation. Full game archives stay in the ignored `.build/` directory.
 
-[TESTING.md](TESTING.md) documents the CI checks, isolated Nova runtime suite, regression baseline, and release procedure. GitHub Actions runs the unit suite and build checks on pushes and pull requests. Runtime assertions run separately on a Nova.
+GitHub Actions runs the unit suite and build checks on pushes and pull requests. Runtime assertions run separately on a Nova. The installer uses Python's standard library. Release packaging uses `requirements-build.txt`.
 
-The installer needs only Python's standard library, which ROCKNIX includes. The release builder uses the pinned dependency in `requirements-build.txt`.
+</details>
+
+<details>
+<summary>Rendering and device support</summary>
+
+Testing covers the Retroid Nova on ROCKNIX. The launcher selects Freedreno and SDL's evdev controller backend.
+
+Gameplay presents the complete 256×224 playfield at 4:3 with horizontal pixel aspect correction. The title uses a centered 300×225 view, and profile menus use a 400×300 view. Status panels use 75% scale and 90% opacity.
+
+The CRT option processes the playfield and HUD together. Controller glyphs render at screen resolution to remain readable with CRT enabled. Keyboard prompts use text keycaps.
+
+</details>
 
 ## Credits
 
-Justin Bohemier created Dungeons of Infinity. The [PortMaster package](https://github.com/PortsMaster-MV/PortMaster-MV-New/tree/main/ports/zeldadoi) supplies the game files and [GMLoader-next](https://github.com/JohnnyonFlame/gmloader-next) runtime during installation. The installer preserves the upstream license files in `zeldadoi-43/license/`. The release builder uses [bsdiff4](https://pypi.org/project/bsdiff4/) to create the binary patch.
+Justin Bohemier created Dungeons of Infinity. The [PortMaster package](https://github.com/PortsMaster-MV/PortMaster-MV-New/tree/main/ports/zeldadoi) supplies the game files and [GMLoader-next](https://github.com/JohnnyonFlame/gmloader-next) runtime during installation. The installer preserves upstream license files in `zeldadoi-43/license/`.
 
-The R3 glyph comes from the supplied controller icon pack's `P4Gamepad/Default/T_P4_R3.png`. `assets/right-stick-click.png` contains an unchanged copy.
+Controller glyphs are the original PNGs from the supplied icon pack's `XGamepad/Retro` directory, including the colored face buttons. [The asset manifest](assets/buttons/manifest.json) records source filenames and checksums. The patch copies this artwork without redrawing it.
+
+The release builder uses [bsdiff4](https://pypi.org/project/bsdiff4/) to create the binary patch.

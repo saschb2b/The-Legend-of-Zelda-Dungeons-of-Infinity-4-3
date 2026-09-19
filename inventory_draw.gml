@@ -6,12 +6,18 @@ draw_set_color(c_white);
 draw_sprite_stretched(sprite_index, 0, X, Y, W, H);
 draw_set_font(global.HUDFont2);
 draw_set_halign(fa_center);
-var heading = NovaTitles[NovaPage];
-if (NovaPage == 1) heading += "  " + string(Inventory_MaxSlots_Useable()) + "/10 SLOTS";
-draw_text(X + W / 2, Y + 12, "<  " + heading + "  >");
-if (NovaTabs) draw_sprite_stretched(sInventory_Selection, 0, X + 8, Y + 8, W - 16, 15);
+draw_set_valign(fa_top);
+if (DB_Started) {
+    draw_text(X + W / 2, Y + 10, "ITEM INFO");
+    draw_set_halign(fa_left);
+    draw_set_alpha(1);
+    exit;
+}
+var heading = NovaTitles[min(NovaPage, 6)];
+if (NovaPage >= 6 && NovaOverflowPages > 1) heading += " " + string(NovaPage - 5);
+draw_text(X + W / 2, Y + 10, heading);
 var origin_x = X + floor((W - NovaColumns * 24) / 2);
-var origin_y = Y + 32;
+var origin_y = Y + 28;
 for (var cell = 0; cell < array_length(NovaSlots); cell++) {
     var slot = NovaSlots[cell];
     var px = origin_x + (cell mod NovaColumns) * 24;
@@ -33,7 +39,7 @@ for (var cell = 0; cell < array_length(NovaSlots); cell++) {
             draw_set_halign(fa_center);
         }
     }
-    if (!NovaTabs && cell == NovaCell) draw_sprite_stretched(sInventory_Selection, 0, px, py, 20, 20);
+    if (cell == NovaCell) draw_sprite_stretched(sInventory_Selection, 0, px, py, 20, 20);
     if (slot == global.Inventory_SlotIndex_Equiped) {
         draw_set_color(c_yellow);
         draw_rectangle(px - 1, py - 1, px + 20, py + 20, true);
@@ -43,22 +49,19 @@ for (var cell = 0; cell < array_length(NovaSlots); cell++) {
 draw_set_font(global.HUDFont2);
 var item = global.Inventory[global.Inventory_SlotIndex_Selected];
 var title = item.ItemClass < 0 ? "EMPTY" : string_upper(Item_Name(item.ItemClass, item.ItemIndex, item.Amount));
-draw_text(X + W / 2, Y + 88, title);
+draw_text(X + W / 2, Y + 78, title);
 if (MenuEnable) {
     var menu_x = X + floor((W - MenuStrW) / 2);
     draw_set_halign(fa_left);
     for (var action = 0; action < MenuItems; action++) {
         draw_set_color(ds_grid_get(MenuItemGrid, 1, action) ? c_white : c_dkgray);
-        draw_text(menu_x + MenuItemPos[action], Y + 110, ds_grid_get(MenuItemGrid, 0, action));
+        draw_text(menu_x + MenuItemPos[action], Y + 93, ds_grid_get(MenuItemGrid, 0, action));
     }
     draw_set_color(c_white);
-    draw_sprite_stretched(sInventory_Selection, 0, menu_x + MenuItemPos[MenuSelectionIndex] - 2, Y + 107, MenuItemW[MenuSelectionIndex] + 3, 12);
+    draw_sprite_stretched(sInventory_Selection, 0, menu_x + MenuItemPos[MenuSelectionIndex] - 2, Y + 90, MenuItemW[MenuSelectionIndex] + 3, 12);
     draw_set_halign(fa_center);
-} else {
-    draw_text(X + W / 2, Y + 109, NovaTabs ? "LEFT/RIGHT: BAG   DOWN: ITEMS" : "UP: BAGS   SWORD: SELECT   ACTION: BACK");
-}
-if (NovaPage == 6) draw_text(X + W / 2, Y + 128, "SAVED ITEMS: USE OR DROP TO FREE SPACE");
-else draw_text(X + W / 2, Y + 128, "STRAFE: NEXT BAG");
+} else if (global.Inventory_SlotIndex_Selected == global.Inventory_SlotIndex_Equiped) draw_text(X + W / 2, Y + 93, "EQUIPPED");
+else if (NovaPage >= 6) draw_text(X + W / 2, Y + 93, "USE OR DROP TO FREE SPACE");
 if (global.Cursed && !DB_Started) {
     draw_text(X + W / 2, Y + H + 5, "CURSED: " + string_upper(string_replace(global.CurseEffectStr, "\\", " ")));
     draw_text(X + W / 2, Y + H + 15, string_upper(string_replace(global.CurseTaskStr, "\\", " ")) + " (" + string(global.CurseTaskCount) + ")");

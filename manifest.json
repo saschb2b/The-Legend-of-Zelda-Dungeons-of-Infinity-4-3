@@ -1,10 +1,10 @@
 {
-  "version": "1.5.1",
+  "version": "1.5.2-rc.1",
   "save_schema": 3,
   "upstream_url": "https://github.com/PortsMaster-MV/PortMaster-MV-New/releases/download/2024-12-03_1532/zeldadoi.zip",
   "upstream_sha256": "cf13009f3f8f5578a17ca4a45de051ea1315280037f01434c187ebc9d9e91353",
   "original_game_sha256": "d1c7f76420650d27d1abd6003657e81841efe5c28d35f012166a3ec4b981c047",
-  "patched_game_sha256": "5b66718b69c9a490f532328f9186f9a5c23eb55ce69bf92db2fdbb1195c3c52d",
-  "patched_game_size": 5070312,
-  "patch_sha256": "456f25519a0cb7806582cedbc950db6bcb835d0c38d8c2178b1a2f8cb6de8f65"
+  "patched_game_sha256": "19d2f7a3c93a6882915a3d73ea74193d634fc1c360bdbabd9463aab689849a72",
+  "patched_game_size": 5148648,
+  "patch_sha256": "7c65e6bd6922d4464e3dddccb17165d3c2cd749a870cd465ada8d0ae05bdc3fe"
 }

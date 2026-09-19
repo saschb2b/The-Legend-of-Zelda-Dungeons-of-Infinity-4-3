@@ -8,5 +8,6 @@ if (keyboard_check_pressed(vk_escape) || input_check_pressed("action")) {
         SelectorPos = 0;
     }
     audio_play_sound(Sound_Throw, 1, false);
+    input_clear_momentary(true);
     exit;
 }

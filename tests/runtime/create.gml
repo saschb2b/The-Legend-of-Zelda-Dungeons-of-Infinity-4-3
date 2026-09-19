@@ -16,7 +16,14 @@ function Record(name, passed) {
     Flush();
 }
 function PressEvent(target, verb, object, kind, number) {
+    input_clear_momentary(false);
     global.NovaTestInput = verb;
+    // Each simulated press starts a fresh frame, including after a profile change.
+    var verbs = is_array(verb) ? verb : [verb];
+    for (var i = 0; i < array_length(verbs); i++) {
+        var state = variable_struct_get(__input_global().__players[0].__verb_state_dict, verbs[i]);
+        if (is_struct(state)) state.__inactive = false;
+    }
     with (target) event_perform_object(object, kind, number);
     global.NovaTestInput = "";
 }
@@ -71,7 +78,7 @@ function MenuTests() {
     input_binding_scan_set_Failure(-20);
     Record("aborted remapping restores every previous binding", input_profile_export("keyboard") == keyboard_before && !instance_exists(remap));
     remap = instance_create_layer(0, 0, "System", oInputRemap, {InputIndex: 1});
-    var keys = [ord("Z"), ord("X"), ord("C"), ord("M"), ord("S"), ord("I"), vk_escape, vk_f1, vk_up, vk_down, vk_left, vk_right];
+    var keys = [ord("Z"), ord("X"), ord("C"), ord("M"), ord("S"), ord("I"), vk_escape, vk_f1, vk_up, vk_down, vk_left, vk_right, vk_pageup, vk_pagedown];
     for (var k = 0; k < array_length(keys); k++) input_binding_scan_set_Success(input_binding_key(keys[k]));
     Record("completed keyboard remapping saves menu and directions", input_binding_get("menu_access", undefined, undefined, "keyboard").__value == vk_escape && input_binding_get("right", undefined, undefined, "keyboard").__value == vk_right && json_stringify(global.Users[0].InputProfile_Keyboard) == input_profile_export("keyboard"));
     input_profile_import(keyboard_before, "keyboard");

@@ -1,7 +1,7 @@
 Capture = "";
 CaptureTick = 0;
 CaptureIndex = 0;
-CaptureNames = ["inventory-gear", "inventory-items", "inventory-bags", "inventory-treasure", "inventory-food", "inventory-pendants", "inventory-overflow"];
+CaptureNames = ["inventory-gear", "inventory-items", "inventory-bags", "inventory-treasure", "inventory-food", "inventory-pendants", "inventory-overflow", "inventory-actions", "inventory-info", "inventory-keyboard", "inventory-crt", "inventory-overflowextra"];
 function CaptureStart() {
     global.ItemData[1].Type = 3;
     global.ItemData[5].Type = 3;
@@ -23,6 +23,18 @@ function CaptureStart() {
     Inventory_Add(47, 0, 3);
     for (var slot = 10; slot < 20; slot++) global.Inventory[slot] = {ItemClass: 13, ItemIndex: slot - 10, Amount: 1, Enabled: true};
     for (var slot = 20; slot < 28; slot++) global.Inventory[slot] = {ItemClass: 36, ItemIndex: slot mod 5, Amount: 1, Enabled: true};
+    global.Inventory_ItemData[18].Amount = 20;
+    global.Inventory_ItemData[17].Amount = 17.5;
+    global.Inventory_ItemData[26].Amount = 32;
+    global.Inventory_ItemData[40].Amount = 9999;
+    global.Inventory_ItemData[1].Amount[0] = 99;
+    global.Inventory_ItemData[5].Amount[0] = 99;
+    global.Inventory_ItemData[20].Amount = 99;
+    oHUD.AddHealth = 0;
+    oHUD.AddMagic = 0;
+    oHUD.AddRupees = 0;
+    global.Inventory_SlotIndex_Equiped = 6;
+    input_profile_set("gamepad");
     with (oLink) UpdateState(24);
     global.Paused = true;
     global.InventoryInst = instance_create_layer(0, 0, "System", oInventory);
@@ -34,6 +46,7 @@ function CaptureStart() {
 function CaptureStep() {
     CaptureTick++;
     if (CaptureTick == 20) {
+        if (CaptureIndex == 8) Record("information retains the inventory grid", array_length(global.InventoryInst.NovaSlots) == 6 && global.InventoryInst.Alpha == 1);
         Capture = CaptureNames[CaptureIndex];
         Flush();
     }
@@ -48,6 +61,37 @@ function CaptureStep() {
         game_end();
         return;
     }
-    global.InventoryInst.NovaPage = CaptureIndex;
-    with (global.InventoryInst) NovaRefresh();
+    var ui = global.InventoryInst;
+    if (instance_exists(global.DB_Inst)) {
+        PressEvent(global.DB_Inst, "action", oDialogueBox, ev_step, ev_step_end);
+        ui.DB_Started = false;
+    }
+    ui.MenuEnable = false;
+    ui.NovaCell = 0;
+    ui.NovaPage = min(CaptureIndex, 6);
+    input_profile_set("gamepad");
+    global.Users[global.UserIndex].Prefs[3] = false;
+    switch (CaptureIndex) {
+        case 7:
+        case 8:
+            ui.NovaPage = 0;
+            with (ui) { NovaRefresh(); NovaItemMenu(); }
+            ui.MenuSelectionIndex = 3;
+            if (CaptureIndex == 8) PressEvent(ui, "sword", oInventory, ev_step, ev_step_normal);
+            break;
+        case 9:
+            ui.NovaPage = 1;
+            input_profile_set("keyboard");
+            break;
+        case 10:
+            ui.NovaPage = 2;
+            global.Users[global.UserIndex].Prefs[3] = true;
+            break;
+        case 11:
+            global.Inventory_ItemData[2].Index = 0;
+            for (var slot = 10; slot <= 31; slot++) global.Inventory[slot] = {ItemClass: 36, ItemIndex: slot mod 5, Amount: 1, Enabled: true};
+            ui.NovaPage = 7;
+            break;
+    }
+    with (ui) NovaRefresh();
 }

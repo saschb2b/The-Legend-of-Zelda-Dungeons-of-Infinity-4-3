@@ -196,5 +196,5 @@ function ProgressionTests() {
     Record("wishing pond includes the hookshot and boomerang", ds_list_find_index(global.PossibleItemLists[12], 6) >= 0 && ds_list_find_index(global.PossibleItemLists[12], 19) >= 0);
     Record("rods deal two base damage to vulnerable bosses", global.EnemyData[oBoss_Armos].LinkWeaponEffects[6][0] == 2 && global.EnemyData[oBoss_Lanmola].LinkWeaponEffects[7] == 2);
     Record("rod boss immunities stay intact", global.EnemyData[oBoss_Moldorm].LinkWeaponEffects[6] == -1 && global.EnemyData[oBoss_Armos].LinkWeaponEffects[6][1] == -1);
-    Record("keyboard supports menu and all four directions", global.BindingIconCount[1] == 12 && GetInputVerbStr(6) == "menu_access" && GetInputVerbStr(8) == "up" && GetInputVerbStr(11) == "right");
+    Record("keyboard supports menu and all four directions", global.BindingIconCount[1] >= 12 && GetInputVerbStr(6) == "menu_access" && GetInputVerbStr(8) == "up" && GetInputVerbStr(11) == "right");
 }
