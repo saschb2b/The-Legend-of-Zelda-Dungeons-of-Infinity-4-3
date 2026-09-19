@@ -26,11 +26,13 @@ Saves go in `zeldadoi-43/savedata/`. To update, close the game, replace the inst
 
 ## Controls and layout
 
-The HUD follows the classic Zelda layout. Magic and the equipped item sit on the left, counters across the top, and hearts on the right. It uses the game's sprites, live values, item quantities, and low-health pulse.
+The HUD follows the classic Zelda layout. The vertical magic meter sits beside the equipped item, counters align beneath their icons, and hearts sit beneath LIFE. It uses the game's icons, live values, item quantities, and low-health pulse. The layout keeps Dungeons of Infinity's four-digit rupee counter and its separate key counter.
 
-Click the **right stick** to show or hide equipment, attack/defence, the minimap, and dungeon progress. These panels sit below the HUD and start hidden for each run. A small right-stick glyph marked **PANELS** appears at the bottom right while the panels are hidden. Menus and dialogue hide the HUD, hint, and panels to keep their controls readable. **Select + Start** returns to Ports.
+Click the **right stick** to show or hide equipment, attack/defence, the minimap, and dungeon progress. These panels sit below the HUD and start hidden for each run. A small **R3 PANELS** hint appears at the bottom right while the panels are hidden. Menus and dialogue hide the HUD, hint, and panels to keep their controls readable. **Select + Start** returns to Ports.
 
 The title screen uses a centered 300×225 view. Profile menus use a taller 400×300 view with a tiled background. Gameplay presents the complete 256×224 playfield at 4:3 with horizontal pixel aspect correction. The side panels use 75% scale and 90% opacity. The CRT option processes the playfield and HUD together.
+
+The renderer draws the control hint at screen resolution so its R3 glyph stays readable, including with CRT enabled.
 
 | Title screen | Profile menu |
 | --- | --- |
@@ -55,7 +57,7 @@ python3 -m venv .build/patchenv
 unzip -p .build/port.zip zeldadoi/zeldadoi.port > .build/original.port
 unzip -p .build/original.port assets/game.droid > .build/game.droid
 /path/to/UndertaleModCli load .build/game.droid -s apply.csx -o .build/patched-game.droid -f -v
-.build/patchenv/bin/python package_release.py --original-game .build/game.droid --patched-game .build/patched-game.droid --version 1.2.1 --output dist/Dungeons-of-Infinity-4-3-v1.2.1-Nova-Patch-Installer.zip
+.build/patchenv/bin/python package_release.py --original-game .build/game.droid --patched-game .build/patched-game.droid --version 1.2.2 --output dist/Dungeons-of-Infinity-4-3-v1.2.2-Nova-Patch-Installer.zip
 python3 -m unittest test_install.py
 ```
 
@@ -66,3 +68,5 @@ The verbose CLI flag permits the original game's audio alignment warning. The pa
 ## Credits
 
 Justin Bohemier created Dungeons of Infinity. The [PortMaster package](https://github.com/PortsMaster-MV/PortMaster-MV-New/tree/main/ports/zeldadoi) supplies the game files and [GMLoader-next](https://github.com/JohnnyonFlame/gmloader-next) runtime during installation. The installer preserves the upstream license files in `zeldadoi-43/license/`. The release builder uses [bsdiff4](https://pypi.org/project/bsdiff4/) to create the binary patch.
+
+The R3 glyph comes from the supplied controller icon pack's `P4Gamepad/Default/T_P4_R3.png`. `assets/right-stick-click.png` contains an unchanged copy.
