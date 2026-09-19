@@ -87,5 +87,17 @@ for (var _nova_heart = 0; _nova_heart < _nova_capacity; _nova_heart++)
     var _nova_frame = _nova_value >= 1 ? 4 : (_nova_value > 0 ? max(1, floor(_nova_value * 4)) : 0);
     draw_sprite_ext(sHUD_Heart, _nova_frame, 166 + (_nova_heart mod 10) * 8, 26 + (_nova_heart div 10) * 8, 1, 1, 0, HealthLowPulseColor, MainAlpha);
 }
+if (!global.Users[global.UserIndex].Prefs[2])
+{
+    draw_set_font(global.HUDFont2);
+    draw_set_halign(fa_right);
+    draw_set_alpha(MainAlpha * 0.8);
+    draw_set_color(c_black);
+    draw_text(249, 205, "PANELS");
+    draw_set_color(c_white);
+    draw_text(248, 204, "PANELS");
+    draw_sprite_stretched(sNovaPanelHint, 0, 228 - string_width("PANELS"), 198, 16, 16);
+    draw_set_halign(fa_left);
+}
 draw_set_color(c_white);
 draw_set_alpha(1);

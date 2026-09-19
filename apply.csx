@@ -2,7 +2,29 @@ using System;
 using System.IO;
 using System.Text.RegularExpressions;
 using UndertaleModLib.Compiler;
+using UndertaleModLib.Models;
+using UndertaleModLib.Util;
 var patchDir = Directory.GetCurrentDirectory();
+var hintTexture = new UndertaleEmbeddedTexture();
+hintTexture.Name = new UndertaleString("Nova panel hint");
+hintTexture.TextureData.Image = GMImage.FromPng(File.ReadAllBytes(Path.Combine(patchDir, "assets", "right-stick-click.png")));
+Data.EmbeddedTextures.Add(hintTexture);
+var hintPage = new UndertaleTexturePageItem {
+    Name = new UndertaleString("Nova panel hint"),
+    SourceWidth = 128, SourceHeight = 128,
+    TargetWidth = 128, TargetHeight = 128,
+    BoundingWidth = 128, BoundingHeight = 128,
+    TexturePage = hintTexture
+};
+Data.TexturePageItems.Add(hintPage);
+var hintSprite = new UndertaleSprite {
+    Name = Data.Strings.MakeString("sNovaPanelHint"),
+    Width = 128, Height = 128,
+    MarginRight = 127, MarginBottom = 127
+};
+hintSprite.Textures.Add(new UndertaleSprite.TextureEntry { Texture = hintPage });
+hintSprite.CollisionMasks.Add(hintSprite.NewMaskEntry(Data));
+Data.Sprites.Add(hintSprite);
 var group = new CodeImportGroup(Data) { AutoCreateAssets = true };
 string Read(string name) => GetDecompiledText(name, null, new Underanalyzer.Decompiler.DecompileSettings());
 string FlattenEnums(string code) {
