@@ -2,6 +2,12 @@
 
 These versions identify the 4:3 patch, independently of the original game's version. Each entry describes changes since the preceding release.
 
+## Unreleased
+
+### Fixed
+
+- Match ALttP's SNES walking ratio: diagonal movement uses two-thirds speed on each axis, removing DOI's diagonal speed boost. Apply the same ratio to running, carrying, and sword-ready movement while preserving their straight-line speeds.
+
 ## [1.5.2](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.5.2) - 2026-09-19
 
 ### Changed

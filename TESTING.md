@@ -41,6 +41,8 @@ The runner creates a disposable game directory under `/storage/.cache/`, with fr
 
 The suite calls the compiled game events. It substitutes input at the input-query boundary, creates actual enemy instances, and checks projectiles, timers, inventory, menu state, and profile contents. It tests recovery and normal behavior as well as blocked actions. Control cases cover remapped button and stick glyphs, alternate and empty bindings, old profile imports, shoulder-page wrapping, contextual action labels, simultaneous inputs, item-information closure, and map dismissal. The test object and input substitution exist only in `runtime-tests.droid` and `runtime-baseline.droid`. Packaging rejects either test build.
 
+Movement tests measure displacement through Link's compiled Step event over eight frames in all eight directions, including walking, running, carrying, and sword-ready movement. They also check opposing inputs, strafe, doorway speed limits, corner assistance, scripted movement, knockback, and falls. Real wall instances check blocked movement and sliding on all four sides. Walking expectations use the SNES values directly: 12 pixels straight or 8 per diagonal axis across eight frames. The tests use fresh saves in the starting clearing.
+
 To show that the assertions catch the original regressions:
 
 ```sh

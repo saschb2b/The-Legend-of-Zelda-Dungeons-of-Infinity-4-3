@@ -47,6 +47,7 @@ try {
             break;
         case 6:
             if (!instance_exists(oHUD) || !instance_exists(oLink) || global.Paused || oLink.State != 1) break;
+            MovementTests();
             PauseTests();
             EnemyTests();
             BackportTests();

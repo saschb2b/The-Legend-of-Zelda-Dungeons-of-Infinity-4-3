@@ -17,9 +17,10 @@ function NovaSwordStep() {
         Facing = NovaSwordFacing;
         var move_x = input_check("right") - input_check("left");
         var move_y = input_check("down") - input_check("up");
-        var move_length = max(1, sqrt(move_x * move_x + move_y * move_y));
-        vx = move_x * WalkSpeed * 0.65 / move_length;
-        vy = move_y * WalkSpeed * 0.65 / move_length;
+        var move_speed = WalkSpeed * 0.65;
+        if (move_x != 0 && move_y != 0) move_speed = move_speed * 2 / 3;
+        vx = move_x * move_speed;
+        vy = move_y * move_speed;
         image_index = 6;
         image_speed = 0;
     } else if (NovaSwordMode == 2) {

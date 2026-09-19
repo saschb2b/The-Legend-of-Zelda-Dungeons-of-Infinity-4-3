@@ -39,6 +39,10 @@ Old saves migrate on load. Dedicated gear moves out of the main bag. Items that 
 
 The sword uses existing poses. Holding the button after a swing keeps the blade out and slows movement to 65%. Charging for 45 frames enables a 16-frame spin with sword level three or higher. Spin damage uses the existing sword damage rules and respects floor levels. These timings and animation are this patch's implementation, not extracted 1.2.1 code.
 
+Diagonal movement follows the NTSC SNES walking ratio from [ALttP's reconstructed movement code](https://github.com/snesrev/zelda3/blob/fbbb3f967a51fafe642e6140d0753979e73b4090/src/player.c#L5656-L5745). Its normal walking table uses 24 units straight and 16 per diagonal axis, with 16 units per pixel. DOI therefore walks at 1.5 pixels per frame straight and 1.0 on each diagonal axis. Total diagonal speed is about 6% slower than straight movement.
+
+The patch applies that two-thirds ratio to DOI's existing running, carrying, and sword-ready speeds before wall collision checks. Opposing inputs cancel first. This adapts the SNES walking rule rather than copying its complete terrain and speed tables. Scripted movement, corner assistance, knockback, and falls retain DOI's behavior. This correction is independent of the 1.2.1 backports.
+
 Rod capacities, in game index order, are 20, 16, 16, 16, 12, and 12 charges, recovered from 1.2.1. Existing rods keep excess charges until spent. Fairy orbs produce one fairy 80% of the time, two 18%, or three 2%. The upstream notes specify mostly single-fairy orbs without giving numbers. The fairy distribution remains a patch choice.
 
 Gem recipes and drop weights use the recovered 1.2.1 values. Topaz uses a new save index so existing gems retain their identities. Pond rewards retain the older engine's fallback rupee formula, with gem ranks adjusted for Topaz.
