@@ -2,7 +2,7 @@
 
 A 4:3 layout patch for the Retroid Nova running ROCKNIX, based on the PortMaster **1.1.6 VM** build.
 
-The title screen fills the display while keeping the logo's proportions. Profile menus use the full screen and keep every control visible. During gameplay, a persistent HUD shows health, magic, the equipped item, rupees, bombs, arrows, and keys. Compact side panels start hidden.
+The title screen fills the display while keeping the logo's proportions. Profile menus use the full screen and keep every control visible. During gameplay, a persistent HUD shows health, magic, the equipped item, rupees, bombs, arrows, and keys. Compact side panels start hidden. Selected fixes from the 1.2.x releases add menu cancellation, title skipping, and enemy status checks.
 
 ## Install on the Nova
 
@@ -30,6 +30,12 @@ The HUD follows the classic Zelda layout. The vertical magic meter sits beside t
 
 Click the **right stick** to show or hide equipment, attack/defence, the minimap, and dungeon progress. These panels sit below the HUD and start hidden for each run. A small **R3 PANELS** hint appears at the bottom right while the panels are hidden. Menus and dialogue hide the HUD, hint, and panels to keep their controls readable. **Select + Start** returns to Ports.
 
+Press the **action button** to back out of a menu, or **Escape** on a keyboard. In name entry, the action button still deletes a letter and Escape cancels the edit. From a pause submenu, cancel returns to the pause menu. From the pause menu itself, cancel resumes play.
+
+Press **Start** or the confirm button to skip the opening title animation. To require the full animation, create `zeldadoi-43/savedata/options.ini` with `[Preferences]` and `CanSkipTitle=0`. Set it to `1` to allow skipping. If you already have that file, add the key to its Preferences section.
+
+Frozen or stoned Medusas and cannons cannot fire. Their attacks resume when the status ends. Pikits cannot steal items while Link falls into a pit or over an edge.
+
 The title screen uses a centered 300×225 view. Profile menus use a taller 400×300 view with a tiled background. Gameplay presents the complete 256×224 playfield at 4:3 with horizontal pixel aspect correction. The side panels use 75% scale and 90% opacity. The CRT option processes the playfield and HUD together.
 
 The renderer draws the control hint at screen resolution so its R3 glyph stays readable, including with CRT enabled.
@@ -46,24 +52,18 @@ The launcher selects Freedreno and SDL's evdev controller backend. Testing cover
 
 ## Rebuild the patch
 
-Install Python 3.9 or newer with virtual environment support and `unzip`. Download [UndertaleModTool CLI 0.9.2.0](https://github.com/UnderminersTeam/UndertaleModTool/releases/tag/0.9.2.0). Create `.build/`, then download the pinned [PortMaster archive](https://github.com/PortsMaster-MV/PortMaster-MV-New/releases/download/2024-12-03_1532/zeldadoi.zip) to `.build/port.zip`.
-
-Run from the repository root:
+On Linux x86-64, use Python 3.11 or newer:
 
 ```sh
-mkdir -p .build dist
-python3 -m venv .build/patchenv
-.build/patchenv/bin/pip install -r requirements-build.txt
-unzip -p .build/port.zip zeldadoi/zeldadoi.port > .build/original.port
-unzip -p .build/original.port assets/game.droid > .build/game.droid
-/path/to/UndertaleModCli load .build/game.droid -s apply.csx -o .build/patched-game.droid -f -v
-.build/patchenv/bin/python package_release.py --original-game .build/game.droid --patched-game .build/patched-game.droid --version 1.2.2 --output dist/Dungeons-of-Infinity-4-3-v1.2.2-Nova-Patch-Installer.zip
-python3 -m unittest test_install.py
+python3 -m unittest discover -v
+python3 build.py --check-release --runtime-tests
 ```
 
-`package_release.py` updates the binary patch and `manifest.json`, verifies the patch against the compiled game, and creates the installer ZIP. Use an unused output filename. Build inputs and full game archives stay outside Git. The installer needs only Python's standard library, which ROCKNIX includes.
+The build downloads the pinned PortMaster package and UndertaleModTool CLI 0.9.2.0, checks both SHA-256 hashes, and compiles the patch. It then verifies the checked-in binary delta against the clean build and tests installation and reinstallation. Build inputs and full game archives stay in `.build/`, outside Git.
 
-The verbose CLI flag permits the original game's audio alignment warning. The patch script adjusts the code and room views. The manifest records the source, patch, and output checksums.
+[TESTING.md](TESTING.md) documents the CI checks, isolated Nova runtime suite, regression baseline, and release procedure. GitHub Actions runs the unit suite and build checks on pushes and pull requests. Runtime assertions run separately on a Nova.
+
+The installer needs only Python's standard library, which ROCKNIX includes. The release builder uses the pinned dependency in `requirements-build.txt`.
 
 ## Credits
 
