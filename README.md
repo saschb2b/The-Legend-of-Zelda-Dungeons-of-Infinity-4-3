@@ -36,7 +36,7 @@ If installation fails, check `zeldadoi-43-installer/install.log`. For another at
 
 ## Controls
 
-These are the default controller bindings. Change them under **Controls**. In the preview, each button hint follows your current mapping, including keyboard bindings.
+These are the default controller bindings. Change them under **Controls**. Each button hint follows your current mapping, including keyboard bindings.
 
 | Button | During play | In the inventory |
 | --- | --- | --- |
@@ -48,14 +48,14 @@ These are the default controller bindings. Change them under **Controls**. In th
 | Start | Open the inventory | Close the inventory |
 | Select | Pause | Close the inventory |
 | Right-stick click | Show or hide Status | |
-| LB / RB | | Previous / next inventory page (preview) |
+| LB / RB | | Previous / next inventory page |
 | Select + Start | Exit to Ports | Exit to Ports |
 
 Press **B** to close the map, menus, item information, or inventory. Closing an action list or item information returns to the inventory. Closing a pause submenu returns to the pause menu. In name entry, B deletes a letter. On a keyboard, Escape closes or cancels the current view.
 
 **Actions** opens an object's choices. **Equip** assigns it to the active item button. **Use** activates or consumes it immediately. Gear in dedicated equipment slots is already active. Its action list provides information and, where allowed, Drop.
 
-The preview uses **LB/RB** to switch inventory pages, or **Page Up/Page Down** on a keyboard. The D-pad stays in the item grid. Health and counters remain visible while browsing or reading item information.
+Use **LB/RB** to switch inventory pages, or **Page Up/Page Down** on a keyboard. The D-pad stays in the item grid. Health and counters remain visible while browsing or reading item information.
 
 The footer keeps Equip on the left, Close in the middle, and the primary action on the right. Available actions appear without moving the other hints. The shoulder hints also stay fixed as page titles change.
 

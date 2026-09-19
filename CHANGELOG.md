@@ -2,7 +2,7 @@
 
 These versions identify the 4:3 patch, independently of the original game's version. Each entry describes changes since the preceding release.
 
-## Unreleased
+## [1.5.2](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.5.2) - 2026-09-19
 
 ### Changed
 
@@ -19,6 +19,10 @@ These versions identify the 4:3 patch, independently of the original game's vers
 - Preserve existing controller and keyboard bindings while adding defaults for the new page controls.
 - Keep all remapping rows inside the Controls window, including keyboard directions and the two bag controls.
 - Split large migrated inventories across additional overflow pages so every retained item remains reachable in the compact layout.
+
+The installer preserves existing saves and migration backups. Follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.5.2/README.md#install-on-the-nova) to update.
+
+[Changes from v1.5.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.5.1...v1.5.2).
 
 ## [1.5.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.5.1) - 2026-09-19
 
