@@ -58,9 +58,11 @@ The renderer draws the control hint at screen resolution so its R3 glyph stays r
 | --- | --- |
 | ![4:3 title screen](screenshots/title.png) | ![4:3 profile menu](screenshots/profile.png) |
 
-| Panels hidden | Panels visible |
+Gameplay screenshots captured on Nova with patch 1.5.1.
+
+| Status hidden | Status visible |
 | --- | --- |
-| ![Fullscreen playfield](screenshots/playfield.png) | ![HUD overlay](screenshots/overlay.png) |
+| ![Fullscreen playfield with the R3 STATUS hint](screenshots/playfield.png) | ![Equipment, map, and dungeon progress over the playfield](screenshots/overlay.png) |
 
 The launcher selects Freedreno and SDL's evdev controller backend. Testing covers the Retroid Nova on ROCKNIX.
 
