@@ -158,7 +158,17 @@ for (var i = 0; i < functions.Count; i++) {
     else inventory += "\n" + body.Replace("function " + name + "(", "global." + name + " = function(").TrimEnd() + ";\n";
 }
 edits[inventoryName] = inventory;
-foreach (var spec in new[] { ("oNovaFoodBag", "sItem_GemBag"), ("oNovaPendantBag", "sItem_BombBag"), ("oNovaCandle", "sHUD_Candle") }) {
+var candleArt = Data.Sprites.ByName("sHUD_Candle");
+var candleSprite = new UndertaleSprite {
+    Name = Data.Strings.MakeString("sNovaCandle"),
+    Width = candleArt.Width, Height = candleArt.Height,
+    OriginX = (int)candleArt.Width / 2, OriginY = (int)candleArt.Height - 1,
+    MarginLeft = candleArt.MarginLeft, MarginRight = candleArt.MarginRight,
+    MarginTop = candleArt.MarginTop, MarginBottom = candleArt.MarginBottom
+};
+foreach (var texture in candleArt.Textures) candleSprite.Textures.Add(new UndertaleSprite.TextureEntry { Texture = texture.Texture });
+Data.Sprites.Add(candleSprite);
+foreach (var spec in new[] { ("oNovaFoodBag", "sItem_GemBag"), ("oNovaPendantBag", "sItem_BombBag"), ("oNovaCandle", "sNovaCandle") }) {
     var bag = new UndertaleGameObject {
         Name = Data.Strings.MakeString(spec.Item1),
         Sprite = Data.Sprites.ByName(spec.Item2),
@@ -166,7 +176,7 @@ foreach (var spec in new[] { ("oNovaFoodBag", "sItem_GemBag"), ("oNovaPendantBag
         Visible = true
     };
     Data.GameObjects.Add(bag);
-    group.QueueReplace("gml_Object_" + spec.Item1 + "_Create_0", "event_inherited(); ShadowOffsetY = -1; if (Class == 51) image_index = 1;");
+    group.QueueReplace("gml_Object_" + spec.Item1 + "_Create_0", "event_inherited(); ShadowOffsetY = -1; if (Class == 51) { image_index = 1; mask_index = sItem_Lamp; }");
 }
 group.QueueAppend("gml_Object_oInventory_Create_0", File.ReadAllText(Path.Combine(patchDir, "inventory_ui.gml")));
 group.QueueReplace("gml_Object_oInventory_Step_0", File.ReadAllText(Path.Combine(patchDir, "inventory_step.gml")));
