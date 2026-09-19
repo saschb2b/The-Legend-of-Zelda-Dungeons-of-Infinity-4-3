@@ -2,7 +2,7 @@
 
 A 4:3 layout patch for the Retroid Nova running ROCKNIX, based on the PortMaster **1.1.6 VM** build.
 
-The title screen fills the display while keeping the logo's proportions. Profile menus use the full screen and keep every control visible. During gameplay, the side panels overlay the playfield and start hidden.
+The title screen fills the display while keeping the logo's proportions. Profile menus use the full screen and keep every control visible. During gameplay, a persistent HUD shows health, magic, the equipped item, rupees, bombs, arrows, and keys. Compact side panels start hidden.
 
 ## Install on the Nova
 
@@ -26,9 +26,11 @@ Saves go in `zeldadoi-43/savedata/`. To update, close the game, replace the inst
 
 ## Controls and layout
 
-Click the **right stick** to show or hide the panels over the playfield. Panels start hidden for each run. Menus and dialogue temporarily hide the panels to keep their controls readable. **Select + Start** returns to Ports.
+The HUD follows the classic Zelda layout. Magic and the equipped item sit on the left, counters across the top, and hearts on the right. It uses the game's sprites, live values, item quantities, and low-health pulse.
 
-The title screen uses a centered 300×225 view. Profile menus use a taller 400×300 view with a tiled background. Gameplay presents the complete 256×224 playfield at 4:3 with horizontal pixel aspect correction. Each HUD panel overlays its screen edge at 90% opacity. The CRT option processes the composed gameplay image.
+Click the **right stick** to show or hide equipment, attack/defence, the minimap, and dungeon progress. These panels sit below the HUD and start hidden for each run. Menus and dialogue hide the HUD and panels to keep their controls readable. **Select + Start** returns to Ports.
+
+The title screen uses a centered 300×225 view. Profile menus use a taller 400×300 view with a tiled background. Gameplay presents the complete 256×224 playfield at 4:3 with horizontal pixel aspect correction. The side panels use 75% scale and 90% opacity. The CRT option processes the playfield and HUD together.
 
 | Title screen | Profile menu |
 | --- | --- |
@@ -53,7 +55,7 @@ python3 -m venv .build/patchenv
 unzip -p .build/port.zip zeldadoi/zeldadoi.port > .build/original.port
 unzip -p .build/original.port assets/game.droid > .build/game.droid
 /path/to/UndertaleModCli load .build/game.droid -s apply.csx -o .build/patched-game.droid -f -v
-.build/patchenv/bin/python package_release.py --original-game .build/game.droid --patched-game .build/patched-game.droid --version 1.1.0 --output dist/Dungeons-of-Infinity-4-3-v1.1.0-Nova-Patch-Installer.zip
+.build/patchenv/bin/python package_release.py --original-game .build/game.droid --patched-game .build/patched-game.droid --version 1.2.0 --output dist/Dungeons-of-Infinity-4-3-v1.2.0-Nova-Patch-Installer.zip
 python3 -m unittest test_install.py
 ```
 

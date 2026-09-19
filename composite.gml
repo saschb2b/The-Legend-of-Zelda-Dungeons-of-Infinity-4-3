@@ -11,8 +11,17 @@ draw_surface_part(application_surface, 288, 0, 1024, 896, 0, 0);
 // Modal screens need the full playfield width for their text and controls.
 if (global.Users[global.UserIndex].Prefs[2] && !global.Paused)
 {
-    draw_surface_part_ext(application_surface, 0, 0, 288, 896, 0, 0, 1, 1, c_white, 0.9);
-    draw_surface_part_ext(application_surface, 1312, 0, 288, 896, 736, 0, 1, 1, c_white, 0.9);
+    draw_surface_part_ext(application_surface, 0, 304, 288, 592, 16, 436, 0.75, 0.75, c_white, 0.9);
+    draw_surface_part_ext(application_surface, 1312, 0, 288, 896, 792, 208, 0.75, 0.75, c_white, 0.9);
+}
+if (instance_exists(oHUD) && !global.Paused && !global.ArcadeVP_Show)
+{
+    if (!surface_exists(NovaHUD)) NovaHUD = surface_create(256, 224);
+    surface_set_target(NovaHUD);
+    draw_clear_alpha(c_black, 0);
+    NovaHUD_Draw();
+    surface_reset_target();
+    draw_surface_ext(NovaHUD, 0, 0, 4, 4, 0, c_white, 1);
 }
 if (global.ArcadeVP_Show)
 {
