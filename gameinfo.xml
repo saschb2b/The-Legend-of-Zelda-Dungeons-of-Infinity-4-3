@@ -3,7 +3,7 @@
   <game>
     <path>./Zelda Dungeons of Infinity 4-3.sh</path>
     <name>The Legend of Zelda: Dungeons of Infinity (4:3 Edition)</name>
-    <desc>Separate 4:3 edition based on the PortMaster 1.1.6 VM build. The playfield fills the Nova display. HUD panels start hidden; click the right stick to toggle them over the playfield. Select + Start exits. This edition uses its own save folder.</desc>
+    <desc>4:3 layout patch for the PortMaster 1.1.6 VM build. The title, profile menus, and playfield fill the Nova display. HUD panels start hidden; click the right stick to toggle them over the playfield. Select + Start exits. This edition uses its own save folder.</desc>
     <developer>Justin Bohemier</developer>
     <publisher>Justin Bohemier</publisher>
     <genre>Action-Adventure</genre>
