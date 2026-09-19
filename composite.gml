@@ -55,11 +55,11 @@ if (instance_exists(oHUD) && !_nova_modal && !global.ArcadeVP_Show && !global.Us
     draw_set_halign(fa_right);
     draw_set_valign(fa_middle);
     draw_set_alpha(oHUD.MainAlpha);
-    var _nova_label_width = string_width("PANELS") * _nova_w / 256;
+    var _nova_label_width = string_width("STATUS") * _nova_w / 256;
     draw_set_color(c_black);
-    draw_text_transformed(_nova_hint_right + 2 * _nova_hint_scale, _nova_hint_y + 2 * _nova_hint_scale, "PANELS", _nova_w / 256, _nova_h / 224, 0);
+    draw_text_transformed(_nova_hint_right + 2 * _nova_hint_scale, _nova_hint_y + 2 * _nova_hint_scale, "STATUS", _nova_w / 256, _nova_h / 224, 0);
     draw_set_color(c_white);
-    draw_text_transformed(_nova_hint_right, _nova_hint_y, "PANELS", _nova_w / 256, _nova_h / 224, 0);
+    draw_text_transformed(_nova_hint_right, _nova_hint_y, "STATUS", _nova_w / 256, _nova_h / 224, 0);
     draw_sprite_stretched(sNovaPanelHint, 0, _nova_hint_right - _nova_label_width - _nova_hint_size - 8 * _nova_hint_scale, _nova_hint_y - _nova_hint_size / 2, _nova_hint_size, _nova_hint_size);
     draw_set_halign(fa_left);
     draw_set_valign(fa_top);

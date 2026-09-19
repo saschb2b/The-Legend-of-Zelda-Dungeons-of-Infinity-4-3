@@ -6,6 +6,14 @@ These versions identify the 4:3 patch, independently of the original game's vers
 
 No unreleased game or installer changes.
 
+## [1.5.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.5.1) - 2026-09-19
+
+### Changed
+
+- Rename the right-stick hint from PANELS to STATUS to describe the equipment, stats, map, and dungeon progress it reveals.
+
+[Changes from v1.5.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.5.0...v1.5.1).
+
 ## [1.5.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.5.0) - 2026-09-19
 
 ### Added

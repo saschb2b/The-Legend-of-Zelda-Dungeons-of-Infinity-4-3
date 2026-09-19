@@ -34,7 +34,7 @@ The installer keeps backups in `zeldadoi-43/save-backups/`. The first inventory 
 
 The HUD follows the classic Zelda layout. The vertical magic meter sits beside the equipped item, counters align beneath their icons, and hearts sit beneath LIFE. It uses the game's icons, live values, item quantities, and low-health pulse. The layout keeps Dungeons of Infinity's four-digit rupee counter and its separate key counter.
 
-Click the **right stick** to show or hide equipment, attack/defence, the minimap, and dungeon progress. These panels sit below the HUD and start hidden for each run. A small **R3 PANELS** hint appears at the bottom right while the panels are hidden. Menus and dialogue hide the HUD, hint, and panels to keep their controls readable. **Select + Start** returns to Ports.
+Click the **right stick** to show or hide equipment, attack/defence, the minimap, and dungeon progress. These panels sit below the HUD and start hidden for each run. A small **R3 STATUS** hint appears at the bottom right while the panels are hidden. Menus and dialogue hide the HUD, hint, and panels to keep their controls readable. **Select + Start** returns to Ports.
 
 Press the **action button** to back out of a menu, or **Escape** on a keyboard. In name entry, the action button still deletes a letter and Escape cancels the edit. From a pause submenu, cancel returns to the pause menu. From the pause menu itself, cancel resumes play.
 
