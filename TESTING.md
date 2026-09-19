@@ -45,6 +45,8 @@ Movement tests measure displacement through Link's compiled Step event over eigh
 
 Sword tests check release and charge-indicator readiness at 0, 1, 44, 45, 47, 48, and 49 held updates. They check pause and resume at the threshold, sword-level restrictions, and indicator dismissal after release. The build verifier requires the indicator to call the same readiness function as the attack.
 
+Facing tests cover every starting direction against eight movement directions and idle input through Link's compiled Step event. Each case runs with eight random seeds and checks the first three updates while walking, running, carrying, strafing, or holding the sword ready. They also check corner-assist and knockback locks, releasing either diagonal input, and stopping. Expected ordinary turns follow the reconstructed SNES [facing routine](https://github.com/snesrev/zelda3/blob/fbbb3f967a51fafe642e6140d0753979e73b4090/src/player.c#L5932-L5967): keep a facing included in the diagonal, otherwise prefer its vertical direction. DOI's facing locks remain in effect.
+
 To show that the assertions catch the original regressions:
 
 ```sh

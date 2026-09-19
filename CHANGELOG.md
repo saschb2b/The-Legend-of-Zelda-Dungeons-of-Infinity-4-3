@@ -9,6 +9,7 @@ These versions identify the 4:3 patch, independently of the original game's vers
 - Match ALttP's SNES walking ratio: diagonal movement uses two-thirds speed on each axis, removing DOI's diagonal speed boost. Running uses the same ratio while preserving its straight-line speed.
 - Match SNES sword-ready and carrying speeds on normal ground: 1.25 pixels straight and 0.8125 per diagonal axis.
 - Match the SNES 48-update sword-charge threshold and keep the charge indicator synchronized with spin readiness.
+- Make diagonal turning predictable: retain Link's facing when it matches a held direction, otherwise face vertically. Fix turns that could randomly face away from both held directions.
 
 ## [1.5.2](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.5.2) - 2026-09-19
 

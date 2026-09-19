@@ -141,6 +141,24 @@ Edit("gml_Object_oLink_Step_0",
     @"S = (ItemHolding == -4) ? ((Action[6] && !InDoorPassage) ? RunSpeed : WalkSpeed) : CarryingSpeed;
         // ALttP NTSC uses 16/24 for walking and 13/20 for carrying before collision resolution.
         if ((Action[0] || Action[1]) && (Action[2] || Action[3])) S = ItemHolding == -4 ? S * 2 / 3 : S * 13 / 20;");
+var linkCode = FlattenEnums(Read("gml_GlobalScript___Link"));
+var facingStart = linkCode.IndexOf("function Facing_Check()\n{");
+if (facingStart < 0) throw new Exception("Link facing function missing");
+var facingEnd = linkCode.IndexOf("\nfunction CheckMoveAssist()", facingStart);
+if (facingEnd < 0) throw new Exception("Link facing function boundary missing");
+Edit("gml_GlobalScript___Link", linkCode.Substring(facingStart, facingEnd - facingStart), @"
+function Facing_Check()
+{
+    if (MoveAssistDir != 0 || BounceBack || Action[9]) exit;
+    // SNES keeps a facing included in the diagonal; otherwise the vertical direction wins.
+    if ((Facing == 1 && vy < 0) || (Facing == 2 && vy > 0)
+        || (Facing == 3 && vx < 0) || (Facing == 4 && vx > 0)) exit;
+    if (vy < 0) Facing = 1;
+    else if (vy > 0) Facing = 2;
+    else if (vx < 0) Facing = 3;
+    else if (vx > 0) Facing = 4;
+}
+");
 using (var backports = JsonDocument.Parse(File.ReadAllText(Path.Combine(patchDir, "backports.json")))) {
     foreach (var fix in backports.RootElement.EnumerateArray()) {
         Edit(fix.GetProperty("code").GetString(), fix.GetProperty("anchor").GetString(), fix.GetProperty("replacement").GetString());

@@ -23,6 +23,80 @@ function MovementAt(px, py) {
         + "; actual " + string_format(oLink.x, 0, 6) + "," + string_format(oLink.y, 0, 6));
     return matched;
 }
+function FacingTests(px, py, carried) {
+    var seed = random_get_seed();
+    var sword_sound = asset_get_index("Sound_Sword" + string(global.Inventory_ItemData[44].Index + 1));
+    var directions = [["right"], ["left"], ["down"], ["up"], ["right", "down"], ["left", "down"], ["right", "up"], ["left", "up"], []];
+    // Rows start facing up, down, left, right. Columns follow the input cases above.
+    var expected = [
+        [4, 3, 2, 1, 2, 2, 1, 1, 1],
+        [4, 3, 2, 1, 2, 2, 1, 1, 2],
+        [4, 3, 2, 1, 2, 3, 1, 3, 3],
+        [4, 3, 2, 1, 4, 2, 4, 1, 4]
+    ];
+    var modes = ["walking", "running", "carrying", "strafe", "sword ready"];
+    for (var mode = 0; mode < array_length(modes); mode++) {
+        for (var start = 1; start <= 4; start++) {
+            for (var dir = 0; dir < array_length(directions); dir++) {
+                var matched = true;
+                // Multiple seeds expose random turns without depending on the current dungeon RNG.
+                for (var trial = 0; trial < 8; trial++) {
+                    MovementReset(px, py);
+                    random_set_seed(100 + trial);
+                    oLink.Facing = start;
+                    for (var button = 0; button < array_length(directions[dir]); button++) array_push(global.NovaTestHeld, directions[dir][button]);
+                    if (mode == 1) array_push(global.NovaTestHeld, "action");
+                    if (mode == 2) oLink.ItemHolding = carried;
+                    if (mode == 3) array_push(global.NovaTestHeld, "strafe");
+                    if (mode == 4) {
+                        array_push(global.NovaTestHeld, "sword");
+                        with (oLink) { UpdateState(12); NovaSwordFinishSwing(); }
+                        // Repeated sword setup shares one frame and can exhaust audio channels.
+                        audio_stop_sound(sword_sound);
+                    }
+                    var wanted = mode >= 3 ? start : expected[start - 1][dir];
+                    repeat (3) {
+                        MovementTick();
+                        if (oLink.Facing != wanted) matched = false;
+                    }
+                }
+                Record(modes[mode] + " facing from " + string(start) + " with input " + string(dir), matched);
+            }
+        }
+    }
+    for (var start = 1; start <= 4; start++) {
+        MovementReset(round(px / 2) * 2, round(py / 2) * 2);
+        oLink.Facing = start;
+        oLink.MoveAssistDir = 4;
+        global.NovaTestHeld = ["up"];
+        MovementTick();
+        Record("corner assistance preserves facing " + string(start), oLink.Facing == start);
+        MovementReset(px, py);
+        oLink.Facing = start;
+        oLink.BounceBack = true;
+        oLink.vx = 1;
+        oLink.vy = -1;
+        global.NovaTestHeld = ["down", "left"];
+        MovementTick();
+        Record("knockback preserves facing " + string(start), oLink.Facing == start);
+    }
+    for (var dir = 4; dir < 8; dir++) {
+        for (var retained = 0; retained < 2; retained++) {
+            MovementReset(px, py);
+            global.NovaTestHeld = directions[dir];
+            MovementTick();
+            var key = directions[dir][retained];
+            global.NovaTestHeld = [key];
+            MovementTick();
+            var wanted = key == "right" ? 4 : (key == "left" ? 3 : (key == "down" ? 2 : 1));
+            Record("diagonal release faces remaining direction " + string(dir) + "/" + string(retained), oLink.Facing == wanted);
+            global.NovaTestHeld = [];
+            MovementTick();
+            Record("stopping retains facing " + string(dir) + "/" + string(retained), oLink.Facing == wanted);
+        }
+    }
+    random_set_seed(seed);
+}
 function MovementTests() {
     var start_x = oLink.x;
     var start_y = oLink.y;
@@ -71,6 +145,7 @@ function MovementTests() {
             if (mode == 3) Record("sword facing stays locked direction " + string(dir), oLink.Facing == 4);
         }
     }
+    FacingTests(px, py, carried);
     var cancellation = [[[], 0, 0], [["up", "down"], 0, 0], [["left", "right"], 0, 0], [["up", "down", "right"], 1.5, 0], [["left", "right", "up"], 0, -1.5], [["up", "down", "left", "right"], 0, 0]];
     for (var i = 0; i < array_length(cancellation); i++) {
         MovementReset(px, py);
