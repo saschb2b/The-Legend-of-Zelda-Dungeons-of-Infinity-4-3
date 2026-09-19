@@ -88,7 +88,9 @@ draw_set_color(DefenseColor);
 draw_text(MainSide + 51, 82, string(oLink.DefensePoints));
 draw_set_color(c_white);
 ";
-group.QueueReplace(hudName, hud.Substring(0, metricsStart) + equipmentStats + hud.Substring(metricsEnd));
+var panelHUD = hud.Substring(0, metricsStart) + equipmentStats + hud.Substring(metricsEnd);
+panelHUD = ReplaceOnce(panelHUD, "if (ShowLamp)", "if (ShowLamp && (global.Inventory_ItemData[24].Owns[0] || global.Inventory_ItemData[51].Owns[0]))");
+group.QueueReplace(hudName, panelHUD);
 group.QueueAppend("gml_Object_oGame_Create_0", "global.Users[global.UserIndex].Prefs[2] = false;");
 Edit("gml_GlobalScript___Users", "return [true, true, true, false, true, false, false, false];", "return [true, true, false, false, true, false, false, false];");
 var title = Data.Rooms.ByName("Room_Title");
@@ -156,7 +158,7 @@ for (var i = 0; i < functions.Count; i++) {
     else inventory += "\n" + body.Replace("function " + name + "(", "global." + name + " = function(").TrimEnd() + ";\n";
 }
 edits[inventoryName] = inventory;
-foreach (var spec in new[] { ("oNovaFoodBag", "sItem_GemBag"), ("oNovaPendantBag", "sItem_BombBag") }) {
+foreach (var spec in new[] { ("oNovaFoodBag", "sItem_GemBag"), ("oNovaPendantBag", "sItem_BombBag"), ("oNovaCandle", "sHUD_Candle") }) {
     var bag = new UndertaleGameObject {
         Name = Data.Strings.MakeString(spec.Item1),
         Sprite = Data.Sprites.ByName(spec.Item2),
@@ -164,13 +166,13 @@ foreach (var spec in new[] { ("oNovaFoodBag", "sItem_GemBag"), ("oNovaPendantBag
         Visible = true
     };
     Data.GameObjects.Add(bag);
-    group.QueueReplace("gml_Object_" + spec.Item1 + "_Create_0", "event_inherited(); ShadowOffsetY = -1;");
+    group.QueueReplace("gml_Object_" + spec.Item1 + "_Create_0", "event_inherited(); ShadowOffsetY = -1; if (Class == 51) image_index = 1;");
 }
 group.QueueAppend("gml_Object_oInventory_Create_0", File.ReadAllText(Path.Combine(patchDir, "inventory_ui.gml")));
 group.QueueReplace("gml_Object_oInventory_Step_0", File.ReadAllText(Path.Combine(patchDir, "inventory_step.gml")));
 group.QueueReplace("gml_Object_oInventory_Draw_0", File.ReadAllText(Path.Combine(patchDir, "inventory_draw.gml")));
 group.QueueReplace("gml_Object_oInventory_Step_2", "if (Close) { Alpha -= AlphaSpeed; if (Alpha <= 0) instance_destroy(); }");
-string GlobalInventoryCalls(string source) => Regex.Replace(source, @"(?<![.\w])Nova(GearSlot|BagRange|EmptyRange|EmptySlot|InventoryInit|InventoryMigrate)\(", "global.Nova$1(");
+string GlobalInventoryCalls(string source) => Regex.Replace(source, @"(?<![.\w])Nova(GearSlot|BagRange|EmptyRange|EmptySlot|InventoryInit|InventoryMigrate|CandleInit)\(", "global.Nova$1(");
 foreach (var edit in edits) group.QueueReplace(edit.Key, GlobalInventoryCalls(edit.Value));
 group.Import();
 Console.WriteLine("4:3 overlay patch compiled.");

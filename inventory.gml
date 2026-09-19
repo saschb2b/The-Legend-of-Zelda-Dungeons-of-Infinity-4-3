@@ -5,6 +5,7 @@ function NovaGearSlot(item_class) {
         case 46: return 2;
         case 16: return 3;
         case 24: return 4;
+        case 51: return 4;
         case 0: return 5;
         case 4: return 6;
         case 15: return 7;
@@ -94,9 +95,12 @@ function NovaInventoryInit() {
     for (var slot = 38; slot <= 43; slot++) global.Inventory[slot] = {ItemClass: -1, ItemIndex: -1, Amount: 0, Enabled: true};
     global.Inventory[2].ItemClass = 46;
     global.Inventory[2].ItemIndex = 0;
+    global.NovaCandleInit();
 }
 function NovaInventoryMigrate(save) {
-    if (variable_struct_exists(save, "NovaInventoryVersion") && save.NovaInventoryVersion == 1) return;
+    var version = variable_struct_exists(save, "NovaInventoryVersion") ? save.NovaInventoryVersion : 0;
+    if (version >= 2) return;
+    if (version == 1) { global.NovaCandleInit(); return; }
     var old_slots = StructCopy(global.Inventory);
     var old_equipped = global.Inventory_SlotIndex_Equiped;
     ItemDataInit(2, 2, 0, 0, 6, 3);
@@ -124,5 +128,13 @@ function NovaInventoryMigrate(save) {
         global.Inventory[2].ItemClass = 46;
         global.Inventory[2].ItemIndex = global.Inventory_ItemData[46].Index;
     }
+    global.NovaCandleInit();
     Inventory_Defrag();
+}
+
+function NovaCandleInit() {
+    ItemDataInit(51, 1, 0, 0, 0, 0);
+    var owns = !global.Inventory_ItemData[24].Owns[0];
+    global.Inventory_ItemData[51] = {Owns: [owns, false]};
+    if (owns) global.Inventory[4] = {ItemClass: 51, ItemIndex: 0, Amount: 1, Enabled: true};
 }

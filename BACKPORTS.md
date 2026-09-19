@@ -1,6 +1,6 @@
 # 1.2.x backport audit
 
-The base remains the PortMaster 1.1.6 VM build. Patch release numbers are independent of the original game's versions. Version 1.4.0 backports the documented fixes and core inventory/combat changes below. It does not provide full 1.2.1 parity.
+The base remains the PortMaster 1.1.6 VM build. Patch release numbers are independent of the original game's versions. Version 1.4.1 includes the candle correction and the 1.4.0 backports of the documented fixes and core inventory/combat changes below. It does not provide full 1.2.1 parity.
 
 The references are the developer's bundled 1.2.0/1.2.1 change log, 1.2.1 game manual, and dungeon template data. The newer Windows game uses native compiled code. Except for the dungeon corrections, these are implementations of documented behavior in the older VM game.
 
@@ -18,7 +18,7 @@ The references are the developer's bundled 1.2.0/1.2.1 change log, 1.2.1 game ma
 | Wall-lamp floor layers | All four placement orientations patched; compiled and reviewed |
 | Dungeon locks and doors leading nowhere | Twelve data corrections; transformed lock, position and destination checks on device |
 | Dedicated equipment; five-to-ten main slots; food/pendant bags | Device tests cover capacity, routing, equipped-item compaction, migration, save/load and overflow; all seven inventory pages captured on Nova |
-| Wishstones in the treasure bag; dropping the candle | Device inventory tests |
+| Wishstones in the treasure bag; dropping the candle | Device tests drop and recover the starting candle, check its light, retain its absence through save/load, and check lamp upgrades |
 | Sword poke, level-three spin, level-two pot breaking | Device tests cover charging, pause, release, movement, interruption, pot breaking and damage across floor boundaries |
 | Hookshot/boomerang in large chests and wishing ponds | Device loot-pool checks |
 | Rod damage and charge limits | Device checks cover boss damage/immunities, per-rod caps and preservation of legacy charges |
@@ -28,6 +28,8 @@ The references are the developer's bundled 1.2.0/1.2.1 change log, 1.2.1 game ma
 ## Adaptations for this patch
 
 Inventory uses pages sized for the 4:3 playfield. Strafe advances a page. Moving up from the first item row focuses the heading, where left/right changes pages. The food and pendant bags reuse existing bag sprites. Slot upgrades use the heart-container price and treasure limiter. Their loot pools support incremental upgrades. This does not reproduce an undisclosed upstream probability table.
+
+The candle occupies the light slot and the oil lamp replaces it when acquired. Dropping either removes its light and prevents torch ignition until you recover a light source.
 
 Old saves migrate on load. Dedicated gear moves out of the main bag. Items that do not fit remain accessible on an overflow page and move back when space opens. Migration retains the equipped item and quantities. The installer creates a one-time backup before the first inventory-schema update. This patch writes saves with the new inventory schema.
 

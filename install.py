@@ -117,7 +117,7 @@ def backup_legacy_saves(destination, work):
     saves = destination / 'savedata'
     schema = destination / 'save-schema.txt'
     backup = destination / 'save-backups/before-inventory-v1.zip'
-    if not (saves / 'Users').is_file() or backup.exists() or (schema.exists() and schema.read_text().strip() == '1'):
+    if not (saves / 'Users').is_file() or backup.exists() or (schema.exists() and int(schema.read_text()) >= 1):
         return
     temporary = work / 'legacy-saves.zip'
     with ZipFile(temporary, 'w') as archive:
@@ -176,9 +176,9 @@ def install(ports, upstream_path=None, refresh=True):
         shutil.copyfile(ROOT / 'gameinfo.xml', stage / 'gameinfo.xml')
         shutil.copyfile(ROOT / 'README.md', stage / 'README.md')
         (stage / 'patch-version.txt').write_text(manifest['version'] + '\n')
-        if manifest.get('save_schema') == 1:
+        if manifest.get('save_schema', 0) >= 1:
             backup_legacy_saves(destination, work)
-            (stage / 'save-schema.txt').write_text('1\n')
+            (stage / 'save-schema.txt').write_text(str(manifest['save_schema']) + '\n')
         staged_launcher = work / LAUNCHER
         shutil.copyfile(ROOT / LAUNCHER, staged_launcher)
         staged_launcher.chmod(0o755)

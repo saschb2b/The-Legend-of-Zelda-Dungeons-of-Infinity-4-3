@@ -65,8 +65,8 @@ GitHub-hosted CI compiles the runtime suite but cannot execute the Nova's ARM/GP
    .build/patchenv/bin/python package_release.py \
      --original-game .build/game.droid \
      --patched-game .build/patched.droid \
-     --version 1.4.0 \
-     --output dist/Dungeons-of-Infinity-4-3-v1.4.0-Nova-Patch-Installer.zip
+     --version 1.4.1 \
+     --output dist/Dungeons-of-Infinity-4-3-v1.4.1-Nova-Patch-Installer.zip
    python3 build.py --check-release --runtime-tests
    ```
 

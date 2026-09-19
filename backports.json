@@ -165,13 +165,13 @@
     "id": "inventory-class-count-0",
     "code": "gml_GlobalScript___Inventory",
     "anchor": "function Inventory_InitData()\n{\n    global.InventoryInst = -4;\n    global.Inventory_SlotIndex_RowStart[4] = 32;\n    global.Inventory_SlotIndex_RowEnd[4] = (global.Inventory_SlotIndex_RowStart[4] + 2) - 1;\n    global.Inventory_SlotIndex_RowStart[5] = global.Inventory_SlotIndex_RowEnd[4] + 1;\n    global.Inventory_SlotIndex_RowEnd[5] = (global.Inventory_SlotIndex_RowStart[5] + 2) - 1;\n    global.Inventory_SlotIndex_RowStart[6] = global.Inventory_SlotIndex_RowEnd[5] + 1;\n    global.Inventory_SlotIndex_RowEnd[6] = (global.Inventory_SlotIndex_RowStart[6] + 2) - 1;\n    global.Inventory_SlotIndex_Gems = global.Inventory_SlotIndex_RowStart[4];\n    global.Inventory_SlotIndex_Last = global.Inventory_SlotIndex_RowEnd[6];\n    for (var i = 0; i <= global.Inventory_SlotIndex_Last; i++)\n    {\n        global.Inventory[i] = \n        {\n            ItemClass: -1,\n            ItemIndex: -1,\n            Amount: 0,\n            Enabled: true\n        };\n    }\n    for (var _ItemClass = 0; _ItemClass < 49; _ItemClass++)",
-    "replacement": "function Inventory_InitData()\n{\n    global.InventoryInst = -4;\n    global.Inventory_SlotIndex_RowStart[4] = 32;\n    global.Inventory_SlotIndex_RowEnd[4] = (global.Inventory_SlotIndex_RowStart[4] + 2) - 1;\n    global.Inventory_SlotIndex_RowStart[5] = global.Inventory_SlotIndex_RowEnd[4] + 1;\n    global.Inventory_SlotIndex_RowEnd[5] = (global.Inventory_SlotIndex_RowStart[5] + 2) - 1;\n    global.Inventory_SlotIndex_RowStart[6] = global.Inventory_SlotIndex_RowEnd[5] + 1;\n    global.Inventory_SlotIndex_RowEnd[6] = (global.Inventory_SlotIndex_RowStart[6] + 2) - 1;\n    global.Inventory_SlotIndex_Gems = global.Inventory_SlotIndex_RowStart[4];\n    global.Inventory_SlotIndex_Last = global.Inventory_SlotIndex_RowEnd[6];\n    for (var i = 0; i <= global.Inventory_SlotIndex_Last; i++)\n    {\n        global.Inventory[i] = \n        {\n            ItemClass: -1,\n            ItemIndex: -1,\n            Amount: 0,\n            Enabled: true\n        };\n    }\n    for (var _ItemClass = 0; _ItemClass < 51; _ItemClass++)"
+    "replacement": "function Inventory_InitData()\n{\n    global.InventoryInst = -4;\n    global.Inventory_SlotIndex_RowStart[4] = 32;\n    global.Inventory_SlotIndex_RowEnd[4] = (global.Inventory_SlotIndex_RowStart[4] + 2) - 1;\n    global.Inventory_SlotIndex_RowStart[5] = global.Inventory_SlotIndex_RowEnd[4] + 1;\n    global.Inventory_SlotIndex_RowEnd[5] = (global.Inventory_SlotIndex_RowStart[5] + 2) - 1;\n    global.Inventory_SlotIndex_RowStart[6] = global.Inventory_SlotIndex_RowEnd[5] + 1;\n    global.Inventory_SlotIndex_RowEnd[6] = (global.Inventory_SlotIndex_RowStart[6] + 2) - 1;\n    global.Inventory_SlotIndex_Gems = global.Inventory_SlotIndex_RowStart[4];\n    global.Inventory_SlotIndex_Last = global.Inventory_SlotIndex_RowEnd[6];\n    for (var i = 0; i <= global.Inventory_SlotIndex_Last; i++)\n    {\n        global.Inventory[i] = \n        {\n            ItemClass: -1,\n            ItemIndex: -1,\n            Amount: 0,\n            Enabled: true\n        };\n    }\n    for (var _ItemClass = 0; _ItemClass < 52; _ItemClass++)"
   },
   {
     "id": "inventory-class-count-1",
     "code": "gml_GlobalScript___Inventory",
     "anchor": "function Inventory_CountStackItems()\n{\n    for (var _ItemClass = 0; _ItemClass < 49; _ItemClass++)",
-    "replacement": "function Inventory_CountStackItems()\n{\n    for (var _ItemClass = 0; _ItemClass < 51; _ItemClass++)"
+    "replacement": "function Inventory_CountStackItems()\n{\n    for (var _ItemClass = 0; _ItemClass < 52; _ItemClass++)"
   },
   {
     "id": "treasure-wishstone-count",
@@ -183,19 +183,19 @@
     "id": "new-bag-metadata",
     "code": "gml_GlobalScript___Items",
     "anchor": "    ItemDataInit(2, 2, 0, 0, 10, 7);",
-    "replacement": "    ItemDataInit(2, 2, 0, 0, 6, 3);\n    ItemDataInit(49, 1, 0, 0, 0, 7);\n    ItemDataInit(50, 1, 0, 0, 0, 7);"
+    "replacement": "    ItemDataInit(2, 2, 0, 0, 6, 3);\n    ItemDataInit(49, 1, 0, 0, 0, 7);\n    ItemDataInit(50, 1, 0, 0, 0, 7);\n    ItemDataInit(51, 1, 0, 0, 0, 0);"
   },
   {
     "id": "new-bag-names",
     "code": "gml_GlobalScript___Items",
     "anchor": "function Item_Name(arg0, arg1, arg2 = 1)\n{",
-    "replacement": "function Item_Name(arg0, arg1, arg2 = 1)\n{\n    if (arg0 == 49) return \"Food Bag\";\n    if (arg0 == 50) return \"Pendant Bag\";\n    if (arg0 == 2) return \"Inventory Slot\";"
+    "replacement": "function Item_Name(arg0, arg1, arg2 = 1)\n{\n    if (arg0 == 49) return \"Food Bag\";\n    if (arg0 == 50) return \"Pendant Bag\";\n    if (arg0 == 2) return \"Inventory Slot\";\n    if (arg0 == 51) return \"Candle\";"
   },
   {
     "id": "new-bag-description",
     "code": "gml_GlobalScript___Items",
     "anchor": "function Item_Info(arg0, arg1)\n{",
-    "replacement": "function Item_Info(arg0, arg1)\n{\n    if (arg0 == 49) return \"Holds three food items in a separate bag.\";\n    if (arg0 == 50) return \"Holds three pendants in a separate bag.\";\n    if (arg0 == 2) return \"Unlocks one extra main inventory slot, up to ten.\";"
+    "replacement": "function Item_Info(arg0, arg1)\n{\n    if (arg0 == 49) return \"Holds three food items in a separate bag.\";\n    if (arg0 == 50) return \"Holds three pendants in a separate bag.\";\n    if (arg0 == 2) return \"Unlocks one extra main inventory slot, up to ten.\";\n    if (arg0 == 51) return \"Lights your way and ignites torches. Dropping it removes your light.\";"
   },
   {
     "id": "wishstone-description",
@@ -213,13 +213,13 @@
     "id": "bag-class-mapping",
     "code": "gml_GlobalScript___Items",
     "anchor": "function ItemClassFromObjIndex(arg0)\n{",
-    "replacement": "function ItemClassFromObjIndex(arg0)\n{\n    if (arg0 == oNovaFoodBag) return 49;\n    if (arg0 == oNovaPendantBag) return 50;"
+    "replacement": "function ItemClassFromObjIndex(arg0)\n{\n    if (arg0 == oNovaFoodBag) return 49;\n    if (arg0 == oNovaPendantBag) return 50;\n    if (arg0 == oNovaCandle) return 51;"
   },
   {
     "id": "bag-object-mapping",
     "code": "gml_GlobalScript___Items",
     "anchor": "function ObjIndexFromItemClass(arg0)\n{",
-    "replacement": "function ObjIndexFromItemClass(arg0)\n{\n    if (arg0 == 49) return oNovaFoodBag;\n    if (arg0 == 50) return oNovaPendantBag;"
+    "replacement": "function ObjIndexFromItemClass(arg0)\n{\n    if (arg0 == 49) return oNovaFoodBag;\n    if (arg0 == 50) return oNovaPendantBag;\n    if (arg0 == 51) return oNovaCandle;"
   },
   {
     "id": "new-loot-pools",
@@ -237,13 +237,13 @@
     "id": "item-class-count-0",
     "code": "gml_GlobalScript___Items",
     "anchor": "_ItemClass < 49",
-    "replacement": "_ItemClass < 51"
+    "replacement": "_ItemClass < 52"
   },
   {
     "id": "item-class-count-1",
     "code": "gml_GlobalScript___Items",
     "anchor": "i < 49",
-    "replacement": "i < 51"
+    "replacement": "i < 52"
   },
   {
     "id": "bag-upgrade-index",
@@ -255,7 +255,7 @@
     "id": "inventory-save-schema",
     "code": "gml_GlobalScript___Users",
     "anchor": "    global.Users[global.UserIndex].SaveData.Inventory = StructCopy(global.Inventory);",
-    "replacement": "    global.Users[global.UserIndex].SaveData.NovaInventoryVersion = 1;\n    global.Users[global.UserIndex].SaveData.Inventory = StructCopy(global.Inventory);"
+    "replacement": "    global.Users[global.UserIndex].SaveData.NovaInventoryVersion = 2;\n    global.Users[global.UserIndex].SaveData.Inventory = StructCopy(global.Inventory);"
   },
   {
     "id": "inventory-save-migration",
@@ -460,5 +460,35 @@
     "code": "gml_Object_oInventory_Destroy_0",
     "anchor": "ds_grid_destroy(DBScript_Info);",
     "replacement": "ds_grid_destroy(DBScript_Info);\nds_grid_destroy(MenuItemGrid);"
+  },
+  {
+    "id": "candle-frame",
+    "code": "gml_GlobalScript___Items",
+    "anchor": "    image_index = Index;",
+    "replacement": "    image_index = Class == 51 ? 1 : Index;"
+  },
+  {
+    "id": "candle-lamp-upgrade",
+    "code": "gml_GlobalScript___Inventory",
+    "anchor": "    Item_NonDuplicatableList_Remove(arg0, arg1);\n    Inventory_CountStackItems();",
+    "replacement": "    if (arg0 == 24) global.Inventory_ItemData[51].Owns[0] = false;\n    Item_NonDuplicatableList_Remove(arg0, arg1);\n    Inventory_CountStackItems();"
+  },
+  {
+    "id": "candle-cannot-replace-lamp",
+    "code": "gml_GlobalScript___Inventory",
+    "anchor": "    if (arg0 == 2) return -2;",
+    "replacement": "    if (arg0 == 51 && global.Inventory_ItemData[24].Owns[0]) return -1;\n    if (arg0 == 2) return -2;"
+  },
+  {
+    "id": "candle-light-radius",
+    "code": "gml_GlobalScript___PixelRender",
+    "anchor": "        global.LinkLight_Pos[2] = arg1;",
+    "replacement": "        var has_light = global.Inventory_ItemData[24].Owns[0] || global.Inventory_ItemData[51].Owns[0] || (instance_exists(oLink) && oLink.State == 19);\n        global.LinkLight_Pos[2] = has_light ? arg1 : 0;"
+  },
+  {
+    "id": "candle-torches",
+    "code": "gml_GlobalScript___Link",
+    "anchor": "    if (!instance_exists(oLampFlame))",
+    "replacement": "    if (!instance_exists(oLampFlame) && (global.Inventory_ItemData[24].Owns[0] || global.Inventory_ItemData[51].Owns[0]))"
   }
 ]

@@ -11,10 +11,30 @@ function InventoryTests() {
     global.ItemData[5].Type = 3;
     Inventory_InitData();
     Record("new run has five main slots", Inventory_MaxSlots_Useable() == 5);
+    Record("new run has a real candle in the light slot", global.Inventory[4].ItemClass == 51 && global.Inventory_ItemData[51].Owns[0]);
+    var candle_ui = instance_create_layer(0, 0, "System", oInventory);
+    candle_ui.Open = false;
+    candle_ui.NovaPage = 0;
+    candle_ui.NovaCell = 4;
+    oLink.InDoor_Facing = false;
+    with (candle_ui) { NovaRefresh(); NovaItemMenu(); }
+    candle_ui.MenuSelectionIndex = 2;
+    PressEvent(candle_ui, "sword", oInventory, ev_step, ev_step_normal);
+    Lighting_UpdateLinkLight(undefined, 1);
+    Record("dropping the starting candle removes the owned light", global.Inventory[4].ItemClass == -1 && !global.Inventory_ItemData[51].Owns[0] && global.LinkLight_Pos[2] == 0 && instance_exists(oNovaCandle));
+    User_SaveGame();
+    User_LoadGame();
+    Record("save and load keep a dropped candle absent", global.Inventory[4].ItemClass == -1 && !global.Inventory_ItemData[51].Owns[0]);
+    Inventory_Add(51, 0);
+    Lighting_UpdateLinkLight(undefined, 1);
+    Record("recovering a candle restores light without granting a lamp", global.LinkLight_Pos[2] == 1 && !global.Inventory_ItemData[24].Owns[0] && global.Inventory[4].ItemClass == 51);
+    with (oNovaCandle) instance_destroy();
+    with (candle_ui) instance_destroy();
     Inventory_Add(44, 0);
     Inventory_Add(41, 0);
     Inventory_Add(16, 0);
     Inventory_Add(24, 0);
+    Record("oil lamp upgrades the candle and cannot be replaced by it", !global.Inventory_ItemData[51].Owns[0] && global.Inventory[4].ItemClass == 24 && Inventory_CanAdd(51, 0) == -1);
     Inventory_Add(0, 0);
     Record("six gear slots leave the main bag empty", global.Inventory[0].ItemClass == 44 && global.Inventory[1].ItemClass == 41 && global.Inventory[2].ItemClass == 46 && global.Inventory[3].ItemClass == 16 && global.Inventory[4].ItemClass == 24 && global.Inventory[5].ItemClass == 0 && Inventory_FindEmptySlot() == 10);
     Inventory_Add(49, 0);
@@ -48,8 +68,11 @@ function InventoryTests() {
         Inventory_DeleteSlot(slot);
     }
     var before = json_stringify(global.Inventory);
-    global.NovaInventoryMigrate({NovaInventoryVersion: 1});
+    global.NovaInventoryMigrate({NovaInventoryVersion: 2});
     Record("current saves do not migrate twice", json_stringify(global.Inventory) == before);
+    global.Inventory_ItemData[51] = undefined;
+    global.NovaInventoryMigrate({NovaInventoryVersion: 1});
+    Record("first inventory-schema saves gain candle metadata without moving gear", json_stringify(global.Inventory) == before && !global.Inventory_ItemData[51].Owns[0]);
     // A full legacy bag can contain more consumables than the new main bag fits.
     var legacy = array_create(38);
     for (var slot = 0; slot < 38; slot++) legacy[slot] = {ItemClass: -1, ItemIndex: -1, Amount: 0, Enabled: true};
@@ -89,7 +112,7 @@ function InventoryTests() {
     global.Inventory[4].ItemIndex = 0;
     oLink.InDoor_Facing = false;
     with (ui) { NovaRefresh(); NovaItemMenu(); }
-    Record("candle has a drop action in dedicated gear", ds_grid_get(ui.MenuItemGrid, 1, 2));
+    Record("oil lamp has a drop action in dedicated gear", ds_grid_get(ui.MenuItemGrid, 1, 2));
     ui.MenuEnable = false;
     ui.NovaCell = 0;
     global.Inventory[0].ItemClass = 44;
@@ -102,7 +125,7 @@ function InventoryTests() {
     User_SaveGame();
     Inventory_InitData();
     User_LoadGame();
-    Record("saving and loading preserves migrated inventory", json_stringify(global.Inventory) == round_trip && global.Inventory_SlotIndex_Equiped == equipped_before_save && global.Users[global.UserIndex].SaveData.NovaInventoryVersion == 1);
+    Record("saving and loading preserves migrated inventory", json_stringify(global.Inventory) == round_trip && global.Inventory_SlotIndex_Equiped == equipped_before_save && global.Users[global.UserIndex].SaveData.NovaInventoryVersion == 2);
     global.Inventory = saved_inventory;
     global.Inventory_ItemData = saved_items;
     global.ItemData = saved_data;

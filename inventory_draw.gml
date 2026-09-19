@@ -20,7 +20,7 @@ for (var cell = 0; cell < array_length(NovaSlots); cell++) {
     var item = global.Inventory[slot];
     if (item.ItemClass >= 0) {
         var spr = item.ItemClass == 44 ? sItem_Sword_Inventory : object_get_sprite(ObjIndexFromItemClass(item.ItemClass));
-        var index = item.ItemClass == 31 ? global.Level.SwitchBlock_ActiveColor : item.ItemIndex;
+        var index = item.ItemClass == 51 ? 1 : (item.ItemClass == 31 ? global.Level.SwitchBlock_ActiveColor : item.ItemIndex);
         var offset = Inventory_GetPosOffset(spr, index);
         draw_sprite(spr, index, px + offset[0] + 2, py + offset[1] + 1);
         var amount = item.Amount;

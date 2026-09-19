@@ -36,7 +36,7 @@ Press the **action button** to back out of a menu, or **Escape** on a keyboard. 
 
 Press **Start** or the confirm button to skip the opening title animation. To require the full animation, create `zeldadoi-43/savedata/options.ini` with `[Preferences]` and `CanSkipTitle=0`. Set it to `1` to allow skipping. If you already have that file, add the key to its Preferences section.
 
-The inventory separates equipment from the main bag. You start with five main slots and can add five more. Food and pendant bags each hold three items. The treasure bag also accepts wishstones. Press **Strafe** to advance pages, or move up to the heading and use left/right. Sword selects an item, Item equips it, and Action goes back.
+The inventory separates equipment from the main bag. You start with five main slots and can add five more. Food and pendant bags each hold three items. The treasure bag also accepts wishstones. Press **Strafe** to advance pages, or move up to the heading and use left/right. Sword selects an item, Item equips it, and Action goes back. The starting candle occupies the light slot. You can drop it for a darker challenge, or replace it with an oil lamp.
 
 Hold **Sword** after a swing to poke while moving. With a level-three sword or higher, keep holding until the blade flashes, then release for a spin. Level-two swords can break pots.
 

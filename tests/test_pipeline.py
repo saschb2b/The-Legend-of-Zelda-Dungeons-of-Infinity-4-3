@@ -78,7 +78,7 @@ class InstallIntegrationTests(unittest.TestCase):
             self.assertTrue((self.ports / install.LAUNCHER).stat().st_mode & 0o111)
 
     def test_inventory_migration_backup_survives_reinstallation(self):
-        self.manifest['save_schema'] = 1
+        self.manifest['save_schema'] = 2
         self.run_install()
         backup = self.game / 'save-backups/before-inventory-v1.zip'
         original_backup = backup.read_bytes()
@@ -88,6 +88,7 @@ class InstallIntegrationTests(unittest.TestCase):
         self.run_install()
         self.assertEqual(backup.read_bytes(), original_backup)
         self.assertEqual((self.game / 'savedata/Users').read_bytes(), b'new schema save')
+        self.assertEqual((self.game / 'save-schema.txt').read_text(), '2\n')
 
     def test_every_checksum_failure_keeps_the_existing_install(self):
         for field in ('patch_sha256', 'upstream_sha256', 'original_game_sha256', 'patched_game_sha256'):
