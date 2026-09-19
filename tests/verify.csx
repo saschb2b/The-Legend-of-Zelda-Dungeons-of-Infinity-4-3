@@ -25,7 +25,7 @@ Check(Code("gml_Object_oTitle_Step_0").Contains("global.CanSkipTitle"), "Title s
 var menuDraw = Code("gml_Object_oMenu_Draw_0");
 Check(menuDraw.Contains("NovaChallengeDraw()") && menuDraw.Contains("Previous bag") && menuDraw.Contains("Next bag"), "Challenge and control menu patches must coexist");
 Check(Code("gml_Object_oMenu_Step_0").Contains("keyboard_check_pressed(vk_escape)"), "Menu cancel missing");
-Check(Code("gml_Object_oMenu_Game_Step_0").Contains("input_check_pressed(\"action\")"), "Pause cancel missing");
+Check(Code("gml_Object_oMenu_Game_Step_0").Contains("global.NovaCloseVerb()"), "Pause cancel missing");
 Check(Code("gml_Object_oEnemy_Medusa_Alarm_0").Contains("Stoned"), "Medusa status guard missing");
 Check(Code("gml_Object_oEnemy_Cannon_Step_0").Contains("!Stoned"), "Cannon status guard missing");
 Check(Code("gml_Object_oEnemy_Pikit_Tongue_Step_0").Contains("oLink.State != 20"), "Pikit falling guard missing");

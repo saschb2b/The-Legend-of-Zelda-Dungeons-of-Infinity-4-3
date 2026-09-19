@@ -24,7 +24,7 @@ class InstallIntegrationTests(unittest.TestCase):
         self.patched = b'patched game'
         self.delta = binary_patch([(0, len(self.patched), 0)], b'', self.patched, len(self.patched))
         (self.payload / 'patches/game.droid.bsdiff').write_bytes(self.delta)
-        for name in ('README.md', 'gameinfo.xml', install.LAUNCHER):
+        for name in ('README.md', 'controller.py', 'gameinfo.xml', install.LAUNCHER):
             (self.payload / name).write_text('fixture')
         self.upstream = self.root / 'upstream.zip'
         self.make_upstream()
@@ -75,6 +75,7 @@ class InstallIntegrationTests(unittest.TestCase):
                 self.assertEqual(port.read('assets/audio.ogg'), b'unchanged audio')
             self.assertEqual((self.game / 'savedata/Users').read_bytes(), b'precious save')
             self.assertEqual((self.game / 'patch-version.txt').read_text(), 'test\n')
+            self.assertEqual((self.game / 'controller.py').read_text(), 'fixture')
             self.assertTrue((self.ports / install.LAUNCHER).stat().st_mode & 0o111)
 
     def test_inventory_migration_backup_survives_reinstallation(self):

@@ -4,7 +4,7 @@ Testing has three layers. Each catches a different failure:
 
 | Layer | Runs on | Checks |
 | --- | --- | --- |
-| Unit and installer integration | Python, no downloads | BSDIFF decoding, checksum failures, interrupted downloads, save preservation, repeated installation, archive traversal, release contents, compiler failure detection, inventory-save backup, runner binary format |
+| Unit and installer integration | Python, no downloads | Controller mapping, BSDIFF decoding, checksum failures, interrupted downloads, save preservation, repeated installation, archive traversal, release contents, compiler failure detection, inventory-save backup, runner binary format |
 | Clean build | Linux x86-64 | Pinned upstream and compiler hashes, exact patch anchors, GML compilation, compiled room and code invariants, production/test separation, release delta equality, installation of the real package |
 | Runtime regression | Nova with ROCKNIX | Real GameMaker menus, combat, inventory migration, Topaz and challenge save/load, gem recipes, challenge limits, Wallmaster attacks, dungeon templates, and enemy status events |
 
@@ -48,6 +48,10 @@ Sword tests check release and charge-indicator readiness at 0, 1, 44, 45, 47, 48
 Facing tests cover every starting direction against eight movement directions and idle input through Link's compiled Step event. Each case runs with eight random seeds and checks the first three updates while walking, running, carrying, strafing, or holding the sword ready. They also check corner-assist and knockback locks, releasing either diagonal input, and stopping. Expected ordinary turns follow the reconstructed SNES [facing routine](https://github.com/snesrev/zelda3/blob/fbbb3f967a51fafe642e6140d0753979e73b4090/src/player.c#L5932-L5967): keep a facing included in the diagonal, otherwise prefer its vertical direction. DOI's facing locks remain in effect.
 
 HUD tests call the compiled renderer with room-scroll, doorway-exit, door-closing, and stair states. They cover all four scroll directions, CRT on and off, and returning control to the player. Draw counters check HUD and Status-hint visibility. A pixel sample checks that the magic meter stays at its screen position while camera coordinates change. Pause-menu, map, dialogue, inventory, and unrelated-pause cases check visibility outside travel. These fixtures test the renderer's response to transition states, not an entire doorway crossing.
+
+Shop tests use an actual merchant, item, and purchase script with keyboard and controller profiles. They check closing from every choice, item information, and insufficient-funds messages, including simultaneous confirm and close presses. Closing must preserve goods, rupees, and coupons. Confirming Buy must charge once and start receiving the item. The opening interaction must not also submit or close the dialog.
+
+Controller tests check PortMaster's Nintendo A/B mapping and preserve other controls, Xbox mappings, and custom layouts. The device runner uses the repository's launcher and controller adapter. Before release, verify the physical Nova buttons: B swings the sword, A interacts, and menus use A to confirm and B to close. Logical input injection alone cannot verify the controller translation.
 
 To show that the assertions catch the original regressions:
 

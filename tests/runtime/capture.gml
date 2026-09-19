@@ -72,7 +72,7 @@ function CaptureStep() {
     }
     var ui = global.InventoryInst;
     if (instance_exists(global.DB_Inst)) {
-        PressEvent(global.DB_Inst, "action", oDialogueBox, ev_step, ev_step_end);
+        PressEvent(global.DB_Inst, global.NovaCloseVerb(), oDialogueBox, ev_step, ev_step_end);
         ui.DB_Started = false;
     }
     ui.MenuEnable = false;
@@ -86,7 +86,7 @@ function CaptureStep() {
             ui.NovaPage = 0;
             with (ui) { NovaRefresh(); NovaItemMenu(); }
             ui.MenuSelectionIndex = 3;
-            if (CaptureIndex == 8) PressEvent(ui, "sword", oInventory, ev_step, ev_step_normal);
+            if (CaptureIndex == 8) PressEvent(ui, global.NovaConfirmVerb(), oInventory, ev_step, ev_step_normal);
             break;
         case 9:
             ui.NovaPage = 1;

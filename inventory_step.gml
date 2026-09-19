@@ -15,8 +15,8 @@ var left = input_check_pressed("left");
 var right = input_check_pressed("right");
 var up = input_check_pressed("up");
 var down = input_check_pressed("down");
-var confirm = input_check_pressed("sword");
-var close_input = input_check_pressed("action");
+var confirm = input_check_pressed(global.NovaConfirmVerb());
+var close_input = input_check_pressed(global.NovaCloseVerb());
 if (close_input) {
     if (MenuEnable) MenuEnable = false;
     else Close = true;

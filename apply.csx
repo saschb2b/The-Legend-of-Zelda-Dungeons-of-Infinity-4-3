@@ -61,14 +61,30 @@ Edit("gml_Object_oMenu_Game_Step_0", "if (input_check_pressed(\"menu_access\"))"
     File.ReadAllText(Path.Combine(patchDir, "pause_cancel.gml")) + "\nif (input_check_pressed(\"menu_access\"))");
 Edit("gml_Object_oGame_Step_1", "if (input_check_pressed(\"hud\"))",
     "if (input_check_pressed(\"hud\") && !global.Paused && !instance_exists(oInventory) && !instance_exists(oMap) && !instance_exists(oMenu_Game) && !instance_exists(oDialogueBox))");
-group.QueueAppend("gml_Object_oMap_Step_0", "if (!Open && !Close && (input_check_pressed(\"action\") || input_check_pressed(\"menu_access\") || keyboard_check_pressed(vk_escape))) { Close = true; input_clear_momentary(true); }");
+group.QueueAppend("gml_Object_oMap_Step_0", "if (!Open && !Close && (input_check_pressed(global.NovaCloseVerb()) || input_check_pressed(\"menu_access\") || keyboard_check_pressed(vk_escape))) { Close = true; input_clear_momentary(true); }");
+Edit("gml_Object_oMenu_Step_0", "NameEntry_Name != \"\" && input_check_pressed(\"action\")", "NameEntry_Name != \"\" && input_check_pressed(global.NovaCloseVerb())");
+group.QueueAppend("gml_Object_oDialogueBox_Create_0", "NovaShopDialogue = false;");
+Edit("gml_Object_oShop_Step_0", "global.DB_Inst.Script = DB_Script;", @"
+global.DB_Inst.Script = DB_Script;
+global.DB_Inst.NovaShopDialogue = true;
+global.DB_ExitCode = 0;
+// The interaction press belongs to opening the shop, not its first choice.
+input_clear_momentary(true);");
 Edit("gml_Object_oDialogueBox_Step_2", "if (CameraExists)", @"
-if (global.NovaInventoryInfo() && (input_check_pressed(""action"") || keyboard_check_pressed(vk_escape))) {
+if (NovaShopDialogue && (input_check_pressed(global.NovaCloseVerb()) || keyboard_check_pressed(vk_escape))) {
+    global.DB_ExitCode = 0;
+    ScriptNext = false;
+    Status = 5;
+    input_clear_momentary(true);
+}
+if (global.NovaInventoryInfo() && (input_check_pressed(global.NovaCloseVerb()) || keyboard_check_pressed(vk_escape))) {
     ScriptNext = false;
     Status = 5;
     input_clear_momentary(true);
 }
 if (CameraExists)");
+Edit("gml_Object_oDialogueBox_Step_2", "var Key = input_check_pressed(\"sword\") || input_check_pressed(\"action\");", "var Key = (NovaShopDialogue || global.NovaInventoryInfo()) ? input_check_pressed(global.NovaConfirmVerb()) : (input_check_pressed(\"sword\") || input_check_pressed(\"action\"));");
+Edit("gml_Object_oDialogueBox_Step_2", "if (input_check_pressed(\"sword\") || input_check_pressed(\"action\"))", "if (NovaShopDialogue ? input_check_pressed(global.NovaConfirmVerb()) : (input_check_pressed(\"sword\") || input_check_pressed(\"action\")))");
 foreach (var modal in new[] { "oInventory", "oMap", "oMenu_Game" })
     group.QueueAppend("gml_Object_" + modal + "_Destroy_0", "input_clear_momentary(true);");
 // A blocked alarm must stay armed so the Medusa can fire after the status ends.
@@ -166,12 +182,23 @@ using (var backports = JsonDocument.Parse(File.ReadAllText(Path.Combine(patchDir
 }
 Edit("gml_GlobalScript___input_config_verbs", "hud: input_binding_key(112)",
     "hud: input_binding_key(112), nova_bag_previous: input_binding_key(vk_pageup), nova_bag_next: input_binding_key(vk_pagedown)");
+Edit("gml_GlobalScript___input_config_verbs", "menu_input: [input_binding_gamepad_button(32778), input_binding_gamepad_button(32769)]", "menu_input: [input_binding_gamepad_button(gp_start), input_binding_gamepad_button(gp_face2)]");
 Edit("gml_GlobalScript___input_config_verbs", "hud: input_binding_gamepad_button(32780)",
     "hud: input_binding_gamepad_button(32780), nova_bag_previous: input_binding_gamepad_button(gp_shoulderl), nova_bag_next: input_binding_gamepad_button(gp_shoulderr)");
 Edit("gml_GlobalScript_input_profile_import", "    return _global.__players[arg2].__profile_import(arg0, arg1);", @"
     var profile = is_string(arg0) ? json_parse(arg0) : arg0;
     if (is_struct(profile) && (arg1 == ""gamepad"" || arg1 == ""keyboard"")) {
         var pad = arg1 == ""gamepad"";
+        if (pad && variable_struct_exists(profile, ""menu_input"")) {
+            var confirm = profile.menu_input;
+            if (is_array(confirm) && array_length(confirm) == 2
+                && is_struct(confirm[0]) && is_struct(confirm[1])
+                && variable_struct_exists(confirm[0], ""__type"") && variable_struct_exists(confirm[0], ""__value"")
+                && variable_struct_exists(confirm[1], ""__type"") && variable_struct_exists(confirm[1], ""__value"")
+                && confirm[0].__type == ""gamepad button"" && confirm[0].__value == gp_start
+                && confirm[1].__type == ""gamepad button"" && confirm[1].__value == gp_face1)
+                confirm[1].__value = gp_face2;
+        }
         var verbs = [""nova_bag_previous"", ""nova_bag_next""];
         var values = pad ? [gp_shoulderl, gp_shoulderr] : [vk_pageup, vk_pagedown];
         for (var i = 0; i < 2; i++) {
@@ -203,7 +230,7 @@ edits["gml_Object_oMenu_Draw_0"] = remapDraw.Substring(0, remapStart) + @"
                 var PosY = inst_100005.y + 10 + i * (device == 0 ? 14 : 10);
                 draw_text_transformed(PosX, PosY, labels[global.BindingVerbs[device][i]] + "":"", text_scale, text_scale, 0);
                 if (Bindings_Remap && i == global.BindingRemap_VerbIndex) draw_rectangle(PosX + 66, PosY, PosX + 110, PosY + 9, false);
-                else draw_text_transformed(PosX + 66, PosY, global.BindingIcons[device][i], text_scale, text_scale, 0);
+                else draw_text_transformed(PosX + 66, PosY, device == 0 ? global.NovaKeyLabel(global.NovaBinding(GetInputVerbStr(global.BindingVerbs[device][i]), ""gamepad"")) : global.BindingIcons[device][i], text_scale, text_scale, 0);
             }
             break;" + remapDraw.Substring(remapEnd);
 ApplyContent();

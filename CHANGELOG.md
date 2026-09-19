@@ -6,6 +6,8 @@ These versions identify the 4:3 patch, independently of the original game's vers
 
 ### Fixed
 
+- Restore B for the sword and A for interactions on the Nova by correcting PortMaster's A/B translation. Menus use A to confirm and B to close, with matching glyphs and Controls labels.
+- Close shop dialogs with B or Escape without buying or consuming a coupon. Consume the opening press so it cannot also act inside the dialog.
 - Match ALttP's SNES walking ratio: diagonal movement uses two-thirds speed on each axis, removing DOI's diagonal speed boost. Running uses the same ratio while preserving its straight-line speed.
 - Match SNES sword-ready and carrying speeds on normal ground: 1.25 pixels straight and 0.8125 per diagonal axis.
 - Match the SNES 48-update sword-charge threshold and keep the charge indicator synchronized with spin readiness.

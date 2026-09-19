@@ -41,8 +41,8 @@ These are the default controller bindings. Change them under **Controls**. Each 
 | Button | During play | In the inventory |
 | --- | --- | --- |
 | D-pad / left stick | Move | Highlight an object or action |
-| A | Sword | Open Actions, open a bag, or confirm the highlighted action |
-| B | Interact | Close the current view |
+| A | Interact | Open Actions, open a bag, or confirm the highlighted action |
+| B | Sword | Close the current view |
 | X | Use the equipped item | Equip the highlighted object, when available |
 | Y | Open the map | |
 | Start | Open the inventory | Close the inventory |
@@ -52,6 +52,8 @@ These are the default controller bindings. Change them under **Controls**. Each 
 | Select + Start | Exit to Ports | Exit to Ports |
 
 Press **B** to close the map, menus, item information, or inventory. Closing an action list or item information returns to the inventory. Closing a pause submenu returns to the pause menu. In name entry, B deletes a letter. On a keyboard, Escape closes or cancels the current view.
+
+At a shop counter, press **A** to inspect an item. In its dialog, A confirms the highlighted choice and **B** closes without buying. Closing also works while reading item information or a purchase refusal.
 
 **Actions** opens an object's choices. **Equip** assigns it to the active item button. **Use** activates or consumes it immediately. Gear in dedicated equipment slots is already active. Its action list provides information and, where allowed, Drop.
 

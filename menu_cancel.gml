@@ -1,5 +1,5 @@
-// The action button remains backspace during name entry. Escape discards the edit.
-if (Menu_Active && !Bindings_Remap && (keyboard_check_pressed(vk_escape) || (Menu_ActiveIndex != 5 && !keyboard_check(vk_alt) && input_check_pressed("action")))) {
+// Close deletes a letter during name entry. Escape discards the edit.
+if (Menu_Active && !Bindings_Remap && (keyboard_check_pressed(vk_escape) || (Menu_ActiveIndex != 5 && !keyboard_check(vk_alt) && input_check_pressed(global.NovaCloseVerb())))) {
     switch (Menu_ActiveIndex) {
         case 0:
             audio_stop_all();

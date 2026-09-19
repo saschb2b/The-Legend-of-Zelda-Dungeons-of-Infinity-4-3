@@ -1,4 +1,4 @@
-if (keyboard_check_pressed(vk_escape) || input_check_pressed("action")) {
+if (keyboard_check_pressed(vk_escape) || input_check_pressed(global.NovaCloseVerb())) {
     if (Index == 0) {
         Close = true;
         Music_Fade(1, 6);

@@ -19,7 +19,7 @@ function InventoryTests() {
     oLink.InDoor_Facing = false;
     with (candle_ui) { NovaRefresh(); NovaItemMenu(); }
     candle_ui.MenuSelectionIndex = 2;
-    PressEvent(candle_ui, "sword", oInventory, ev_step, ev_step_normal);
+    PressEvent(candle_ui, global.NovaConfirmVerb(), oInventory, ev_step, ev_step_normal);
     Lighting_UpdateLinkLight(undefined, 1);
     Record("dropping the starting candle removes the owned light", global.Inventory[4].ItemClass == -1 && !global.Inventory_ItemData[51].Owns[0] && global.LinkLight_Pos[2] == 0 && instance_exists(oNovaCandle));
     User_SaveGame();

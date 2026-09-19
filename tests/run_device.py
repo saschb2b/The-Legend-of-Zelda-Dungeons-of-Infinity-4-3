@@ -64,18 +64,19 @@ if CAPTURE:
  (stage/'harness-savedata').mkdir()
  (stage/'harness-savedata/nova-capture-enabled.txt').touch()
 (stage/'gmloader.json').write_text(json.dumps(config))
-text=(source.parent/PRODUCTION_LAUNCHER).read_text()
+text=LAUNCHER_TEXT
 anchor='GAMEDIR="/$directory/ports/zeldadoi-43"'
 if text.count(anchor)!=1: raise RuntimeError('Unrecognised launcher layout.')
 text=text.replace(anchor,'GAMEDIR='+repr(str(stage)))
 launcher.write_text(text)
 launcher.chmod(0o755)
 '''
-        constants = f'CAPTURE={args.capture!r}\nSOURCE={source!r}\nSTAGE={stage!r}\nLAUNCHER={launcher!r}\nPRODUCTION_LAUNCHER={LAUNCHER!r}\n'
+        constants = f'CAPTURE={args.capture!r}\nSOURCE={source!r}\nSTAGE={stage!r}\nLAUNCHER={launcher!r}\nLAUNCHER_TEXT={(ROOT / LAUNCHER).read_text()!r}\n'
         snapshot, staging = setup.split('shutil.copytree', 1)
         before = json.loads(request('python3 -', (constants + snapshot).encode()))
         created = True
         request('python3 -', (constants + 'import json,pathlib,shutil\nsource=pathlib.Path(SOURCE)\nstage=pathlib.Path(STAGE)\nlauncher=pathlib.Path(LAUNCHER)\nshutil.copytree' + staging).encode())
+        copy(args.host, args.control_path, ROOT / 'controller.py', stage + '/controller.py')
         with tempfile.TemporaryDirectory() as directory:
             port_path = Path(directory) / 'runtime.port'
             with ZipFile(ROOT / '.build/original.port') as original, ZipFile(port_path, 'w') as port:

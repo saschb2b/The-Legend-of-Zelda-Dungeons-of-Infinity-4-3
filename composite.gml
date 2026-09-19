@@ -55,7 +55,7 @@ if (instance_exists(oMap) && !oMap.Close) {
     var size = 18 * min(sx, sy);
     draw_set_font(global.HUDFont2);
     draw_set_alpha(oMap.Alpha);
-    var binding = global.NovaBinding("action");
+    var binding = global.NovaBinding(global.NovaCloseVerb());
     var width = global.NovaPromptWidth(binding, "CLOSE", sx, size);
     global.NovaPromptDraw(binding, "CLOSE", 222 * sx - width, 200 * sy, sx, sy, size);
     draw_set_alpha(1);

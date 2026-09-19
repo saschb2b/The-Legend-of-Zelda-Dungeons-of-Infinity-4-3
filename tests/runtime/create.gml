@@ -29,7 +29,8 @@ function PressEvent(target, verb, object, kind, number) {
     with (target) event_perform_object(object, kind, number);
     global.NovaTestInput = "";
 }
-function MenuCase(index, expected, verb = "action") {
+function MenuCase(index, expected, verb = undefined) {
+    if (verb == undefined) verb = global.NovaCloseVerb();
     with (oMenu) {
         MenuWin_Main_Shift = false;
         Menu_Active = true;
@@ -70,7 +71,7 @@ function MenuTests() {
     oMenu.Menu_Active = true;
     oMenu.Menu_ActiveIndex = 13;
     oMenu.Bindings_Remap = true;
-    PressEvent(oMenu, "action", oMenu, ev_step, ev_step_normal);
+    PressEvent(oMenu, global.NovaCloseVerb(), oMenu, ev_step, ev_step_normal);
     Record("cancel does not interrupt binding capture", oMenu.Menu_ActiveIndex == 13);
     oMenu.Bindings_Remap = false;
     MenuCase(12, 4, "escape");
@@ -92,13 +93,13 @@ function PauseTests() {
     for (var index = 1; index <= 2; index++) {
         pause.Index = index;
         pause.SelectorPos = 1;
-        PressEvent(pause, "action", oMenu_Game, ev_step, ev_step_normal);
+        PressEvent(pause, global.NovaCloseVerb(), oMenu_Game, ev_step, ev_step_normal);
         Record("pause submenu " + string(index) + " cancels", pause.Index == 0 && !pause.Close && !pause.Quitting);
     }
     pause.Index = 1;
     PressEvent(pause, "escape", oMenu_Game, ev_step, ev_step_normal);
     Record("Escape backs out of options without closing pause", pause.Index == 0 && !pause.Close);
-    PressEvent(pause, "action", oMenu_Game, ev_step, ev_step_normal);
+    PressEvent(pause, global.NovaCloseVerb(), oMenu_Game, ev_step, ev_step_normal);
     Record("action resumes from pause root", pause.Close && !pause.Quitting);
     with (pause) instance_destroy();
 }

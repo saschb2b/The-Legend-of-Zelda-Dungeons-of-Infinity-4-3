@@ -30,7 +30,9 @@ export LD_LIBRARY_PATH="$GAMEDIR/libs.${DEVICE_ARCH}:$GAMEDIR/lib:$LD_LIBRARY_PA
 export MESA_LOADER_DRIVER_OVERRIDE=msm
 export GALLIUM_DRIVER=freedreno
 export SDL_JOYSTICK_HIDAPI=0
-export SDL_GAMECONTROLLERCONFIG="$sdl_controllerconfig"
+export SDL_GAMECONTROLLERCONFIG="$(printf '%s' "$sdl_controllerconfig" | python3 "$GAMEDIR/controller.py")"
+# SDL's mapping file overrides the per-game mapping above.
+unset SDL_GAMECONTROLLERCONFIG_FILE
 
 # Display loading splash
 if [ "$CFW_NAME" == "muOS" ]; then

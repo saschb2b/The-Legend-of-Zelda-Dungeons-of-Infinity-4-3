@@ -1,3 +1,5 @@
+global.NovaConfirmVerb = function() { return input_profile_get() == "gamepad" ? "action" : "sword"; };
+global.NovaCloseVerb = function() { return input_profile_get() == "gamepad" ? "sword" : "action"; };
 global.NovaBinding = function(verb, profile = undefined) {
     var binding = input_binding_get(verb, 0, 0, profile);
     if (binding.__type == undefined) binding = input_binding_get(verb, 0, 1, profile);
@@ -6,7 +8,9 @@ global.NovaBinding = function(verb, profile = undefined) {
 global.NovaGlyph = function(binding) {
     if (binding.__type != "gamepad button" && binding.__type != "gamepad axis") return -1;
     var value = binding.__value;
-    if (value >= gp_face1 && value <= gp_shoulderrb) return value - gp_face1;
+    if (value == gp_face1) return 1;
+    if (value == gp_face2) return 0;
+    if (value >= gp_face3 && value <= gp_shoulderrb) return value - gp_face1;
     if (value == gp_select) return 8;
     if (value == gp_stickl) return 9;
     if (value == gp_stickr) return 10;
@@ -16,6 +20,8 @@ global.NovaGlyph = function(binding) {
 };
 global.NovaKeyLabel = function(binding) {
     if (binding.__type == undefined) return "UNBOUND";
+    if (binding.__type == "gamepad button" && binding.__value == gp_face1) return "B";
+    if (binding.__type == "gamepad button" && binding.__value == gp_face2) return "A";
     if (binding.__type == "gamepad button" && binding.__value == gp_start) return "START";
     if (binding.__type == "key") {
         switch (binding.__value) {
@@ -121,8 +127,8 @@ global.NovaInventoryFooter = function(inventory, sx, sy) {
     var primary = info ? "MORE" : global.NovaInventoryAction(inventory);
     var prompts = [
         {binding: global.NovaBinding("item"), label: "EQUIP", visible: !info && !inventory.MenuEnable && selected.ItemClass >= 0 && global.ItemData[selected.ItemClass].CanEquip},
-        {binding: global.NovaBinding("action"), label: "CLOSE", visible: true},
-        {binding: global.NovaBinding("sword"), label: primary, visible: info ? global.DB_Inst.LinesLeft > 3 : primary != ""}
+        {binding: global.NovaBinding(global.NovaCloseVerb()), label: "CLOSE", visible: true},
+        {binding: global.NovaBinding(global.NovaConfirmVerb()), label: primary, visible: info ? global.DB_Inst.LinesLeft > 3 : primary != ""}
     ];
     var font = draw_get_font();
     draw_set_font(global.HUDFont2);
