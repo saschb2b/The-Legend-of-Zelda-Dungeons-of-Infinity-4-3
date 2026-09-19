@@ -54,6 +54,23 @@ function ControlTests() {
     Record("inventory leaves room for the full HUD", global.NovaInventoryHUD() && ui.Y - oCamera.Y >= 64 && ui.X - oCamera.X >= 24 && ui.X + ui.W <= oCamera.X + 232 && ui.Y + ui.H + 23 <= oCamera.Y + 224);
     var footer_empty = global.NovaInventoryFooter(ui, 5, 960 / 224);
     Record("empty inventory retains only the Close hint", !footer_empty[0].visible && footer_empty[1].visible && !footer_empty[2].visible);
+    var page_before = ui.NovaPage;
+    var overflow_before = ui.NovaOverflowPages;
+    var pager_before = global.NovaInventoryPager(ui, 5, 960 / 224);
+    ui.NovaOverflowPages = 2;
+    var font_before = draw_get_font();
+    draw_set_font(global.HUDFont2);
+    for (var page = 0; page <= 7; page++) {
+        ui.NovaPage = page;
+        var pager = global.NovaInventoryPager(ui, 5, 960 / 224);
+        var half_title = string_width(global.NovaInventoryHeading(ui)) * 5 / 2;
+        var center = (ui.X - oCamera.X + ui.W / 2) * 5;
+        Record("page " + string(page) + " keeps both shoulder hints fixed", pager[0].x == pager_before[0].x && pager[1].x == pager_before[1].x && pager[0].y == pager_before[0].y && pager[1].y == pager_before[1].y);
+        Record("page " + string(page) + " title fits between shoulder hints", pager[0].x + pager[0].width + 40 <= center - half_title && center + half_title + 40 <= pager[1].x);
+    }
+    draw_set_font(font_before);
+    ui.NovaPage = page_before;
+    ui.NovaOverflowPages = overflow_before;
     PressEvent(ui, "nova_bag_previous", oInventory, ev_step, ev_step_normal);
     Record("left shoulder opens gear from items", ui.NovaPage == 0);
     PressEvent(ui, "nova_bag_previous", oInventory, ev_step, ev_step_normal);

@@ -46,11 +46,11 @@ global.NovaKeyWidth = function(binding) {
     draw_set_font(font);
     return width;
 };
-global.NovaPromptWidth = function(binding, label, scale_x, size) {
+global.NovaPromptWidth = function(binding, label, scale_x, size, gap = 4) {
     var icon_width = global.NovaGlyph(binding) >= 0 ? size : global.NovaKeyWidth(binding) * scale_x;
-    return icon_width + (label == "" ? 0 : (4 + string_width(label)) * scale_x);
+    return icon_width + (label == "" ? 0 : (gap + string_width(label)) * scale_x);
 };
-global.NovaPromptDraw = function(binding, label, px, py, scale_x, scale_y, size) {
+global.NovaPromptDraw = function(binding, label, px, py, scale_x, scale_y, size, gap = 4) {
     var frame = global.NovaGlyph(binding);
     var icon_width = size;
     draw_set_color(c_white);
@@ -71,7 +71,7 @@ global.NovaPromptDraw = function(binding, label, px, py, scale_x, scale_y, size)
         draw_set_font(font);
     }
     if (label != "") {
-        var text_x = px + icon_width + 4 * scale_x;
+        var text_x = px + icon_width + gap * scale_x;
         draw_set_color(c_black);
         draw_text_transformed(text_x + scale_x, py + scale_y, label, scale_x, scale_y, 0);
         draw_set_color(c_white);
@@ -96,6 +96,24 @@ global.NovaInventoryHeading = function(inventory) {
     var heading = inventory.NovaTitles[min(inventory.NovaPage, 6)];
     if (inventory.NovaPage >= 6 && inventory.NovaOverflowPages > 1) heading += " " + string(inventory.NovaPage - 5);
     return heading;
+};
+global.NovaInventoryPager = function(inventory, sx, sy) {
+    var font = draw_get_font();
+    draw_set_font(global.HUDFont2);
+    // Reserve the full title set, including both possible legacy overflow pages.
+    var heading_width = string_width(inventory.NovaTitles[6] + " 2");
+    for (var i = 0; i < array_length(inventory.NovaTitles); i++) heading_width = max(heading_width, string_width(inventory.NovaTitles[i]));
+    var bindings = [global.NovaBinding("nova_bag_previous"), global.NovaBinding("nova_bag_next")];
+    var size = 18 * min(sx, sy);
+    var widths = [global.NovaPromptWidth(bindings[0], "", sx, size), global.NovaPromptWidth(bindings[1], "", sx, size)];
+    var center = (inventory.X - oCamera.X + inventory.W / 2) * sx;
+    var offset = (heading_width / 2 + 8) * sx;
+    var py = (inventory.Y - oCamera.Y + 14) * sy;
+    draw_set_font(font);
+    return [
+        {binding: bindings[0], x: center - offset - widths[0], y: py, width: widths[0], size: size},
+        {binding: bindings[1], x: center + offset, y: py, width: widths[1], size: size}
+    ];
 };
 global.NovaInventoryFooter = function(inventory, sx, sy) {
     var info = global.NovaInventoryInfo();
@@ -139,20 +157,14 @@ global.NovaInventoryPrompts = function(inventory) {
     with (inventory) {
     var sx = display_get_gui_width() / 256;
     var sy = display_get_gui_height() / 224;
-    var size = 18 * min(sx, sy);
-    var left = X - oCamera.X;
-    var top = Y - oCamera.Y;
     draw_set_font(global.HUDFont2);
     draw_set_alpha(Alpha);
     if (!global.NovaInventoryInfo()) {
-        var previous = global.NovaBinding("nova_bag_previous");
-        var next = global.NovaBinding("nova_bag_next");
-        var previous_width = global.NovaPromptWidth(previous, "", sx, size);
-        var heading_half = string_width(global.NovaInventoryHeading(id)) * sx / 2;
-        var center = (left + W / 2) * sx;
-        var gap = 8 * sx;
-        global.NovaPromptDraw(previous, "", center - heading_half - gap - previous_width, (top + 14) * sy, sx, sy, size);
-        global.NovaPromptDraw(next, "", center + heading_half + gap, (top + 14) * sy, sx, sy, size);
+        var pager = global.NovaInventoryPager(id, sx, sy);
+        for (var i = 0; i < array_length(pager); i++) {
+            var prompt = pager[i];
+            global.NovaPromptDraw(prompt.binding, "", prompt.x, prompt.y, sx, sy, prompt.size);
+        }
     }
     var prompts = global.NovaInventoryFooter(id, sx, sy);
     for (var i = 0; i < array_length(prompts); i++) {

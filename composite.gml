@@ -60,11 +60,11 @@ if (instance_exists(oMap) && !oMap.Close) {
 if (instance_exists(oHUD) && !_nova_modal && !global.ArcadeVP_Show && !global.Users[global.UserIndex].Prefs[2]) {
     var sx = _nova_w / 256;
     var sy = _nova_h / 224;
-    var size = 96 * _nova_h / 960;
+    var size = 64 * _nova_h / 960;
     draw_set_font(global.HUDFont2);
     draw_set_alpha(oHUD.MainAlpha);
     var binding = global.NovaBinding("hud");
-    var width = global.NovaPromptWidth(binding, "STATUS", sx, size);
-    global.NovaPromptDraw(binding, "STATUS", _nova_w - 40 * _nova_h / 960 - width, _nova_h - 64 * _nova_h / 960, sx, sy, size);
+    var width = global.NovaPromptWidth(binding, "STATUS", sx, size, 2);
+    global.NovaPromptDraw(binding, "STATUS", _nova_w - 40 * _nova_h / 960 - width, _nova_h - 64 * _nova_h / 960, sx, sy, size, 2);
     draw_set_alpha(1);
 }

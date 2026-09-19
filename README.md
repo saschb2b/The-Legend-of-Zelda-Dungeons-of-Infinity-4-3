@@ -57,13 +57,13 @@ Press **B** to close the map, menus, item information, or inventory. Closing an 
 
 The preview uses **LB/RB** to switch inventory pages, or **Page Up/Page Down** on a keyboard. The D-pad stays in the item grid. Health and counters remain visible while browsing or reading item information.
 
-The footer keeps Equip on the left, Close in the middle, and the primary action on the right. Available actions appear without moving the other hints.
+The footer keeps Equip on the left, Close in the middle, and the primary action on the right. Available actions appear without moving the other hints. The shoulder hints also stay fixed as page titles change.
 
 | Inventory below the HUD | Contextual item actions |
 | --- | --- |
 | ![Compact bag inventory below health and counters, with shoulder and colored face-button hints](screenshots/inventory.png) | ![Item action list with a confirm hint that names the highlighted Info action](screenshots/inventory-actions.png) |
 
-Inventory screenshots use a populated test inventory to show full counters and two rows of hearts. All screenshots come from the game running on a Nova.
+The bag screenshot uses a populated test inventory to show full counters and two rows of hearts. All screenshots come from the game running on a Nova.
 
 | Status at a stick-click | Menus that fit the screen |
 | --- | --- |

@@ -34,7 +34,7 @@ def main():
     parser.add_argument('--control-path', type=Path)
     parser.add_argument('--game', type=Path, default=ROOT / '.build/runtime-tests.droid')
     parser.add_argument('--ports-dir', default='/storage/roms/ports')
-    parser.add_argument('--capture', action='store_true', help='Capture inventory screens after the assertions.')
+    parser.add_argument('--capture', action='store_true', help='Capture inventory and Status hints after the assertions.')
     parser.add_argument('--report-dir', type=Path, default=ROOT / '.build/device-results')
     args = parser.parse_args()
     game_bytes = args.game.read_bytes()
@@ -103,7 +103,7 @@ print(urllib.request.urlopen(r,timeout=10).read().decode())
                     break
                 capture = report.get('capture', '')
                 if args.capture and capture and capture not in captures:
-                    if not re.fullmatch(r'inventory-[a-z]+', capture):
+                    if not re.fullmatch(r'(inventory|status)-[a-z]+', capture):
                         raise RuntimeError('Invalid screenshot name in test report.')
                     path = stage + '/' + capture + '.png'
                     request('source /etc/profile; grim ' + shlex.quote(path))

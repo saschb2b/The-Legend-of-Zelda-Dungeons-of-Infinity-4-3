@@ -1,7 +1,7 @@
 Capture = "";
 CaptureTick = 0;
 CaptureIndex = 0;
-CaptureNames = ["inventory-gear", "inventory-items", "inventory-bags", "inventory-treasure", "inventory-food", "inventory-pendants", "inventory-overflow", "inventory-actions", "inventory-info", "inventory-keyboard", "inventory-crt", "inventory-overflowextra"];
+CaptureNames = ["inventory-gear", "inventory-items", "inventory-bags", "inventory-treasure", "inventory-food", "inventory-pendants", "inventory-overflow", "inventory-actions", "inventory-info", "inventory-keyboard", "inventory-crt", "inventory-overflowextra", "status-default", "status-crt", "status-remapped", "status-keyboard"];
 function CaptureStart() {
     global.ItemData[1].Type = 3;
     global.ItemData[5].Type = 3;
@@ -59,6 +59,15 @@ function CaptureStep() {
         Complete = true;
         Flush();
         game_end();
+        return;
+    }
+    if (CaptureIndex >= 12) {
+        with (oInventory) instance_destroy();
+        global.Paused = false;
+        global.Users[global.UserIndex].Prefs[2] = false;
+        global.Users[global.UserIndex].Prefs[3] = CaptureIndex == 13;
+        input_profile_set(CaptureIndex == 15 ? "keyboard" : "gamepad");
+        if (CaptureIndex == 14) input_binding_set("hud", input_binding_gamepad_button(gp_face3), 0, 0, "gamepad");
         return;
     }
     var ui = global.InventoryInst;

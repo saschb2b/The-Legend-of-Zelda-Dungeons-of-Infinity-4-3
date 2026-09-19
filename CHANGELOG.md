@@ -10,7 +10,8 @@ These versions identify the 4:3 patch, independently of the original game's vers
 - Switch inventory pages with remappable LB/RB controls, or Page Up/Page Down on a keyboard. D-pad navigation stays in the item grid.
 - Show current bindings with the supplied Retro controller glyphs and colored face buttons. The Status hint updates after remapping. Keyboard prompts show the bound key.
 - Replace the ambiguous Select hint with Actions, Open for bags, or the highlighted action's name. Show the Equip shortcut only when it applies.
-- Keep inventory prompts in fixed positions: Equip on the left, Close in the middle, and the primary action on the right. Group shoulder hints beside the page heading.
+- Keep inventory prompts in fixed positions: Equip on the left, Close in the middle, and the primary action on the right. Shoulder hints stay fixed beside the heading across every page.
+- Reduce the Status glyph's size and spacing while keeping its label readable and its binding current.
 
 ### Fixed
 
