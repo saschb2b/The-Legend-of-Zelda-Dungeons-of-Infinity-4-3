@@ -1,6 +1,7 @@
 import argparse
 import hashlib
 import json
+import re
 import shlex
 import subprocess
 import sys
@@ -33,8 +34,11 @@ def main():
     parser.add_argument('--control-path', type=Path)
     parser.add_argument('--game', type=Path, default=ROOT / '.build/runtime-tests.droid')
     parser.add_argument('--ports-dir', default='/storage/roms/ports')
+    parser.add_argument('--capture', action='store_true', help='Capture inventory screens after the assertions.')
     parser.add_argument('--report-dir', type=Path, default=ROOT / '.build/device-results')
     args = parser.parse_args()
+    game_bytes = args.game.read_bytes()
+    game_digest = hashlib.sha256(game_bytes).hexdigest()
     request = lambda command, data=None: remote(args.host, args.control_path, command, data)
     token = uuid.uuid4().hex[:12]
     stage = f'/storage/.cache/doi43-harness-{token}'
@@ -43,6 +47,7 @@ def main():
     args.report_dir.mkdir(parents=True, exist_ok=True)
     report = None
     created = False
+    captures = set()
     try:
         setup = '''import hashlib,json,pathlib,shutil,urllib.request
 source=pathlib.Path(SOURCE)
@@ -55,6 +60,9 @@ print(json.dumps(saves))
 shutil.copytree(source,stage,ignore=shutil.ignore_patterns('savedata','test-savedata','log.txt'))
 config=json.loads((stage/'gmloader.json').read_text())
 config['save_dir']='harness-savedata'
+if CAPTURE:
+ (stage/'harness-savedata').mkdir()
+ (stage/'harness-savedata/nova-capture-enabled.txt').touch()
 (stage/'gmloader.json').write_text(json.dumps(config))
 text=(source.parent/PRODUCTION_LAUNCHER).read_text()
 anchor='GAMEDIR="/$directory/ports/zeldadoi-43"'
@@ -63,7 +71,7 @@ text=text.replace(anchor,'GAMEDIR='+repr(str(stage)))
 launcher.write_text(text)
 launcher.chmod(0o755)
 '''
-        constants = f'SOURCE={source!r}\nSTAGE={stage!r}\nLAUNCHER={launcher!r}\nPRODUCTION_LAUNCHER={LAUNCHER!r}\n'
+        constants = f'CAPTURE={args.capture!r}\nSOURCE={source!r}\nSTAGE={stage!r}\nLAUNCHER={launcher!r}\nPRODUCTION_LAUNCHER={LAUNCHER!r}\n'
         snapshot, staging = setup.split('shutil.copytree', 1)
         before = json.loads(request('python3 -', (constants + snapshot).encode()))
         created = True
@@ -72,7 +80,7 @@ launcher.chmod(0o755)
             port_path = Path(directory) / 'runtime.port'
             with ZipFile(ROOT / '.build/original.port') as original, ZipFile(port_path, 'w') as port:
                 for entry in original.infolist():
-                    port.writestr(entry, args.game.read_bytes() if entry.filename == 'assets/game.droid' else original.read(entry))
+                    port.writestr(entry, game_bytes if entry.filename == 'assets/game.droid' else original.read(entry))
             copy(args.host, args.control_path, port_path, stage + '/zeldadoi.port')
         launch_code = f'''import urllib.request,time
 urllib.request.urlopen('http://127.0.0.1:1234/reloadgames',timeout=5).read()
@@ -87,12 +95,24 @@ print(urllib.request.urlopen(r,timeout=10).read().decode())
             if data:
                 try:
                     report = json.loads(data)
-                    report['game_sha256'] = hashlib.sha256(args.game.read_bytes()).hexdigest()
+                    report['game_sha256'] = game_digest
                     (args.report_dir / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
                 except json.JSONDecodeError:
                     continue
                 if report.get('complete'):
                     break
+                capture = report.get('capture', '')
+                if args.capture and capture and capture not in captures:
+                    if not re.fullmatch(r'inventory-[a-z]+', capture):
+                        raise RuntimeError('Invalid screenshot name in test report.')
+                    path = stage + '/' + capture + '.png'
+                    request('source /etc/profile; grim ' + shlex.quote(path))
+                    (args.report_dir / (capture + '.png')).write_bytes(request('cat ' + shlex.quote(path)))
+                    captures.add(capture)
+                    request('touch ' + shlex.quote(stage + '/harness-savedata/nova-capture-done.txt'))
+            error = request(f'grep -A5 "ERROR in action" {shlex.quote(stage + "/log.txt")} 2>/dev/null || true')
+            if error:
+                raise RuntimeError('Game runner failed: ' + error.decode(errors='replace'))
             time.sleep(2)
         if not report or not report.get('complete'):
             raise RuntimeError('No complete runtime report within 180 seconds.')

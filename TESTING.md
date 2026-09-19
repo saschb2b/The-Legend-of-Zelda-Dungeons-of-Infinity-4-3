@@ -4,9 +4,9 @@ The harness has three layers. Each catches a different failure:
 
 | Layer | Runs on | Checks |
 | --- | --- | --- |
-| Unit and installer integration | Python, no downloads | BSDIFF decoding, checksum failures, interrupted downloads, save preservation, repeated installation, archive traversal, release contents, compiler failure detection |
+| Unit and installer integration | Python, no downloads | BSDIFF decoding, checksum failures, interrupted downloads, save preservation, repeated installation, archive traversal, release contents, compiler failure detection, inventory-save backup, runner binary format |
 | Clean build | Linux x86-64 | Pinned upstream and compiler hashes, exact patch anchors, GML compilation, compiled room and code invariants, production/test separation, release delta equality, installation of the real package |
-| Runtime regression | Nova with ROCKNIX | Real GameMaker menu, title, pause, Medusa, cannon, and Pikit events with controlled inputs and fixtures |
+| Runtime regression | Nova with ROCKNIX | Real GameMaker menus, bindings, combat, boss recovery, inventory migration and save/load, loot pools, dungeon templates and enemy status events with controlled inputs and fixtures |
 
 ## Local and CI checks
 
@@ -22,7 +22,7 @@ The unit suite uses temporary synthetic archives and needs no game files or thir
 
 `build.py` verifies every cached input before use. `--utmt /path/to/UndertaleModCli` and `--upstream-zip /path/to/zeldadoi.zip` can reuse local downloads. A custom compiler path bypasses the compiler archive download check. Use version 0.9.2.0.
 
-The compiler can exit successfully after a script exception. The build requires completion markers and an output file, then reloads the result for structural checks. The original game's audio alignment warning requires the CLI's verbose flag.
+The compiler can exit successfully after a script exception. The build requires completion markers and an output file, then reloads the result for structural checks. The original game's audio alignment warning requires the CLI's verbose flag. The patch pins serialization to the older runner's format and verifies that the FUNC chunk includes a locals-table count. The tool can otherwise misidentify the empty upstream table as newer alignment padding and produce a file that crashes at startup.
 
 `--check-release` requires the checked-in delta to reconstruct exactly the bytes from the clean source build. During development, omit that flag until you regenerate the delta. CI uploads only `.build/build-report.json`. It never uploads full games, runtimes, saves, or instrumented builds.
 
@@ -35,7 +35,7 @@ python3 build.py --runtime-tests
 python3 tests/run_device.py root@your-device.local
 ```
 
-Optional arguments include `--control-path /path/to/socket`, `--ports-dir /storage/roms/ports`, and `--report-dir .build/device-results`.
+Optional arguments include `--control-path /path/to/socket`, `--ports-dir /storage/roms/ports`, and `--report-dir .build/device-results`. Add `--capture` to save screenshots of all seven inventory pages after the assertions. Review them for clipping and HUD overlap. The harness does not compare pixels.
 
 The runner creates a disposable game directory under `/storage/.cache/`, with fresh saves, and a temporary Ports launcher. It launches through EmulationStation and runs the suite automatically. It writes the JSON assertion report and game log locally, removes the disposable installation, and compares production save hashes. It never switches the production game to a test build. If SSH disconnects before cleanup, remove the reported `doi43-harness-*` directory and matching `DOI43 Harness *.sh` launcher after closing the test game.
 
@@ -49,7 +49,7 @@ python3 tests/run_device.py root@your-device.local \
   --report-dir .build/baseline-results
 ```
 
-The baseline contains the unpatched 1.1.6 game with the same instrumentation. That command must fail on the behaviors the patch adds. Review each named failure. A launch error does not prove regression coverage.
+The baseline contains the unpatched 1.1.6 game with the same instrumentation. That command must fail on the behaviors the patch adds. Review each named failure. Some original bugs terminate the runner before the report can complete. Retain the partial assertion report and the named error in `game.log`. A launch error does not prove regression coverage.
 
 GitHub-hosted CI compiles the runtime suite but cannot execute the Nova's ARM/GPU runtime. Before releasing, run the suite on a device. Also check the physical confirm/cancel buttons, title animation, R3 panel toggle, pause layout, CRT mode, and Select + Start. Injected input does not verify physical controller mapping, rendering quality, audio, or an entire generated dungeon run.
 
@@ -65,8 +65,8 @@ GitHub-hosted CI compiles the runtime suite but cannot execute the Nova's ARM/GP
    .build/patchenv/bin/python package_release.py \
      --original-game .build/game.droid \
      --patched-game .build/patched.droid \
-     --version 1.3.0 \
-     --output dist/Dungeons-of-Infinity-4-3-v1.3.0-Nova-Patch-Installer.zip
+     --version 1.4.0 \
+     --output dist/Dungeons-of-Infinity-4-3-v1.4.0-Nova-Patch-Installer.zip
    python3 build.py --check-release --runtime-tests
    ```
 

@@ -1,0 +1,464 @@
+[
+  {
+    "id": "bari-attacker",
+    "code": "gml_GlobalScript___Enemies",
+    "anchor": "ShockLink(other.id, true);",
+    "replacement": "ShockLink(id, true);"
+  },
+  {
+    "id": "shock-snapshot",
+    "code": "gml_GlobalScript___Link",
+    "anchor": "        UpdateState(18);\n        ShockEnemyInst = arg0.id;",
+    "replacement": "        if (!instance_exists(arg0)) exit;\n        ShockEnemyInst = arg0.id;\n        NovaShockX = arg0.x;\n        NovaShockY = arg0.y;\n        NovaShockAttack = arg0.Attack;\n        UpdateState(18);"
+  },
+  {
+    "id": "shock-expired-attacker",
+    "code": "gml_Object_oLink_Alarm_2",
+    "anchor": "LinkHit(point_direction(ShockEnemyInst.x, ShockEnemyInst.y, x, y), 1.25, 12, ShockEnemyInst.Attack);",
+    "replacement": "LinkHit(point_direction(NovaShockX, NovaShockY, x, y), 1.25, 12, NovaShockAttack);"
+  },
+  {
+    "id": "guru-update",
+    "code": "gml_GlobalScript___Gurubar",
+    "anchor": "        GuruInst[i].State = State;",
+    "replacement": "        if (!instance_exists(GuruInst[i])) continue;\n        GuruInst[i].State = State;"
+  },
+  {
+    "id": "guru-destroy",
+    "code": "gml_Object_oEnemy_Guru_Bar_Step_2",
+    "anchor": "        var _Guru = GuruInst[i];",
+    "replacement": "        var _Guru = GuruInst[i];\n        if (!instance_exists(_Guru)) continue;"
+  },
+  {
+    "id": "moon-pearl-pause",
+    "code": "gml_Object_oLink_Step_0",
+    "anchor": "                global.Paused = true;\n                global.Level.SwitchBlock_ActiveColor",
+    "replacement": "                global.Level.SwitchBlock_ActiveColor"
+  },
+  {
+    "id": "pickup-floor",
+    "code": "gml_GlobalScript___Link",
+    "anchor": "    if (arg1 != -4)\n    {\n        if (!arg1.ShopItem)",
+    "replacement": "    if (arg1 != -4 && !Collision_CheckFloorLevel(FloorLevel, arg1)) return -4;\n    if (arg1 != -4)\n    {\n        if (!arg1.ShopItem)"
+  },
+  {
+    "id": "carried-object-floor",
+    "code": "gml_GlobalScript___Link",
+    "anchor": "        var _Pickup = true;",
+    "replacement": "        var _Pickup = Collision_CheckFloorLevel(FloorLevel, Inst);"
+  },
+  {
+    "id": "explorer-loot",
+    "code": "gml_Object_oDeadGuy_Create_0",
+    "anchor": "    return ItemHolding != -1;",
+    "replacement": "    if (ItemHolding != -1 && !Item_Allowed(ItemHolding, -1, 2)) ItemHolding = -1;\n    return ItemHolding != -1;"
+  },
+  {
+    "id": "explorer-recheck",
+    "code": "gml_Object_oDeadGuy_Step_0",
+    "anchor": "        if (global.DB_ExitCode == 1)\n        {",
+    "replacement": "        if (global.DB_ExitCode == 1 && !DBScriptFunction_DeadGuy_CheckLoot())\n        {\n            MsgBox(\"Nothing was found.\");\n            DB_Started = false;\n            exit;\n        }\n        if (global.DB_ExitCode == 1)\n        {"
+  },
+  {
+    "id": "treeman-water",
+    "code": "gml_Object_oVillager_Treeman_Step_0",
+    "anchor": "if (TransformInit && oLink.State == 1)",
+    "replacement": "if (TransformInit && !global.LinkDead && (oLink.State == 1 || oLink.State == 5))"
+  },
+  {
+    "id": "treeman-payment",
+    "code": "gml_Object_oVillager_Treeman_Step_0",
+    "anchor": "            case 2:\n                global.Paused = true;",
+    "replacement": "            case 2:\n                if (Inventory_ItemClassExists(37) < 0 || ItemHolding == -1)\n                {\n                    NPC_SetResponse(3);\n                    break;\n                }\n                global.Paused = true;"
+  },
+  {
+    "id": "zora-spread-bow",
+    "code": "gml_Object_oZora_Alarm_3",
+    "anchor": "    case 7:\n        if (global.Inventory_ItemData[7].Index >= 0)\n        {\n            _Rupees = true;\n        }\n        break;",
+    "replacement": ""
+  },
+  {
+    "id": "arrow-spawn",
+    "code": "gml_Object_oArrow_Create_0",
+    "anchor": "Setup = true;",
+    "replacement": "Setup = true;\nevent_perform(ev_step, ev_step_begin);"
+  },
+  {
+    "id": "steel-sword-pots",
+    "code": "gml_Object_oSword_Step_2",
+    "anchor": "if (!SwordLevel(2) && oLink.State != 19)",
+    "replacement": "if (!SwordLevel(1) && oLink.State != 19)"
+  },
+  {
+    "id": "carried-water-overlay",
+    "code": "gml_GlobalScript___Objects",
+    "anchor": "    if (!InWater || z > 3)",
+    "replacement": "    if (!InWater || z > 3 || (instance_exists(oLink) && oLink.ItemHolding == id))"
+  },
+  {
+    "id": "death-lightning",
+    "code": "gml_Object_oIntro_Alarm_1",
+    "anchor": "global.GlobalLighting = false;",
+    "replacement": "if (global.LinkDead)\n{\n    global.GlobalLighting = true;\n    alarm[1] = 30;\n    exit;\n}\nglobal.GlobalLighting = false;"
+  },
+  {
+    "id": "death-lightning-active",
+    "code": "gml_Object_oLinkDeath_Create_0",
+    "anchor": "global.LinkDead = true;",
+    "replacement": "global.LinkDead = true;\nif (instance_exists(oIntro)) global.GlobalLighting = true;"
+  },
+  {
+    "id": "armos-apex",
+    "code": "gml_Object_oBoss_Armos_C_Step_1",
+    "anchor": "if (Armos_MoveToWaypoint(LastArmos_Inst) && z >= LastArmos_JumpZ)",
+    "replacement": "if ((Armos_MoveToWaypoint(LastArmos_Inst) || z >= LastArmos_JumpZ + 16) && z >= LastArmos_JumpZ)"
+  },
+  {
+    "id": "crystal-hold-init",
+    "code": "gml_GlobalScript___Link",
+    "anchor": "        ItemHolding = arg0;\n        ItemHolding.visible = true;",
+    "replacement": "        ItemHolding = arg0;\n        NovaCrystalHold = ItemHolding.object_index == oItem_Crystal;\n        NovaCrystalTicks = 0;\n        ItemHolding.visible = true;"
+  },
+  {
+    "id": "crystal-hold-completion",
+    "code": "gml_Object_oLink_Step_0",
+    "anchor": "        if (ItemHolding.object_index == oItem_Crystal && !audio_is_playing(Music_Boss_Defeated))",
+    "replacement": "        if (NovaCrystalHold) NovaCrystalTicks++;\n        if (NovaCrystalHold && (!audio_is_playing(Music_Boss_Defeated) || NovaCrystalTicks >= room_speed * 15))"
+  },
+  {
+    "id": "crystal-hold-once",
+    "code": "gml_Object_oLink_Step_0",
+    "anchor": "            oHUD.BossesDefeated++;",
+    "replacement": "            NovaCrystalHold = false;\n            oHUD.BossesDefeated++;"
+  },
+  {
+    "id": "main-bag-upgrade",
+    "code": "gml_GlobalScript___Inventory",
+    "anchor": "    if (arg0 == 2)\n    {\n        var _OwnsBombBag = global.Inventory_ItemData[4].Owns[0];\n        var _OwnsArrowQuiver = global.Inventory_ItemData[0].Owns[0];\n        var _OwnsGemBag = global.Inventory_ItemData[15].Owns[0];\n        Inventory_ClearSlot(global.Inventory_SlotIndex_BombBag);\n        Inventory_ClearSlot(global.Inventory_SlotIndex_ArrowQuiver);\n        Inventory_ClearSlot(global.Inventory_SlotIndex_GemBag);\n        if (global.Inventory_SlotIndex_Selected < global.Inventory_SlotIndex_Gems)\n        {\n            var _OldSlotsPerRow = Inventory_SlotsPerRow();\n            var _NewSlotsPerRow = Inventory_SlotsPerRow(global.Inventory_ItemData[2].Index + 1);\n            var _Diff = _NewSlotsPerRow - _OldSlotsPerRow;\n            global.Inventory_SlotIndex_Selected += _Diff;\n            if (global.Inventory_SlotIndex_Equiped == global.Inventory_SlotIndex_BombBag)\n            {\n                global.Inventory_SlotIndex_Equiped += _Diff;\n            }\n        }\n        Inventory_CalculateSlotIndexes(global.Inventory_ItemData[2].Index + 1, false);\n        if (_OwnsBombBag)\n        {\n            global.Inventory[global.Inventory_SlotIndex_BombBag].ItemClass = 4;\n            global.Inventory[global.Inventory_SlotIndex_BombBag].ItemIndex = 0;\n        }\n        if (_OwnsArrowQuiver)\n        {\n            global.Inventory[global.Inventory_SlotIndex_ArrowQuiver].ItemClass = 0;\n            global.Inventory[global.Inventory_SlotIndex_ArrowQuiver].ItemIndex = 0;\n        }\n        if (_OwnsGemBag)\n        {\n            global.Inventory[global.Inventory_SlotIndex_GemBag].ItemClass = 15;\n            global.Inventory[global.Inventory_SlotIndex_GemBag].ItemIndex = 0;\n        }\n    }\n",
+    "replacement": "    if (arg0 == 2)\n    {\n        global.Inventory_ItemData[2].Index = clamp(max(global.Inventory_ItemData[2].Index, arg1), 0, 5);\n        Item_NonDuplicatableList_Remove(2, arg1);\n        Inventory_Defrag();\n        return true;\n    }\n"
+  },
+  {
+    "id": "dedicated-bag-routing",
+    "code": "gml_GlobalScript___Inventory",
+    "anchor": "    var _SlotIndex;\n    switch (arg0)\n    {\n        case 2:\n            return -2;\n        case 14:\n        case 23:\n            if (global.Inventory_ItemData[15].Owns[0])\n            {\n                _SlotIndex = Inventory_FindEmptySlot_Gems();\n                if (_SlotIndex != -1)\n                {\n                    break;\n                }\n            }\n        default:\n            _SlotIndex = Inventory_FindEmptySlot();\n            break;\n    }\n",
+    "replacement": "    if (arg0 == 2) return -2;\n    var _SlotIndex = NovaEmptySlot(arg0);\n"
+  },
+  {
+    "id": "new-bag-transfer",
+    "code": "gml_GlobalScript___Inventory",
+    "anchor": "        case 15:\n            Inventory_TransferGems();",
+    "replacement": "        case 15:\n        case 49:\n        case 50:\n            Inventory_TransferGems();"
+  },
+  {
+    "id": "inventory-init-expansion",
+    "code": "gml_GlobalScript___Inventory",
+    "anchor": "    Inventory_CalculateSlotIndexes();\n}",
+    "replacement": "    Inventory_CalculateSlotIndexes();\n    NovaInventoryInit();\n}"
+  },
+  {
+    "id": "bag-stack-totals",
+    "code": "gml_GlobalScript___Inventory",
+    "anchor": "for (var i = 0; i < Inventory_MaxSlots(); i++)",
+    "replacement": "for (var i = 0; i <= global.Inventory_SlotIndex_Last; i++)"
+  },
+  {
+    "id": "inventory-class-count-0",
+    "code": "gml_GlobalScript___Inventory",
+    "anchor": "function Inventory_InitData()\n{\n    global.InventoryInst = -4;\n    global.Inventory_SlotIndex_RowStart[4] = 32;\n    global.Inventory_SlotIndex_RowEnd[4] = (global.Inventory_SlotIndex_RowStart[4] + 2) - 1;\n    global.Inventory_SlotIndex_RowStart[5] = global.Inventory_SlotIndex_RowEnd[4] + 1;\n    global.Inventory_SlotIndex_RowEnd[5] = (global.Inventory_SlotIndex_RowStart[5] + 2) - 1;\n    global.Inventory_SlotIndex_RowStart[6] = global.Inventory_SlotIndex_RowEnd[5] + 1;\n    global.Inventory_SlotIndex_RowEnd[6] = (global.Inventory_SlotIndex_RowStart[6] + 2) - 1;\n    global.Inventory_SlotIndex_Gems = global.Inventory_SlotIndex_RowStart[4];\n    global.Inventory_SlotIndex_Last = global.Inventory_SlotIndex_RowEnd[6];\n    for (var i = 0; i <= global.Inventory_SlotIndex_Last; i++)\n    {\n        global.Inventory[i] = \n        {\n            ItemClass: -1,\n            ItemIndex: -1,\n            Amount: 0,\n            Enabled: true\n        };\n    }\n    for (var _ItemClass = 0; _ItemClass < 49; _ItemClass++)",
+    "replacement": "function Inventory_InitData()\n{\n    global.InventoryInst = -4;\n    global.Inventory_SlotIndex_RowStart[4] = 32;\n    global.Inventory_SlotIndex_RowEnd[4] = (global.Inventory_SlotIndex_RowStart[4] + 2) - 1;\n    global.Inventory_SlotIndex_RowStart[5] = global.Inventory_SlotIndex_RowEnd[4] + 1;\n    global.Inventory_SlotIndex_RowEnd[5] = (global.Inventory_SlotIndex_RowStart[5] + 2) - 1;\n    global.Inventory_SlotIndex_RowStart[6] = global.Inventory_SlotIndex_RowEnd[5] + 1;\n    global.Inventory_SlotIndex_RowEnd[6] = (global.Inventory_SlotIndex_RowStart[6] + 2) - 1;\n    global.Inventory_SlotIndex_Gems = global.Inventory_SlotIndex_RowStart[4];\n    global.Inventory_SlotIndex_Last = global.Inventory_SlotIndex_RowEnd[6];\n    for (var i = 0; i <= global.Inventory_SlotIndex_Last; i++)\n    {\n        global.Inventory[i] = \n        {\n            ItemClass: -1,\n            ItemIndex: -1,\n            Amount: 0,\n            Enabled: true\n        };\n    }\n    for (var _ItemClass = 0; _ItemClass < 51; _ItemClass++)"
+  },
+  {
+    "id": "inventory-class-count-1",
+    "code": "gml_GlobalScript___Inventory",
+    "anchor": "function Inventory_CountStackItems()\n{\n    for (var _ItemClass = 0; _ItemClass < 49; _ItemClass++)",
+    "replacement": "function Inventory_CountStackItems()\n{\n    for (var _ItemClass = 0; _ItemClass < 51; _ItemClass++)"
+  },
+  {
+    "id": "treasure-wishstone-count",
+    "code": "gml_GlobalScript___Inventory",
+    "anchor": "function Inventory_CountGemBag()\n{\n    var _Count = 0;\n    for (var i = global.Inventory_SlotIndex_RowStart[4]; i <= global.Inventory_SlotIndex_RowEnd[6]; i++)\n    {\n        if (global.Inventory[i].ItemClass == 14 || global.Inventory[i].ItemClass == 23)\n",
+    "replacement": "function Inventory_CountGemBag()\n{\n    var _Count = 0;\n    for (var i = global.Inventory_SlotIndex_RowStart[4]; i <= global.Inventory_SlotIndex_RowEnd[6]; i++)\n    {\n        if (global.Inventory[i].ItemClass == 14 || global.Inventory[i].ItemClass == 23 || global.Inventory[i].ItemClass == 47)\n"
+  },
+  {
+    "id": "new-bag-metadata",
+    "code": "gml_GlobalScript___Items",
+    "anchor": "    ItemDataInit(2, 2, 0, 0, 10, 7);",
+    "replacement": "    ItemDataInit(2, 2, 0, 0, 6, 3);\n    ItemDataInit(49, 1, 0, 0, 0, 7);\n    ItemDataInit(50, 1, 0, 0, 0, 7);"
+  },
+  {
+    "id": "new-bag-names",
+    "code": "gml_GlobalScript___Items",
+    "anchor": "function Item_Name(arg0, arg1, arg2 = 1)\n{",
+    "replacement": "function Item_Name(arg0, arg1, arg2 = 1)\n{\n    if (arg0 == 49) return \"Food Bag\";\n    if (arg0 == 50) return \"Pendant Bag\";\n    if (arg0 == 2) return \"Inventory Slot\";"
+  },
+  {
+    "id": "new-bag-description",
+    "code": "gml_GlobalScript___Items",
+    "anchor": "function Item_Info(arg0, arg1)\n{",
+    "replacement": "function Item_Info(arg0, arg1)\n{\n    if (arg0 == 49) return \"Holds three food items in a separate bag.\";\n    if (arg0 == 50) return \"Holds three pendants in a separate bag.\";\n    if (arg0 == 2) return \"Unlocks one extra main inventory slot, up to ten.\";"
+  },
+  {
+    "id": "wishstone-description",
+    "code": "gml_GlobalScript___Items",
+    "anchor": "\"A seperate bag to hold your gems and kinstones.\"",
+    "replacement": "\"Holds six gems, kinstones or wishstone stacks.\""
+  },
+  {
+    "id": "slot-price",
+    "code": "gml_GlobalScript___Items",
+    "anchor": "function Item_Price(arg0, arg1, arg2)\n{",
+    "replacement": "function Item_Price(arg0, arg1, arg2)\n{\n    if (arg0 == 2) return Item_Price(18, 0, 1);\n    if (arg0 == 49 || arg0 == 50) return 40;"
+  },
+  {
+    "id": "bag-class-mapping",
+    "code": "gml_GlobalScript___Items",
+    "anchor": "function ItemClassFromObjIndex(arg0)\n{",
+    "replacement": "function ItemClassFromObjIndex(arg0)\n{\n    if (arg0 == oNovaFoodBag) return 49;\n    if (arg0 == oNovaPendantBag) return 50;"
+  },
+  {
+    "id": "bag-object-mapping",
+    "code": "gml_GlobalScript___Items",
+    "anchor": "function ObjIndexFromItemClass(arg0)\n{",
+    "replacement": "function ObjIndexFromItemClass(arg0)\n{\n    if (arg0 == 49) return oNovaFoodBag;\n    if (arg0 == 50) return oNovaPendantBag;"
+  },
+  {
+    "id": "new-loot-pools",
+    "code": "gml_GlobalScript___Items",
+    "anchor": "    global.PossibleItemLists[3] = ds_list_create();",
+    "replacement": "    ds_list_add(global.PossibleItemLists[2], 2, 49, 50);\n    global.PossibleItemLists[3] = ds_list_create();\n    ds_list_add(global.PossibleItemLists[3], 6, 19, 49, 50);"
+  },
+  {
+    "id": "new-shop-pools",
+    "code": "gml_GlobalScript___Items",
+    "anchor": "    global.PossibleItemLists[11] = ds_list_create();",
+    "replacement": "    ds_list_add(global.PossibleItemLists[4], 2, 49, 50);\n    ds_list_add(global.PossibleItemLists[10], 49, 50);\n    global.PossibleItemLists[11] = ds_list_create();"
+  },
+  {
+    "id": "item-class-count-0",
+    "code": "gml_GlobalScript___Items",
+    "anchor": "_ItemClass < 49",
+    "replacement": "_ItemClass < 51"
+  },
+  {
+    "id": "item-class-count-1",
+    "code": "gml_GlobalScript___Items",
+    "anchor": "i < 49",
+    "replacement": "i < 51"
+  },
+  {
+    "id": "bag-upgrade-index",
+    "code": "gml_Object_oItem_Bag_Create_0",
+    "anchor": "min(global.Inventory_ItemData[Class].Index + 1, image_number - 1)",
+    "replacement": "min(global.Inventory_ItemData[Class].Index + 1, global.Inventory_ItemData[Class].Index_Max)"
+  },
+  {
+    "id": "inventory-save-schema",
+    "code": "gml_GlobalScript___Users",
+    "anchor": "    global.Users[global.UserIndex].SaveData.Inventory = StructCopy(global.Inventory);",
+    "replacement": "    global.Users[global.UserIndex].SaveData.NovaInventoryVersion = 1;\n    global.Users[global.UserIndex].SaveData.Inventory = StructCopy(global.Inventory);"
+  },
+  {
+    "id": "inventory-save-migration",
+    "code": "gml_GlobalScript___Users",
+    "anchor": "    global.Inventory_SlotIndex_Equiped = global.Users[global.UserIndex].SaveData.Inventory_SlotIndexEquiped;",
+    "replacement": "    global.Inventory_SlotIndex_Equiped = global.Users[global.UserIndex].SaveData.Inventory_SlotIndexEquiped;\n    NovaInventoryMigrate(global.Users[global.UserIndex].SaveData);"
+  },
+  {
+    "id": "sword-state-reset",
+    "code": "gml_GlobalScript___Link",
+    "anchor": "    State = arg0;\n    image_index = 0;",
+    "replacement": "    State = arg0;\n    NovaSwordMode = 0;\n    NovaSwordCharge = 0;\n    image_index = 0;"
+  },
+  {
+    "id": "sword-controls",
+    "code": "gml_Object_oLink_Step_0",
+    "anchor": "if ((State == 1 || State == 2 || State == 11 || State == 19) && !BounceBack)",
+    "replacement": "if (State == 12) NovaSwordStep();\nif ((State == 1 || State == 2 || State == 11 || State == 19) && !BounceBack)"
+  },
+  {
+    "id": "sword-hold",
+    "code": "gml_Object_oLink_Step_0",
+    "anchor": "    case 12:\n        if (image_index >= (image_number - 1))\n        {\n            UpdateState(1);\n        }",
+    "replacement": "    case 12:\n        if (NovaSwordMode == 0 && image_index >= (image_number - 1))\n        {\n            NovaSwordFinishSwing();\n        }"
+  },
+  {
+    "id": "sword-spin-collision",
+    "code": "gml_GlobalScript___Sword",
+    "anchor": "        case 12:\n            if (arg1 == -4)",
+    "replacement": "        case 12:\n            if (oLink.NovaSwordMode == 2)\n            {\n                var radius = 16 + global.Inventory_ItemData[44].Index;\n                if (arg1 == -4) return ObjCollision_Circle(oLink.x, oLink.y - 6, radius, arg0, FloorLevel);\n                ObjCollision_Circle_List(arg1, oLink.x, oLink.y - 6, radius, arg0, FloorLevel);\n                return -4;\n            }\n            if (arg1 == -4)"
+  },
+  {
+    "id": "sword-charge-cue",
+    "code": "gml_Object_oSword_Draw_0",
+    "anchor": "draw_self();",
+    "replacement": "draw_self();\nif (oLink.NovaSwordMode == 1 && oLink.NovaSwordCharge >= 45 && SwordLevel(2))\n{\n    draw_set_color(c_white);\n    draw_circle(x, y, 1 + ((oLink.NovaSwordCharge div 5) mod 2), false);\n}"
+  },
+  {
+    "id": "agahnim-edge",
+    "code": "gml_GlobalScript___Link",
+    "anchor": "function CheckHoles()\n{\n    if (RoomIndex == -1)\n    {\n        return false;\n    }",
+    "replacement": "function CheckHoles()\n{\n    if (RoomIndex == -1)\n    {\n        if (global.Level.Index == 13 && instance_exists(oBoss_Aghanim))\n        {\n            UpdateState(20);\n            return true;\n        }\n        return false;\n    }"
+  },
+  {
+    "id": "fortress-fairy-water",
+    "code": "gml_Object_oLink_Draw_0",
+    "anchor": "    draw_sprite(global.InWaterSprite, global.InWaterImgIndex, x, y);",
+    "replacement": "    draw_sprite((global.Level.Index == 12 && TemplateCheck(global.CurrentRoomIndex, 8, 0)) ? sInWater : global.InWaterSprite, global.InWaterImgIndex, x, y);"
+  },
+  {
+    "id": "fairy-orb-count",
+    "code": "gml_Object_oOrb_Step_2",
+    "anchor": "                instance_create_layer(x - 4, y - 5, layer, oItem_Fairy, \n                {\n                    From: 0\n                });\n                instance_create_layer(x + 4, y - 5, layer, oItem_Fairy, \n                {\n                    From: 0\n                });\n",
+    "replacement": "                var fairies = Prob(0.8) ? 1 : (Prob(0.9) ? 2 : 3);\n                repeat (fairies)\n                {\n                    instance_create_layer(x + irandom_range(-4, 4), y - 5, layer, oItem_Fairy, {From: 0});\n                }\n"
+  },
+  {
+    "id": "food-bag-dialogue",
+    "code": "gml_Object_oHungryGuy_Step_0",
+    "anchor": "i < Inventory_MaxSlots()",
+    "replacement": "i <= global.Inventory_SlotIndex_Last"
+  },
+  {
+    "id": "inventory-bonus-slot",
+    "code": "gml_GlobalScript___Link",
+    "anchor": "    global.Inventory_ItemData[2].Index = 0;",
+    "replacement": "    global.Inventory_ItemData[2].Index = global.StartingGear == 2 ? 1 : 0;"
+  },
+  {
+    "id": "rods-boss-damage",
+    "code": "gml_GlobalScript___Enemies",
+    "anchor": "    global.EnemyData[arg0] = {};",
+    "replacement": "    if (Enemy_IsBoss(arg0))\n    {\n        var rods = [6, 7, 9, 10];\n        for (var i = 0; i < array_length(rods); i++)\n        {\n            var effect = arg6[rods[i]];\n            if (is_array(effect))\n            {\n                for (var j = 0; j < array_length(effect); j++) if (effect[j] == 1) effect[j] = 2;\n            }\n            else if (effect == 1) arg6[rods[i]] = 2;\n        }\n    }\n    global.EnemyData[arg0] = {};"
+  },
+  {
+    "id": "rod-charge-limits",
+    "code": "gml_GlobalScript___Inventory",
+    "anchor": "function Inventory_MaxAmount(arg0)\n{",
+    "replacement": "function Inventory_MaxAmount(arg0, arg1 = 0)\n{\n    if (arg0 == 39)\n    {\n        var charges = [16, 12, 12, 12, 8, 8];\n        return charges[clamp(arg1, 0, 5)];\n    }"
+  },
+  {
+    "id": "rod-add-charge-limit",
+    "code": "gml_GlobalScript___Inventory",
+    "anchor": "var _MaxAmount = Inventory_MaxAmount(arg0);",
+    "replacement": "var _MaxAmount = Inventory_MaxAmount(arg0, arg1);"
+  },
+  {
+    "id": "rod-spawn-charges",
+    "code": "gml_Object_oItem_Rod_Create_0",
+    "anchor": "Amount = 16;",
+    "replacement": "Amount = Inventory_MaxAmount(39, Index);"
+  },
+  {
+    "id": "rod-pickup-charge-limit",
+    "code": "gml_GlobalScript___Link",
+    "anchor": "Inventory_MaxAmount(ItemInst.Class)",
+    "replacement": "Inventory_MaxAmount(ItemInst.Class, ItemInst.Index)"
+  },
+  {
+    "id": "rod-charger-limit",
+    "code": "gml_Object_oRodCharger_Step_0",
+    "anchor": "global.Inventory[global.Inventory_SlotIndex_Equiped].Amount >= 16",
+    "replacement": "global.Inventory[global.Inventory_SlotIndex_Equiped].Amount >= Inventory_MaxAmount(39, RodIndex)"
+  },
+  {
+    "id": "rod-charge-preservation",
+    "code": "gml_GlobalScript___Inventory",
+    "anchor": "            _InvItem.Owns[arg1] = true;\n            global.Inventory[arg3].Amount = clamp(global.Inventory[arg3].Amount + arg2, 0, _MaxAmount);",
+    "replacement": "            _InvItem.Owns[arg1] = true;\n            var charge_limit = max(_MaxAmount, global.Inventory[arg3].Amount);\n            global.Inventory[arg3].Amount = clamp(global.Inventory[arg3].Amount + arg2, 0, charge_limit);"
+  },
+  {
+    "id": "wall-light-floor-1",
+    "code": "gml_GlobalScript___Dungeon_Draw_SpecialObjs_Forced",
+    "anchor": "var _LightInst = instance_create_layer(ObjX, ObjY + 8, \"Objs_Upper\", oWallLight, \n                    {\n                        RoomIndex: arg0,\n                        Location: 1,\n                        Status: !global.Challenges[4]",
+    "replacement": "var _LightInst = instance_create_layer(ObjX, ObjY + 8, \"Objs_\" + FloorLevelStr, oWallLight, \n                    {\n                        RoomIndex: arg0,\n                        Location: 1,\n                        Status: !global.Challenges[4]"
+  },
+  {
+    "id": "wall-light-floor-2",
+    "code": "gml_GlobalScript___Dungeon_Draw_SpecialObjs_Forced",
+    "anchor": "var _LightInst = instance_create_layer(ObjX, ObjY, \"Objs_Upper\", oWallLight, \n                    {\n                        RoomIndex: arg0,\n                        Location: 2,\n                        Status: !global.Challenges[4]",
+    "replacement": "var _LightInst = instance_create_layer(ObjX, ObjY, \"Objs_\" + FloorLevelStr, oWallLight, \n                    {\n                        RoomIndex: arg0,\n                        Location: 2,\n                        Status: !global.Challenges[4]"
+  },
+  {
+    "id": "wall-light-floor-3",
+    "code": "gml_GlobalScript___Dungeon_Draw_SpecialObjs_Forced",
+    "anchor": "var _LightInst = instance_create_layer(ObjX + 8, ObjY, \"Objs_Upper\", oWallLight, \n                    {\n                        RoomIndex: arg0,\n                        Location: 3,\n                        Status: !global.Challenges[4]",
+    "replacement": "var _LightInst = instance_create_layer(ObjX + 8, ObjY, \"Objs_\" + FloorLevelStr, oWallLight, \n                    {\n                        RoomIndex: arg0,\n                        Location: 3,\n                        Status: !global.Challenges[4]"
+  },
+  {
+    "id": "wall-light-floor-4",
+    "code": "gml_GlobalScript___Dungeon_Draw_SpecialObjs_Forced",
+    "anchor": "var _LightInst = instance_create_layer(ObjX, ObjY, \"Objs_Upper\", oWallLight, \n                    {\n                        RoomIndex: arg0,\n                        Location: 4,\n                        Status: !global.Challenges[4]",
+    "replacement": "var _LightInst = instance_create_layer(ObjX, ObjY, \"Objs_\" + FloorLevelStr, oWallLight, \n                    {\n                        RoomIndex: arg0,\n                        Location: 4,\n                        Status: !global.Challenges[4]"
+  },
+  {
+    "id": "keyboard-remap-index",
+    "code": "gml_GlobalScript___Input",
+    "anchor": "input_binding_set(GetInputVerbStr(global.BindingRemap_VerbIndex), input_binding_empty()",
+    "replacement": "input_binding_set(GetInputVerbStr(global.BindingVerbs[global.BindingRemap_InputIndex][global.BindingRemap_VerbIndex]), input_binding_empty()"
+  },
+  {
+    "id": "keyboard-all-verbs",
+    "code": "gml_GlobalScript___Input",
+    "anchor": "global.BindingVerbs[1] = [0, 1, 2, 3, 4, 5, 7];",
+    "replacement": "global.BindingVerbs[1] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];"
+  },
+  {
+    "id": "keyboard-directions",
+    "code": "gml_GlobalScript___Input",
+    "anchor": "function GetInputVerbStr(arg0)\n{",
+    "replacement": "function GetInputVerbStr(arg0)\n{\n    if (arg0 == 8) return \"up\";\n    if (arg0 == 9) return \"down\";\n    if (arg0 == 10) return \"left\";\n    if (arg0 == 11) return \"right\";"
+  },
+  {
+    "id": "keyboard-remap-keys",
+    "code": "gml_Object_oInputRemap_Create_0",
+    "anchor": "        input_binding_scan_params_set([37, 39, 38, 40, 27], [162, 163, 164, 165, 32, 16, 13, 36, 35, 33, 34, 45, 46, 188, 190, 220, 222, 189, 187, 186, 222, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 110, 111, 106, 109, 107, \"A\", \"B\", \"C\", \"D\", \"E\", \"F\", \"G\", \"H\", \"I\", \"J\", \"K\", \"L\", \"M\", \"N\", \"O\", \"P\", \"Q\", \"R\", \"S\", \"T\", \"U\", \"V\", \"W\", \"X\", \"Y\", \"Z\", \"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\", \"0\"]);",
+    "replacement": "        input_binding_scan_params_set([], [37, 39, 38, 40, 27, 162, 163, 164, 165, 32, 16, 13, 36, 35, 33, 34, 45, 46, 188, 190, 220, 222, 189, 187, 186, 222, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 110, 111, 106, 109, 107, \"A\", \"B\", \"C\", \"D\", \"E\", \"F\", \"G\", \"H\", \"I\", \"J\", \"K\", \"L\", \"M\", \"N\", \"O\", \"P\", \"Q\", \"R\", \"S\", \"T\", \"U\", \"V\", \"W\", \"X\", \"Y\", \"Z\", \"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\", \"0\"]);"
+  },
+  {
+    "id": "keyboard-escape-binding",
+    "code": "gml_Object_oInputRemap_Step_0",
+    "anchor": "if (keyboard_check_pressed(vk_escape))",
+    "replacement": "if (keyboard_check_pressed(vk_escape) && global.BindingRemap_InputIndex != 1)"
+  },
+  {
+    "id": "keyboard-remap-layout",
+    "code": "gml_Object_oMenu_Draw_0",
+    "anchor": "        case 14:\n            draw_set_halign(fa_right);\n            var PosX = inst_100005.x + 136;\n            var PosY = inst_100005.y + 14;\n            draw_text(PosX, PosY, \"Sword:\");\n            PosY += 16;\n            draw_text(PosX, PosY, \"Action:\");\n            PosY += 16;\n            draw_text(PosX, PosY, \"Item:\");\n            PosY += 16;\n            draw_text(PosX, PosY, \"Map:\");\n            PosY += 16;\n            draw_text(PosX, PosY, \"Strafe:\");\n            PosY += 16;\n            draw_text(PosX, PosY, \"Inventory:\");\n            PosY += 16;\n            draw_text(PosX, PosY, \"HUD:\");\n            PosY += 16;\n            draw_set_halign(fa_left);\n            PosX = inst_100005.x + 140;\n            PosY = inst_100005.y + 14;\n            for (var i = 0; i < global.BindingIconCount[1]; i++)\n            {\n                var BindingIcon = global.BindingIcons[1][i];\n                BindingIcon = string_replace(BindingIcon, \"empty\", \"\");\n                if (Bindings_Remap)\n                {\n                    if (i == global.BindingRemap_VerbIndex)\n                    {\n                        draw_rectangle(PosX, PosY, PosX + 36, PosY + 15, false);\n                    }\n                    else\n                    {\n                        draw_text(PosX, PosY, BindingIcon);\n                    }\n                }\n                else\n                {\n                    draw_text(PosX, PosY, BindingIcon);\n                }\n                PosY += 16;\n            }\n            break;",
+    "replacement": "        case 14:\n            var labels = [\"Sword\", \"Action\", \"Item\", \"Map\", \"Strafe\", \"Inventory\", \"Menu\", \"HUD\", \"Up\", \"Down\", \"Left\", \"Right\"];\n            draw_set_halign(fa_left);\n            for (var i = 0; i < global.BindingIconCount[1]; i++)\n            {\n                var PosX = inst_100005.x + 108;\n                var PosY = inst_100005.y + 10 + i * 12;\n                draw_text(PosX, PosY, labels[i] + \":\");\n                if (Bindings_Remap && i == global.BindingRemap_VerbIndex) draw_rectangle(PosX + 76, PosY, PosX + 116, PosY + 10, false);\n                else draw_text(PosX + 76, PosY, global.BindingIcons[1][i]);\n            }\n            break;"
+  },
+  {
+    "id": "wishing-pond-equipment",
+    "code": "gml_GlobalScript___Items",
+    "anchor": "    global.PossibleItemLists[12] = ds_list_create();",
+    "replacement": "    global.PossibleItemLists[12] = ds_list_create();\n    ds_list_add(global.PossibleItemLists[12], 6, 19, 49, 50);"
+  },
+  {
+    "id": "spin-all-directions",
+    "code": "gml_Object_oSword_Step_2",
+    "anchor": "case 12:\n                        if (InFrontOfLink(x, y))",
+    "replacement": "case 12:\n                        if (oLink.NovaSwordMode == 2 || InFrontOfLink(x, y))"
+  },
+  {
+    "id": "remap-backup",
+    "code": "gml_Object_oInputRemap_Create_0",
+    "anchor": "Bindings_Clear(InputIndex);",
+    "replacement": "NovaSavedBindings = input_profile_export(GetInputIndexStr(InputIndex), undefined, false);\nNovaRemapComplete = false;\nBindings_Clear(InputIndex);"
+  },
+  {
+    "id": "remap-complete",
+    "code": "gml_GlobalScript___Input",
+    "anchor": "        User_SaveControls();",
+    "replacement": "        oInputRemap.NovaRemapComplete = true;\n        User_SaveControls();"
+  },
+  {
+    "id": "remap-rollback",
+    "code": "gml_GlobalScript___Input",
+    "anchor": "function BindingsRemap_Exit()\n{",
+    "replacement": "function BindingsRemap_Exit()\n{\n    if (instance_exists(oInputRemap) && !oInputRemap.NovaRemapComplete)\n    {\n        input_profile_import(oInputRemap.NovaSavedBindings, GetInputIndexStr(global.BindingRemap_InputIndex));\n        Bindings_GetIcons(global.BindingRemap_InputIndex);\n    }"
+  },
+  {
+    "id": "inventory-menu-cleanup",
+    "code": "gml_Object_oInventory_Destroy_0",
+    "anchor": "ds_grid_destroy(DBScript_Info);",
+    "replacement": "ds_grid_destroy(DBScript_Info);\nds_grid_destroy(MenuItemGrid);"
+  }
+]

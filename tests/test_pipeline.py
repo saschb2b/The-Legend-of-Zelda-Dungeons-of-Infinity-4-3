@@ -1,5 +1,6 @@
 import io
 import json
+import struct
 import tempfile
 import unittest
 from pathlib import Path
@@ -76,6 +77,18 @@ class InstallIntegrationTests(unittest.TestCase):
             self.assertEqual((self.game / 'patch-version.txt').read_text(), 'test\n')
             self.assertTrue((self.ports / install.LAUNCHER).stat().st_mode & 0o111)
 
+    def test_inventory_migration_backup_survives_reinstallation(self):
+        self.manifest['save_schema'] = 1
+        self.run_install()
+        backup = self.game / 'save-backups/before-inventory-v1.zip'
+        original_backup = backup.read_bytes()
+        with ZipFile(backup) as archive:
+            self.assertEqual(archive.read('Users'), b'precious save')
+        (self.game / 'savedata/Users').write_bytes(b'new schema save')
+        self.run_install()
+        self.assertEqual(backup.read_bytes(), original_backup)
+        self.assertEqual((self.game / 'savedata/Users').read_bytes(), b'new schema save')
+
     def test_every_checksum_failure_keeps_the_existing_install(self):
         for field in ('patch_sha256', 'upstream_sha256', 'original_game_sha256', 'patched_game_sha256'):
             with self.subTest(field=field):
@@ -102,6 +115,17 @@ class InstallIntegrationTests(unittest.TestCase):
 
 
 class BuildTests(unittest.TestCase):
+    def test_runner_rejects_a_function_table_without_locals(self):
+        def game(payload):
+            chunk = b'FUNC' + struct.pack('<I', len(payload)) + payload
+            return b'FORM' + struct.pack('<I', len(chunk)) + chunk
+        functions = struct.pack('<I', 3) + bytes(3 * 12)
+        with self.assertRaisesRegex(ValueError, 'locals table is missing'):
+            build.verify_runner_format(game(functions))
+        build.verify_runner_format(game(functions + struct.pack('<I', 0)))
+        with self.assertRaisesRegex(ValueError, 'truncated'):
+            build.verify_runner_format(game(functions + struct.pack('<I', 1)))
+
     def test_compiler_zero_exit_without_completion_marker_fails(self):
         with tempfile.TemporaryDirectory() as temporary, patch.object(build, 'BUILD', Path(temporary)):
             tool = Path(temporary) / 'fake-compiler'

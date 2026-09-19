@@ -113,6 +113,22 @@ def refresh_artwork(ports):
         print('Refresh the Ports game list to display the new entry.', flush=True)
 
 
+def backup_legacy_saves(destination, work):
+    saves = destination / 'savedata'
+    schema = destination / 'save-schema.txt'
+    backup = destination / 'save-backups/before-inventory-v1.zip'
+    if not (saves / 'Users').is_file() or backup.exists() or (schema.exists() and schema.read_text().strip() == '1'):
+        return
+    temporary = work / 'legacy-saves.zip'
+    with ZipFile(temporary, 'w') as archive:
+        for source in sorted(saves.rglob('*')):
+            if source.is_file():
+                archive.write(source, source.relative_to(saves))
+    backup.parent.mkdir(parents=True, exist_ok=True)
+    temporary.replace(backup)
+    print('Saved a copy of the existing saves in save-backups/before-inventory-v1.zip.', flush=True)
+
+
 def install(ports, upstream_path=None, refresh=True):
     ports = ports.resolve()
     ports.mkdir(parents=True, exist_ok=True)
@@ -160,6 +176,9 @@ def install(ports, upstream_path=None, refresh=True):
         shutil.copyfile(ROOT / 'gameinfo.xml', stage / 'gameinfo.xml')
         shutil.copyfile(ROOT / 'README.md', stage / 'README.md')
         (stage / 'patch-version.txt').write_text(manifest['version'] + '\n')
+        if manifest.get('save_schema') == 1:
+            backup_legacy_saves(destination, work)
+            (stage / 'save-schema.txt').write_text('1\n')
         staged_launcher = work / LAUNCHER
         shutil.copyfile(ROOT / LAUNCHER, staged_launcher)
         staged_launcher.chmod(0o755)

@@ -48,9 +48,21 @@ try {
             if (!instance_exists(oHUD) || !instance_exists(oLink) || global.Paused || oLink.State != 1) break;
             PauseTests();
             EnemyTests();
+            BackportTests();
+            ProgressionTests();
+            InventoryTests();
+            SwordTests();
+            if (file_exists("nova-capture-enabled.txt")) {
+                CaptureStart();
+                Stage = 7;
+                break;
+            }
             Complete = true;
             Flush();
             game_end();
+            break;
+        case 7:
+            CaptureStep();
             break;
     }
     if (Ticks > 3600) throw "Runtime harness timed out at stage " + string(Stage);

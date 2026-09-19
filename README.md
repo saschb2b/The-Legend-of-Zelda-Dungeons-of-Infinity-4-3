@@ -2,7 +2,7 @@
 
 A 4:3 layout patch for the Retroid Nova running ROCKNIX, based on the PortMaster **1.1.6 VM** build.
 
-The title screen fills the display while keeping the logo's proportions. Profile menus use the full screen and keep every control visible. During gameplay, a persistent HUD shows health, magic, the equipped item, rupees, bombs, arrows, and keys. Compact side panels start hidden. Selected fixes from the 1.2.x releases add menu cancellation, title skipping, and enemy status checks.
+The title screen fills the display while keeping the logo's proportions. Profile menus use the full screen and keep every control visible. During gameplay, a persistent HUD shows health, magic, the equipped item, rupees, bombs, arrows, and keys. Compact side panels start hidden. Backports from the 1.2.x releases add inventory compartments, sword poke/spin, and crash, progression and control fixes. [BACKPORTS.md](BACKPORTS.md) lists the implemented changes, adaptations and remaining gaps.
 
 ## Install on the Nova
 
@@ -24,6 +24,8 @@ The download contains an installer and a binary patch. It contains no game archi
 
 Saves go in `zeldadoi-43/savedata/`. To update, close the game, replace the installer files with the latest release, and run the installer again. It preserves existing saves. Installation failures appear in `zeldadoi-43-installer/install.log`.
 
+Before the first inventory update it also saves a copy in `zeldadoi-43/save-backups/before-inventory-v1.zip`. Existing inventory migrates on load. Excess items remain available on an overflow page. Keep the backup if you need to return to an earlier patch.
+
 ## Controls and layout
 
 The HUD follows the classic Zelda layout. The vertical magic meter sits beside the equipped item, counters align beneath their icons, and hearts sit beneath LIFE. It uses the game's icons, live values, item quantities, and low-health pulse. The layout keeps Dungeons of Infinity's four-digit rupee counter and its separate key counter.
@@ -34,7 +36,11 @@ Press the **action button** to back out of a menu, or **Escape** on a keyboard. 
 
 Press **Start** or the confirm button to skip the opening title animation. To require the full animation, create `zeldadoi-43/savedata/options.ini` with `[Preferences]` and `CanSkipTitle=0`. Set it to `1` to allow skipping. If you already have that file, add the key to its Preferences section.
 
-Frozen or stoned Medusas and cannons cannot fire. Their attacks resume when the status ends. Pikits cannot steal items while Link falls into a pit or over an edge.
+The inventory separates equipment from the main bag. You start with five main slots and can add five more. Food and pendant bags each hold three items. The treasure bag also accepts wishstones. Press **Strafe** to advance pages, or move up to the heading and use left/right. Sword selects an item, Item equips it, and Action goes back.
+
+Hold **Sword** after a swing to poke while moving. With a level-three sword or higher, keep holding until the blade flashes, then release for a spin. Level-two swords can break pots.
+
+Frozen or stoned Medusas and cannons cannot fire. Their attacks resume when the status ends. Pikits cannot steal items while Link falls into a pit or over an edge. Keyboard remapping includes Menu and all four directions. An aborted remap restores the previous bindings.
 
 The title screen uses a centered 300×225 view. Profile menus use a taller 400×300 view with a tiled background. Gameplay presents the complete 256×224 playfield at 4:3 with horizontal pixel aspect correction. The side panels use 75% scale and 90% opacity. The CRT option processes the playfield and HUD together.
 

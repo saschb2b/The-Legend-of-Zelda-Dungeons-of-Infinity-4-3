@@ -3,10 +3,12 @@ Stage = 0;
 Ticks = 0;
 Results = [];
 Complete = false;
+Capture = "";
 global.NovaTestInput = "";
+global.NovaTestHeld = [];
 function Flush() {
     var file = file_text_open_write("nova-test-report.json");
-    file_text_write_string(file, json_stringify({complete: Complete, results: Results}));
+    file_text_write_string(file, json_stringify({complete: Complete, results: Results, capture: Capture}));
     file_text_close(file);
 }
 function Record(name, passed) {
@@ -63,6 +65,16 @@ function MenuTests() {
     Record("cancel does not interrupt binding capture", oMenu.Menu_ActiveIndex == 13);
     oMenu.Bindings_Remap = false;
     MenuCase(12, 4, "escape");
+    var keyboard_before = input_profile_export("keyboard");
+    var remap = instance_create_layer(0, 0, "System", oInputRemap, {InputIndex: 1});
+    input_binding_scan_set_Success(input_binding_key(ord("Q")));
+    input_binding_scan_set_Failure(-20);
+    Record("aborted remapping restores every previous binding", input_profile_export("keyboard") == keyboard_before && !instance_exists(remap));
+    remap = instance_create_layer(0, 0, "System", oInputRemap, {InputIndex: 1});
+    var keys = [ord("Z"), ord("X"), ord("C"), ord("M"), ord("S"), ord("I"), vk_escape, vk_f1, vk_up, vk_down, vk_left, vk_right];
+    for (var k = 0; k < array_length(keys); k++) input_binding_scan_set_Success(input_binding_key(keys[k]));
+    Record("completed keyboard remapping saves menu and directions", input_binding_get("menu_access", undefined, undefined, "keyboard").__value == vk_escape && input_binding_get("right", undefined, undefined, "keyboard").__value == vk_right && json_stringify(global.Users[0].InputProfile_Keyboard) == input_profile_export("keyboard"));
+    input_profile_import(keyboard_before, "keyboard");
     global.StartingGear = 0;
 }
 function PauseTests() {

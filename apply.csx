@@ -1,9 +1,15 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using UndertaleModLib.Compiler;
 using UndertaleModLib.Models;
 using UndertaleModLib.Util;
+// The bundled runner expects a FUNC locals table. The upstream empty table is
+// mistaken for 2024.8 alignment padding by the tool's version detection.
+Data.SetGMS2Version(2024, 6);
+Data.FORM.FUNC.CodeLocals ??= new UndertaleModLib.UndertaleSimpleList<UndertaleCodeLocals>();
 var patchDir = Directory.GetCurrentDirectory();
 var hintTexture = new UndertaleEmbeddedTexture();
 hintTexture.Name = new UndertaleString("Nova panel hint");
@@ -28,8 +34,8 @@ Data.Sprites.Add(hintSprite);
 var group = new CodeImportGroup(Data) { AutoCreateAssets = true };
 string Read(string name) => GetDecompiledText(name, null, new Underanalyzer.Decompiler.DecompileSettings());
 string FlattenEnums(string code) {
-    var matches = Regex.Matches(code, @"UnknownEnum\.Value_(\d+)");
-    foreach (Match match in matches) code = code.Replace(match.Value, match.Groups[1].Value);
+    var matches = Regex.Matches(code, @"UnknownEnum\.Value_(m?\d+)");
+    foreach (Match match in matches) code = code.Replace(match.Value, match.Groups[1].Value.Replace("m", "-"));
     return Regex.Replace(code, @"\s*enum UnknownEnum\s*\{[^}]*\}\s*", "");
 }
 string ReplaceOnce(string code, string anchor, string replacement) {
@@ -38,8 +44,10 @@ string ReplaceOnce(string code, string anchor, string replacement) {
         throw new Exception("Expected one patch anchor: " + anchor);
     return code.Substring(0, first) + replacement + code.Substring(first + anchor.Length);
 }
+var edits = new Dictionary<string, string>();
 void Edit(string name, string anchor, string replacement) {
-    group.QueueReplace(name, ReplaceOnce(FlattenEnums(Read(name)), anchor, replacement));
+    var code = edits.ContainsKey(name) ? edits[name] : FlattenEnums(Read(name));
+    edits[name] = ReplaceOnce(code, anchor, replacement);
 }
 Edit("gml_Object_oInit_Create_0", "ini_close();",
     "global.CanSkipTitle = ini_read_real(\"Preferences\", \"CanSkipTitle\", 1) == 1;\nini_close();");
@@ -82,11 +90,7 @@ draw_set_color(c_white);
 ";
 group.QueueReplace(hudName, hud.Substring(0, metricsStart) + equipmentStats + hud.Substring(metricsEnd));
 group.QueueAppend("gml_Object_oGame_Create_0", "global.Users[global.UserIndex].Prefs[2] = false;");
-var usersName = "gml_GlobalScript___Users";
-var users = FlattenEnums(Read(usersName));
-var defaults = "return [true, true, true, false, true, false, false, false];";
-if (!users.Contains(defaults)) throw new Exception("HUD default not found");
-group.QueueReplace(usersName, ReplaceOnce(users, defaults, "return [true, true, false, false, true, false, false, false];"));
+Edit("gml_GlobalScript___Users", "return [true, true, true, false, true, false, false, false];", "return [true, true, false, false, true, false, false, false];");
 var title = Data.Rooms.ByName("Room_Title");
 title.Views[0].ViewX = 50;
 title.Views[0].ViewWidth = 300;
@@ -113,5 +117,60 @@ group.QueueReplace("gml_Object_oNovaScreen_CleanUp_0", "display_set_gui_maximise
 foreach (var screen in new[] { "oTitle", "oMenu" }) {
     group.QueueAppend($"gml_Object_{screen}_Create_0", "instance_create_layer(0, 0, \"System\", oNovaScreen);");
 }
+group.QueueAppend("gml_Object_oLink_Create_0", File.ReadAllText(Path.Combine(patchDir, "sword.gml")));
+group.QueueAppend("gml_Object_oLink_Create_0", "NovaCrystalHold = false; NovaCrystalTicks = 0;");
+using (var backports = JsonDocument.Parse(File.ReadAllText(Path.Combine(patchDir, "backports.json")))) {
+    foreach (var fix in backports.RootElement.EnumerateArray()) {
+        Edit(fix.GetProperty("code").GetString(), fix.GetProperty("anchor").GetString(), fix.GetProperty("replacement").GetString());
+    }
+}
+using (var corrections = JsonDocument.Parse(File.ReadAllText(Path.Combine(patchDir, "dungeon_fixes.json")))) {
+    var statements = "";
+    foreach (var fix in corrections.RootElement.EnumerateArray()) {
+        var path = "Templates_Dungeon_Temp";
+        foreach (var part in fix[0].EnumerateArray()) {
+            if (part.ValueKind == JsonValueKind.Number) path += "[" + part.GetInt32() + "]";
+            else {
+                var member = part.GetString();
+                if (!Regex.IsMatch(member, @"^[A-Za-z_][A-Za-z_0-9]*$")) throw new Exception("Invalid dungeon field");
+                path += "." + member;
+            }
+        }
+        statements += "    if (" + path + " != " + fix[1].GetInt32() + ") throw \"Dungeon patch source mismatch.\";\n";
+        statements += "    " + path + " = " + fix[2].GetInt32() + ";\n";
+    }
+    var anchor = "    global.Templates_Dungeon = array_create(7);";
+    Edit("gml_GlobalScript___Dungeon", anchor, statements + anchor);
+}
+var inventoryName = "gml_GlobalScript___Inventory";
+var inventory = edits.ContainsKey(inventoryName) ? edits[inventoryName] : FlattenEnums(Read(inventoryName));
+var additions = File.ReadAllText(Path.Combine(patchDir, "inventory.gml"));
+var functions = Regex.Matches(additions, @"(?m)^function (\w+)\(");
+for (var i = 0; i < functions.Count; i++) {
+    var name = functions[i].Groups[1].Value;
+    var start = functions[i].Index;
+    var end = i + 1 < functions.Count ? functions[i + 1].Index : additions.Length;
+    var body = additions.Substring(start, end - start);
+    var original = Regex.Match(inventory, @"(?ms)^function " + name + @"\(.*?(?=^function |\z)");
+    if (original.Success) inventory = inventory.Substring(0, original.Index) + body + inventory.Substring(original.Index + original.Length);
+    else inventory += "\n" + body.Replace("function " + name + "(", "global." + name + " = function(").TrimEnd() + ";\n";
+}
+edits[inventoryName] = inventory;
+foreach (var spec in new[] { ("oNovaFoodBag", "sItem_GemBag"), ("oNovaPendantBag", "sItem_BombBag") }) {
+    var bag = new UndertaleGameObject {
+        Name = Data.Strings.MakeString(spec.Item1),
+        Sprite = Data.Sprites.ByName(spec.Item2),
+        ParentId = Data.GameObjects.ByName("oItem"),
+        Visible = true
+    };
+    Data.GameObjects.Add(bag);
+    group.QueueReplace("gml_Object_" + spec.Item1 + "_Create_0", "event_inherited(); ShadowOffsetY = -1;");
+}
+group.QueueAppend("gml_Object_oInventory_Create_0", File.ReadAllText(Path.Combine(patchDir, "inventory_ui.gml")));
+group.QueueReplace("gml_Object_oInventory_Step_0", File.ReadAllText(Path.Combine(patchDir, "inventory_step.gml")));
+group.QueueReplace("gml_Object_oInventory_Draw_0", File.ReadAllText(Path.Combine(patchDir, "inventory_draw.gml")));
+group.QueueReplace("gml_Object_oInventory_Step_2", "if (Close) { Alpha -= AlphaSpeed; if (Alpha <= 0) instance_destroy(); }");
+string GlobalInventoryCalls(string source) => Regex.Replace(source, @"(?<![.\w])Nova(GearSlot|BagRange|EmptyRange|EmptySlot|InventoryInit|InventoryMigrate)\(", "global.Nova$1(");
+foreach (var edit in edits) group.QueueReplace(edit.Key, GlobalInventoryCalls(edit.Value));
 group.Import();
 Console.WriteLine("4:3 overlay patch compiled.");

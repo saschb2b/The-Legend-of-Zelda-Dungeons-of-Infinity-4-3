@@ -56,6 +56,7 @@ def main():
         raise SystemExit('Binary patch verification failed.')
     manifest = {
         'version': args.version,
+        'save_schema': 1,
         'upstream_url': UPSTREAM_URL,
         'upstream_sha256': UPSTREAM_HASH,
         'original_game_sha256': ORIGINAL_HASH,

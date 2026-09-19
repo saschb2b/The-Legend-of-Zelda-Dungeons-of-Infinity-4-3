@@ -3,6 +3,7 @@ import hashlib
 import io
 import json
 import shutil
+import struct
 import subprocess
 import tempfile
 import urllib.request
@@ -57,6 +58,32 @@ def run_umt(tool, source, script, output=None, sentinel=None):
         raise RuntimeError(f'Compiler failed. See {log}\n{content[-5000:]}')
 
 
+def verify_runner_format(game):
+    if len(game) < 8 or game[:4] != b'FORM' or struct.unpack_from('<I', game, 4)[0] != len(game) - 8:
+        raise ValueError('Invalid GameMaker FORM length.')
+    offset = 8
+    found = False
+    while offset + 8 <= len(game):
+        tag, size = struct.unpack_from('<4sI', game, offset)
+        end = offset + 8 + size
+        if end > len(game):
+            raise ValueError('GameMaker chunk exceeds the file.')
+        if tag == b'FUNC':
+            found = True
+            if size < 8:
+                raise ValueError('FUNC locals table is missing.')
+            count = struct.unpack_from('<I', game, offset + 8)[0]
+            locals_offset = offset + 12 + count * 12
+            if locals_offset + 4 > end:
+                raise ValueError('FUNC locals table is missing.')
+            locals_count = struct.unpack_from('<I', game, locals_offset)[0]
+            if locals_count > (end - locals_offset - 4) // 8:
+                raise ValueError('FUNC locals table is truncated.')
+        offset = end
+    if offset != len(game) or not found:
+        raise ValueError('Incomplete GameMaker chunk table.')
+
+
 def extract_original(archive, manifest):
     install.verify(archive.read_bytes(), manifest['upstream_sha256'], 'PortMaster package')
     with ZipFile(archive) as zipped:
@@ -106,12 +133,15 @@ def main():
     tool = args.utmt.resolve() if args.utmt else toolchain()
     output = BUILD / 'patched.droid'
     run_umt(tool, BUILD / 'game.droid', 'apply.csx', output, '4:3 overlay patch compiled.')
+    verify_runner_format(output.read_bytes())
     run_umt(tool, output, 'tests/verify.csx', sentinel='NOVA BUILD VERIFIED')
     if args.check_release:
         check_release(original, output.read_bytes(), manifest)
     if args.runtime_tests:
         run_umt(tool, output, 'tests/runtime/inject.csx', BUILD / 'runtime-tests.droid', 'NOVA TEST HARNESS COMPILED')
         run_umt(tool, BUILD / 'game.droid', 'tests/runtime/inject.csx', BUILD / 'runtime-baseline.droid', 'NOVA TEST HARNESS COMPILED')
+        verify_runner_format((BUILD / 'runtime-tests.droid').read_bytes())
+        verify_runner_format((BUILD / 'runtime-baseline.droid').read_bytes())
     summary = {'compiled': True, 'release_verified': args.check_release,
                'runtime_harness_compiled': args.runtime_tests,
                'sha256': hashlib.sha256(output.read_bytes()).hexdigest()}
