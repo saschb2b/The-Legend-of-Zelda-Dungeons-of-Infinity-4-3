@@ -53,6 +53,8 @@ The baseline contains the unpatched 1.1.6 game with the same instrumentation. Th
 
 GitHub-hosted CI compiles the runtime suite but cannot execute the Nova's ARM/GPU runtime. Before releasing, run the suite on a device. Also check the physical confirm/cancel buttons, title animation, remapped Status toggling, shoulder paging, item actions and information, pause layout, CRT mode, and Select + Start. Verify that the glyph matches the button that actually triggers each action. Inspect all three challenge pages, including the longest values and returning to the start menu. Runtime assertions measure the text columns and window bounds, but screenshots still need review. Injected input does not verify physical controller mapping, rendering quality, audio, or an entire generated dungeon run.
 
+For inventory prompts, compare empty slots, equipment, usable items, action lists, and item information. Close must retain its position throughout. Check remapped buttons and keyboard keycaps for overlap. This follows [XAG 112's guidance on consistent prompt locations and order](https://learn.microsoft.com/en-us/xbox/accessibility/xbox-accessibility-guidelines/112). The specific Equip / Close / primary-action row is a design choice for this compact layout.
+
 ## Versioning and release cadence
 
 Use [SemVer-style](https://semver.org/spec/v2.0.0.html) version numbers for the patch, independently of the upstream game. Compatibility means existing installations can update and load saves, including through documented automatic migrations.

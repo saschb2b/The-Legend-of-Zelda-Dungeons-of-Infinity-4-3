@@ -92,6 +92,49 @@ global.NovaInventoryAction = function(inventory) {
     if (item.ItemClass == 15 || item.ItemClass == 49 || item.ItemClass == 50) return "OPEN";
     return "ACTIONS";
 };
+global.NovaInventoryHeading = function(inventory) {
+    var heading = inventory.NovaTitles[min(inventory.NovaPage, 6)];
+    if (inventory.NovaPage >= 6 && inventory.NovaOverflowPages > 1) heading += " " + string(inventory.NovaPage - 5);
+    return heading;
+};
+global.NovaInventoryFooter = function(inventory, sx, sy) {
+    var info = global.NovaInventoryInfo();
+    var selected = global.Inventory[global.Inventory_SlotIndex_Selected];
+    var primary = info ? "MORE" : global.NovaInventoryAction(inventory);
+    var prompts = [
+        {binding: global.NovaBinding("item"), label: "EQUIP", visible: !info && !inventory.MenuEnable && selected.ItemClass >= 0 && global.ItemData[selected.ItemClass].CanEquip},
+        {binding: global.NovaBinding("action"), label: "CLOSE", visible: true},
+        {binding: global.NovaBinding("sword"), label: primary, visible: info ? global.DB_Inst.LinesLeft > 3 : primary != ""}
+    ];
+    var font = draw_get_font();
+    draw_set_font(global.HUDFont2);
+    var reserves = ["EQUIP", "CLOSE", "ACTIONS"];
+    var size = 18 * min(sx, sy);
+    var available = (inventory.W - 16) * sx;
+    var total = 16 * sx;
+    for (var i = 0; i < 3; i++) total += global.NovaPromptWidth(prompts[i].binding, reserves[i], sx, size);
+    var fit = min(1, available / total);
+    var widths = [];
+    total = 0;
+    for (var i = 0; i < 3; i++) {
+        widths[i] = global.NovaPromptWidth(prompts[i].binding, reserves[i], sx * fit, size * fit);
+        total += widths[i];
+    }
+    // Hidden actions retain their space so changing selection cannot move Close.
+    var gap = (available - total) / 2;
+    var px = (inventory.X - oCamera.X + 8) * sx;
+    for (var i = 0; i < 3; i++) {
+        prompts[i].x = px;
+        prompts[i].y = (inventory.Y - oCamera.Y + 116) * sy;
+        prompts[i].width = widths[i];
+        prompts[i].scale_x = sx * fit;
+        prompts[i].scale_y = sy * fit;
+        prompts[i].size = size * fit;
+        px += widths[i] + gap;
+    }
+    draw_set_font(font);
+    return prompts;
+};
 global.NovaInventoryPrompts = function(inventory) {
     with (inventory) {
     var sx = display_get_gui_width() / 256;
@@ -101,37 +144,20 @@ global.NovaInventoryPrompts = function(inventory) {
     var top = Y - oCamera.Y;
     draw_set_font(global.HUDFont2);
     draw_set_alpha(Alpha);
-    var previous = global.NovaBinding("nova_bag_previous");
-    var next = global.NovaBinding("nova_bag_next");
-    var previous_width = global.NovaPromptWidth(previous, "", sx, size);
-    var next_width = global.NovaPromptWidth(next, "", sx, size);
-    global.NovaPromptDraw(previous, "", (left + 8) * sx, (top + 14) * sy, sx, sy, size);
-    global.NovaPromptDraw(next, "", (left + W - 8) * sx - next_width, (top + 14) * sy, sx, sy, size);
-    var verbs = [];
-    var labels = [];
-    var selected = global.Inventory[global.Inventory_SlotIndex_Selected];
-    if (MenuEnable || selected.ItemClass >= 0) {
-        array_push(verbs, "sword");
-        array_push(labels, global.NovaInventoryAction(id));
+    if (!global.NovaInventoryInfo()) {
+        var previous = global.NovaBinding("nova_bag_previous");
+        var next = global.NovaBinding("nova_bag_next");
+        var previous_width = global.NovaPromptWidth(previous, "", sx, size);
+        var heading_half = string_width(global.NovaInventoryHeading(id)) * sx / 2;
+        var center = (left + W / 2) * sx;
+        var gap = 8 * sx;
+        global.NovaPromptDraw(previous, "", center - heading_half - gap - previous_width, (top + 14) * sy, sx, sy, size);
+        global.NovaPromptDraw(next, "", center + heading_half + gap, (top + 14) * sy, sx, sy, size);
     }
-    if (!MenuEnable && selected.ItemClass >= 0 && global.ItemData[selected.ItemClass].CanEquip) {
-        array_push(verbs, "item");
-        array_push(labels, "EQUIP");
-    }
-    array_push(verbs, "action");
-    array_push(labels, "CLOSE");
-    var widths = [];
-    var total = 0;
-    for (var i = 0; i < array_length(verbs); i++) {
-        widths[i] = global.NovaPromptWidth(global.NovaBinding(verbs[i]), labels[i], sx, size);
-        total += widths[i];
-    }
-    var gap = 8 * sx;
-    total += gap * (array_length(verbs) - 1);
-    var px = (left + W / 2) * sx - total / 2;
-    for (var i = 0; i < array_length(verbs); i++) {
-        global.NovaPromptDraw(global.NovaBinding(verbs[i]), labels[i], px, (top + 116) * sy, sx, sy, size);
-        px += widths[i] + gap;
+    var prompts = global.NovaInventoryFooter(id, sx, sy);
+    for (var i = 0; i < array_length(prompts); i++) {
+        var prompt = prompts[i];
+        if (prompt.visible) global.NovaPromptDraw(prompt.binding, prompt.label, prompt.x, prompt.y, prompt.scale_x, prompt.scale_y, prompt.size);
     }
     draw_set_alpha(1);
     }

@@ -45,21 +45,7 @@ else
     draw_surface_stretched(NovaFrame, 0, 0, _nova_w, _nova_h);
 }
 // Render glyphs after CRT scaling so their letters remain readable.
-if (instance_exists(oInventory) && !instance_exists(oDialogueBox)) global.NovaInventoryPrompts(oInventory);
-if (global.NovaInventoryInfo()) {
-    var sx = _nova_w / 256;
-    var sy = _nova_h / 224;
-    var size = 18 * min(sx, sy);
-    draw_set_font(global.HUDFont2);
-    var close_binding = global.NovaBinding("action");
-    var close_width = global.NovaPromptWidth(close_binding, "CLOSE", sx, size);
-    var more_binding = global.NovaBinding("sword");
-    var more_width = global.DB_Inst.LinesLeft > 3 ? global.NovaPromptWidth(more_binding, "MORE", sx, size) + 8 * sx : 0;
-    var px = 128 * sx - (more_width + close_width) / 2;
-    var py = (oInventory.Y - oCamera.Y + 116) * sy;
-    if (more_width > 0) global.NovaPromptDraw(more_binding, "MORE", px, py, sx, sy, size);
-    global.NovaPromptDraw(close_binding, "CLOSE", px + more_width, py, sx, sy, size);
-}
+if (instance_exists(oInventory) && (!instance_exists(oDialogueBox) || global.NovaInventoryInfo())) global.NovaInventoryPrompts(oInventory);
 if (instance_exists(oMap) && !oMap.Close) {
     var sx = _nova_w / 256;
     var sy = _nova_h / 224;

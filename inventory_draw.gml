@@ -13,8 +13,7 @@ if (DB_Started) {
     draw_set_alpha(1);
     exit;
 }
-var heading = NovaTitles[min(NovaPage, 6)];
-if (NovaPage >= 6 && NovaOverflowPages > 1) heading += " " + string(NovaPage - 5);
+var heading = global.NovaInventoryHeading(id);
 draw_text(X + W / 2, Y + 10, heading);
 var origin_x = X + floor((W - NovaColumns * 24) / 2);
 var origin_y = Y + 28;

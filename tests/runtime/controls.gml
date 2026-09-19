@@ -52,6 +52,8 @@ function ControlTests() {
     ui.Alpha = 1;
     global.InventoryInst = ui;
     Record("inventory leaves room for the full HUD", global.NovaInventoryHUD() && ui.Y - oCamera.Y >= 64 && ui.X - oCamera.X >= 24 && ui.X + ui.W <= oCamera.X + 232 && ui.Y + ui.H + 23 <= oCamera.Y + 224);
+    var footer_empty = global.NovaInventoryFooter(ui, 5, 960 / 224);
+    Record("empty inventory retains only the Close hint", !footer_empty[0].visible && footer_empty[1].visible && !footer_empty[2].visible);
     PressEvent(ui, "nova_bag_previous", oInventory, ev_step, ev_step_normal);
     Record("left shoulder opens gear from items", ui.NovaPage == 0);
     PressEvent(ui, "nova_bag_previous", oInventory, ev_step, ev_step_normal);
@@ -63,6 +65,8 @@ function ControlTests() {
     with (ui) { NovaRefresh(); NovaItemMenu(); }
     Record("confirm opens actions for the highlighted item", ui.MenuEnable);
     Record("active gear has no redundant equip action", !ds_grid_get(ui.MenuItemGrid, 1, 0) && !ds_grid_get(ui.MenuItemGrid, 1, 1));
+    var footer_gear = global.NovaInventoryFooter(ui, 5, 960 / 224);
+    Record("item actions keep Close in its empty-inventory position", footer_gear[1].x == footer_empty[1].x && footer_gear[1].y == footer_empty[1].y && !footer_gear[0].visible);
     var action_labels = ["EQUIP", "USE", "DROP", "INFO"];
     for (var action = 0; action < 4; action++) {
         ui.MenuSelectionIndex = action;
@@ -70,6 +74,8 @@ function ControlTests() {
     }
     PressEvent(ui, "sword", oInventory, ev_step, ev_step_normal);
     Record("item information keeps the HUD visible", global.NovaInventoryInfo() && global.NovaInventoryHUD());
+    var footer_info = global.NovaInventoryFooter(ui, 5, 960 / 224);
+    Record("item information preserves the footer positions", footer_info[1].x == footer_empty[1].x && footer_info[2].x == footer_gear[2].x && !footer_info[0].visible);
     PressEvent(global.DB_Inst, "action", oDialogueBox, ev_step, ev_step_end);
     Record("close dismisses information without closing inventory", !instance_exists(global.DB_Inst) && instance_exists(ui) && !ui.Close && __input_global().__cleared);
     PressEvent(ui, "", oInventory, ev_step, ev_step_normal);
@@ -97,6 +103,30 @@ function ControlTests() {
     for (var slot = 15; slot <= 31; slot++) global.Inventory[slot] = {ItemClass: -1, ItemIndex: -1, Amount: 0, Enabled: true};
     with (ui) NovaRefresh();
     Record("empty overflow returns to a valid bag", ui.NovaPage == 1 && global.Inventory_SlotIndex_Selected >= 10 && global.Inventory_SlotIndex_Selected < 15);
+    var footer_item = global.NovaInventoryFooter(ui, 5, 960 / 224);
+    Record("equippable items keep Close fixed while exposing Equip", footer_item[0].visible && footer_item[1].x == footer_empty[1].x && footer_item[2].x == footer_gear[2].x);
+    Record("secondary action precedes Close and the primary action", footer_item[0].x + footer_item[0].width < footer_item[1].x && footer_item[1].x + footer_item[1].width < footer_item[2].x);
+    Record("Nova controller prompts keep their full size", footer_item[0].size == 18 * (960 / 224) && footer_item[2].scale_x == 5);
+    input_binding_set("action", input_binding_gamepad_button(gp_face4), 0, 0, "gamepad");
+    input_binding_set("sword", input_binding_gamepad_button(gp_face3), 0, 0, "gamepad");
+    var footer_remapped = global.NovaInventoryFooter(ui, 5, 960 / 224);
+    Record("remapped glyphs preserve action order and positions", global.NovaGlyph(footer_remapped[1].binding) == 3 && global.NovaGlyph(footer_remapped[2].binding) == 2 && footer_remapped[1].x == footer_item[1].x && footer_remapped[2].x == footer_item[2].x);
+    input_profile_import(gamepad_before, "gamepad");
+    input_profile_set("keyboard");
+    for (var scale = 1; scale <= 5; scale += 4) {
+        var footer_keyboard = global.NovaInventoryFooter(ui, scale, scale * 6 / 7);
+        Record("keyboard footer fits at scale " + string(scale), footer_keyboard[0].x >= (ui.X - oCamera.X + 8) * scale && footer_keyboard[2].x + footer_keyboard[2].width <= (ui.X - oCamera.X + ui.W - 8) * scale + 0.01 && footer_keyboard[0].x + footer_keyboard[0].width < footer_keyboard[1].x && footer_keyboard[1].x + footer_keyboard[1].width < footer_keyboard[2].x);
+    }
+    var footer_verbs = ["item", "action", "sword"];
+    for (var i = 0; i < 3; i++) {
+        var verb = footer_verbs[i];
+        input_binding_set(verb, input_binding_empty(), 0, 0, "keyboard");
+        input_binding_set(verb, input_binding_empty(), 0, 1, "keyboard");
+    }
+    var footer_unbound = global.NovaInventoryFooter(ui, 5, 960 / 224);
+    Record("unbound key labels fit without colliding", footer_unbound[0].x + footer_unbound[0].width < footer_unbound[1].x && footer_unbound[1].x + footer_unbound[1].width < footer_unbound[2].x && footer_unbound[2].x + footer_unbound[2].width <= (ui.X - oCamera.X + ui.W - 8) * 5 + 0.01);
+    input_profile_import(keyboard_before, "keyboard");
+    input_profile_set("gamepad");
     PressEvent(ui, "action", oInventory, ev_step, ev_step_normal);
     Record("close dismisses inventory and consumes the input", ui.Close && __input_global().__cleared);
     global.NovaTestInput = "action";
