@@ -53,24 +53,46 @@ The baseline contains the unpatched 1.1.6 game with the same instrumentation. Th
 
 GitHub-hosted CI compiles the runtime suite but cannot execute the Nova's ARM/GPU runtime. Before releasing, run the suite on a device. Also check the physical confirm/cancel buttons, title animation, R3 panel toggle, pause layout, CRT mode, and Select + Start. Inspect all three challenge pages, including the longest values and returning to the start menu. Runtime assertions measure the text columns and window bounds, but screenshots still need review. Injected input does not verify physical controller mapping, rendering quality, audio, or an entire generated dungeon run.
 
+## Versioning and release cadence
+
+Use [SemVer-style](https://semver.org/spec/v2.0.0.html) version numbers for the patch, independently of the upstream game. Compatibility means existing installations can update and load saves, including through documented automatic migrations.
+
+| Increment | Use for |
+| --- | --- |
+| Patch (`x.y.Z`) | Bug fixes and refinements to existing layout, controls, or installation |
+| Minor (`x.Y.0`) | A planned batch of new gameplay features, modes, or substantial backports |
+| Major (`X.0.0`) | Changes that break the documented installation or save compatibility contract |
+
+Batch related work under **Unreleased** in [CHANGELOG.md](CHANGELOG.md). A completed task, commit, or test run does not require a release. Publish routine fixes together after the batch passes verification. Publish a separate hotfix when an existing release has a serious crash, save, or installation problem.
+
+Keep work-in-progress builds local. For shared testing, use a GitHub draft or an `-rc.N` prerelease for the intended version. Promote a tested batch to stable once it is ready. Documentation, release-note corrections, tests, and CI maintenance alone do not need an installer release or a version bump.
+
+Published tags, version numbers, archives, and checksums stay unchanged. Correct release titles or notes when needed, without replacing their downloads. The next version describes the actual shipped changes, not the amount of development activity.
+
+Follow [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) for release notes. `CHANGELOG.md` is the source for GitHub release bodies. Each entry lists only changes since the preceding release, grouped under Added, Changed, or Fixed when useful. Omit empty groups and cumulative feature lists. Include save-migration details, known limitations introduced by the release, and a comparison link. Link to the installation guide instead of repeating it in every entry.
+
+Use the title `vX.Y.Z: Short description` and copy that version's changelog section into the GitHub release body. Do not generate player-facing notes from raw commit subjects. Check the wording against the actual tag diff before publishing.
+
 ## Release procedure
 
-1. Run unit tests and `python3 build.py --runtime-tests`.
+1. Review the Unreleased changes, choose the increment using the policy above, and run unit tests and `python3 build.py --runtime-tests`.
 2. Run the Nova suite and inspect any failures. Complete the physical-control and visual checks above.
 3. Create the delta and patch-only installer with an unused version and output filename:
 
    ```sh
+   read -r -p 'New patch version (without v): ' release_version
    python3 -m venv .build/patchenv
    .build/patchenv/bin/pip install -r requirements-build.txt
    .build/patchenv/bin/python package_release.py \
      --original-game .build/game.droid \
      --patched-game .build/patched.droid \
-     --version 1.5.0 \
-     --output dist/Dungeons-of-Infinity-4-3-v1.5.0-Nova-Patch-Installer.zip
+     --version "$release_version" \
+     --output "dist/Dungeons-of-Infinity-4-3-v${release_version}-Nova-Patch-Installer.zip"
    python3 build.py --check-release --runtime-tests
    ```
 
-4. Commit the source, tests, binary delta, and manifest together. Push and require the GitHub checks to pass before tagging a release.
-5. Publish only the installer ZIP and its SHA-256 checksum. Never attach `.droid`, `.port`, `.build/`, test reports containing device data, or upstream downloads.
+4. Move the shipped changelog entries from Unreleased to the chosen version, with the release date and comparison link.
+5. Commit the source, tests, binary delta, manifest, and changelog together. Push and require the GitHub checks to pass before tagging a release.
+6. Publish the matching changelog section, installer ZIP, and SHA-256 checksum. Never attach `.droid`, `.port`, `.build/`, test reports containing device data, or upstream downloads.
 
 `package_release.py` writes a fixed allowlist of installer files with stable ZIP timestamps. It verifies binary-patch reconstruction and refuses an existing output filename. `manifest.json` records the original game, patched game, delta, and upstream archive hashes.

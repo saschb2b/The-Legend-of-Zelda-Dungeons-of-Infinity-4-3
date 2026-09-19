@@ -6,6 +6,8 @@ The title screen fills the display while keeping the logo's proportions. Profile
 
 Backports from the 1.2.x releases add inventory compartments, sword poke/spin, Topaz, revised gem recipes, variable challenges, and a Wallmaster mode. They also include crash, progression, and control fixes. [BACKPORTS.md](BACKPORTS.md) lists the implemented changes, adaptations, and remaining gaps.
 
+[CHANGELOG.md](CHANGELOG.md) records changes between patch releases. Patch version numbers are independent of the original game's versions.
+
 ## Install on the Nova
 
 Install PortMaster on ROCKNIX and connect the Nova to Wi-Fi.
