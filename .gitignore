@@ -1,0 +1,6 @@
+/dist/
+/.build/
+__pycache__/
+*.droid
+*.port
+*.zip
