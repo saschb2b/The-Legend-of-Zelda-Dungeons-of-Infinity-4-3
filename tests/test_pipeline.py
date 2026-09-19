@@ -100,6 +100,20 @@ class InstallIntegrationTests(unittest.TestCase):
                 self.assert_preserved()
                 self.manifest[field] = digest
 
+    def test_content_upgrade_backs_up_schema_two_saves_once(self):
+        (self.game / 'save-schema.txt').write_text('2\n')
+        self.manifest['save_schema'] = 3
+        self.run_install()
+        backup = self.game / 'save-backups/before-content-v3.zip'
+        snapshot = backup.read_bytes()
+        with ZipFile(backup) as archive:
+            self.assertEqual(archive.read('Users'), b'precious save')
+        (self.game / 'savedata/Users').write_bytes(b'Topaz and challenge settings')
+        self.run_install()
+        self.assertEqual(backup.read_bytes(), snapshot)
+        self.assertEqual((self.game / 'savedata/Users').read_bytes(), b'Topaz and challenge settings')
+        self.assertEqual((self.game / 'save-schema.txt').read_text(), '3\n')
+
     def test_archive_traversal_fails_before_commit(self):
         self.make_upstream('zeldadoi/../../escape')
         self.manifest['upstream_sha256'] = sha256(self.upstream.read_bytes()).hexdigest()

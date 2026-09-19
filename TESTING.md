@@ -1,12 +1,12 @@
 # Testing and releases
 
-The harness has three layers. Each catches a different failure:
+Testing has three layers. Each catches a different failure:
 
 | Layer | Runs on | Checks |
 | --- | --- | --- |
 | Unit and installer integration | Python, no downloads | BSDIFF decoding, checksum failures, interrupted downloads, save preservation, repeated installation, archive traversal, release contents, compiler failure detection, inventory-save backup, runner binary format |
 | Clean build | Linux x86-64 | Pinned upstream and compiler hashes, exact patch anchors, GML compilation, compiled room and code invariants, production/test separation, release delta equality, installation of the real package |
-| Runtime regression | Nova with ROCKNIX | Real GameMaker menus, bindings, combat, boss recovery, inventory migration and save/load, loot pools, dungeon templates and enemy status events with controlled inputs and fixtures |
+| Runtime regression | Nova with ROCKNIX | Real GameMaker menus, combat, inventory migration, Topaz and challenge save/load, gem recipes, challenge limits, Wallmaster attacks, dungeon templates, and enemy status events |
 
 ## Local and CI checks
 
@@ -28,7 +28,7 @@ The compiler can exit successfully after a script exception. The build requires 
 
 ## Nova runtime suite
 
-Close any running game first. Install this patch on the device and enable SSH access. Use a key or an existing SSH control socket. The harness contains no credentials.
+Close any running game first. Install this patch on the device and enable SSH access. Use a key or an existing SSH control socket. The test runner contains no credentials.
 
 ```sh
 python3 build.py --runtime-tests
@@ -51,7 +51,7 @@ python3 tests/run_device.py root@your-device.local \
 
 The baseline contains the unpatched 1.1.6 game with the same instrumentation. That command must fail on the behaviors the patch adds. Review each named failure. Some original bugs terminate the runner before the report can complete. Retain the partial assertion report and the named error in `game.log`. A launch error does not prove regression coverage.
 
-GitHub-hosted CI compiles the runtime suite but cannot execute the Nova's ARM/GPU runtime. Before releasing, run the suite on a device. Also check the physical confirm/cancel buttons, title animation, R3 panel toggle, pause layout, CRT mode, and Select + Start. Injected input does not verify physical controller mapping, rendering quality, audio, or an entire generated dungeon run.
+GitHub-hosted CI compiles the runtime suite but cannot execute the Nova's ARM/GPU runtime. Before releasing, run the suite on a device. Also check the physical confirm/cancel buttons, title animation, R3 panel toggle, pause layout, CRT mode, and Select + Start. Inspect all three challenge pages, including the longest values and returning to the start menu. Runtime assertions measure the text columns and window bounds, but screenshots still need review. Injected input does not verify physical controller mapping, rendering quality, audio, or an entire generated dungeon run.
 
 ## Release procedure
 
@@ -65,8 +65,8 @@ GitHub-hosted CI compiles the runtime suite but cannot execute the Nova's ARM/GP
    .build/patchenv/bin/python package_release.py \
      --original-game .build/game.droid \
      --patched-game .build/patched.droid \
-     --version 1.4.1 \
-     --output dist/Dungeons-of-Infinity-4-3-v1.4.1-Nova-Patch-Installer.zip
+     --version 1.5.0 \
+     --output dist/Dungeons-of-Infinity-4-3-v1.5.0-Nova-Patch-Installer.zip
    python3 build.py --check-release --runtime-tests
    ```
 

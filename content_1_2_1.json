@@ -1,0 +1,437 @@
+{
+  "source_exe_sha256": "f80262606d6932ea2042ef3bb862e2585f06279d965e34b59948c05bcc7f5025",
+  "gem_order": [
+    "Quartz",
+    "Topaz",
+    "Turquoise",
+    "Citrine",
+    "Amethyst",
+    "Jade",
+    "Diamond",
+    "Ruby",
+    "Sapphire",
+    "Opal"
+  ],
+  "save_indices": [
+    0,
+    9,
+    3,
+    2,
+    1,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "drop_weights": [
+    13,
+    12,
+    11,
+    10,
+    9,
+    8,
+    7,
+    6,
+    5,
+    4
+  ],
+  "rod_charges": [
+    20,
+    16,
+    16,
+    16,
+    12,
+    12
+  ],
+  "recipes": [
+    [
+      {
+        "Class": 35,
+        "Index": 0,
+        "Amount": 2
+      }
+    ],
+    [
+      {
+        "Class": 13,
+        "Index": 2,
+        "Amount": 2
+      },
+      {
+        "Class": 27,
+        "Index": 0,
+        "Amount": 1
+      }
+    ],
+    [
+      {
+        "Class": 35,
+        "Index": 0,
+        "Amount": 3
+      },
+      {
+        "Class": 5,
+        "Index": 0,
+        "Amount": 10
+      },
+      {
+        "Class": 33,
+        "Index": 1,
+        "Amount": 5
+      }
+    ],
+    [
+      {
+        "Class": 13,
+        "Index": 4,
+        "Amount": 2
+      },
+      {
+        "Class": 1,
+        "Index": 0,
+        "Amount": 60
+      },
+      {
+        "Class": 40,
+        "Index": 0,
+        "Amount": 1
+      },
+      {
+        "Class": 33,
+        "Index": 0,
+        "Amount": 5
+      }
+    ],
+    [
+      {
+        "Class": 36,
+        "Index": 3,
+        "Amount": 1
+      },
+      {
+        "Class": 40,
+        "Index": 0,
+        "Amount": 1
+      },
+      {
+        "Class": 40,
+        "Index": 0,
+        "Amount": 1
+      },
+      {
+        "Class": 40,
+        "Index": 0,
+        "Amount": 1
+      },
+      {
+        "Class": 33,
+        "Index": 2,
+        "Amount": 2
+      }
+    ],
+    [
+      {
+        "Class": 36,
+        "Index": 1,
+        "Amount": 1
+      },
+      {
+        "Class": 27,
+        "Index": 0,
+        "Amount": 2
+      },
+      {
+        "Class": 38,
+        "Index": 2,
+        "Amount": 1
+      },
+      {
+        "Class": 38,
+        "Index": 3,
+        "Amount": 1
+      },
+      {
+        "Class": 38,
+        "Index": 0,
+        "Amount": 1
+      },
+      {
+        "Class": 38,
+        "Index": 1,
+        "Amount": 1
+      }
+    ],
+    [
+      {
+        "Class": 36,
+        "Index": 4,
+        "Amount": 1
+      },
+      {
+        "Class": 2,
+        "Index": 0,
+        "Amount": 1
+      },
+      {
+        "Class": 4,
+        "Index": 0,
+        "Amount": 1
+      },
+      {
+        "Class": 0,
+        "Index": 0,
+        "Amount": 1
+      },
+      {
+        "Class": 49,
+        "Index": 0,
+        "Amount": 1
+      },
+      {
+        "Class": 50,
+        "Index": 0,
+        "Amount": 1
+      },
+      {
+        "Class": 7,
+        "Index": 0,
+        "Amount": 1
+      }
+    ],
+    [
+      {
+        "Class": 36,
+        "Index": 0,
+        "Amount": 1
+      },
+      {
+        "Class": 18,
+        "Index": 0,
+        "Amount": 1
+      },
+      {
+        "Class": 39,
+        "Index": 0,
+        "Amount": 20
+      },
+      {
+        "Class": 39,
+        "Index": 2,
+        "Amount": 16
+      },
+      {
+        "Class": 39,
+        "Index": 4,
+        "Amount": 12
+      },
+      {
+        "Class": 39,
+        "Index": 5,
+        "Amount": 12
+      },
+      {
+        "Class": 15,
+        "Index": 0,
+        "Amount": 1
+      },
+      {
+        "Class": 6,
+        "Index": 0,
+        "Amount": 1
+      }
+    ],
+    [
+      {
+        "Class": 36,
+        "Index": 2,
+        "Amount": 1
+      },
+      {
+        "Class": 24,
+        "Index": 0,
+        "Amount": 1
+      },
+      {
+        "Class": 39,
+        "Index": 1,
+        "Amount": 16
+      },
+      {
+        "Class": 39,
+        "Index": 3,
+        "Amount": 16
+      },
+      {
+        "Class": 16,
+        "Index": 0,
+        "Amount": 1
+      },
+      {
+        "Class": 46,
+        "Index": 0,
+        "Amount": 1
+      },
+      {
+        "Class": 41,
+        "Index": 0,
+        "Amount": 1
+      },
+      {
+        "Class": 9,
+        "Index": 0,
+        "Amount": 1
+      },
+      {
+        "Class": 19,
+        "Index": 0,
+        "Amount": 1
+      }
+    ],
+    [
+      {
+        "Class": 40,
+        "Index": 0,
+        "Amount": 1
+      },
+      {
+        "Class": 34,
+        "Index": 6,
+        "Amount": 1
+      },
+      {
+        "Class": 34,
+        "Index": 4,
+        "Amount": 1
+      },
+      {
+        "Class": 34,
+        "Index": 5,
+        "Amount": 1
+      },
+      {
+        "Class": 34,
+        "Index": 7,
+        "Amount": 1
+      },
+      {
+        "Class": 34,
+        "Index": 1,
+        "Amount": 1
+      },
+      {
+        "Class": 34,
+        "Index": 3,
+        "Amount": 1
+      },
+      {
+        "Class": 34,
+        "Index": 0,
+        "Amount": 1
+      },
+      {
+        "Class": 34,
+        "Index": 2,
+        "Amount": 1
+      },
+      {
+        "Class": 44,
+        "Index": 0,
+        "Amount": 1
+      }
+    ]
+  ],
+  "challenges": {
+    "ChallengeOptionTitles": [
+      [
+        "4 hearts",
+        "3 hearts",
+        "2 hearts",
+        "1 heart"
+      ],
+      [
+        "16 hearts",
+        "8 hearts",
+        "6 hearts",
+        "5 hearts"
+      ],
+      [
+        "Normal",
+        "Lvl 4 defense max",
+        "Lvl 3 defense max",
+        "Lvl 2 defense max"
+      ],
+      [
+        "Normal",
+        "More dark rooms",
+        "All dark rooms",
+        "No lights, no lamps"
+      ],
+      [
+        "5 slots",
+        "4 slots",
+        "3 slots",
+        "2 slots"
+      ],
+      [
+        "No Limit",
+        "400 Rupees",
+        "300 Rupees",
+        "200 Rupees"
+      ],
+      [
+        "Normal prices",
+        "More expensive",
+        "Much more expensive",
+        "5th Avenue"
+      ],
+      [
+        "Normal",
+        "More enemies",
+        "Much more enemies",
+        "I am Death Incarnate!"
+      ],
+      [
+        "Normal",
+        "More curses",
+        "Much more curses",
+        "Curses Galore!"
+      ]
+    ],
+    "ChallengeTitles": [
+      "Map isn't visible",
+      "No food items spawned",
+      "A Wall Master hunts you"
+    ],
+    "ChallengeMaxArray_Hearts": [
+      16.0,
+      8.0,
+      6.0,
+      5.0
+    ],
+    "ChallengeMaxArray_Defense": [
+      8.0,
+      4.0,
+      3.0,
+      2.0
+    ],
+    "ChallengeMaxArray_Rupees": [
+      -1.0,
+      400.0,
+      300.0,
+      200.0
+    ],
+    "ChallengeMaxArray_ShopPrices": [
+      1.0,
+      1.5,
+      2.0,
+      2.5
+    ],
+    "ChallengeMaxArray_Curses": [
+      1.0,
+      2.0,
+      4.0,
+      6.0
+    ]
+  }
+}

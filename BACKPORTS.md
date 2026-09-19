@@ -1,8 +1,8 @@
 # 1.2.x backport audit
 
-The base remains the PortMaster 1.1.6 VM build. Patch release numbers are independent of the original game's versions. Version 1.4.1 includes the candle correction and the 1.4.0 backports of the documented fixes and core inventory/combat changes below. It does not provide full 1.2.1 parity.
+The base remains the PortMaster 1.1.6 VM build. Patch release numbers are independent of the original game's versions. Version 1.5.0 adds Topaz, revised recipes and artwork, variable challenges, and a Wallmaster mode to the inventory, combat, and fixes below. It does not provide full 1.2.1 parity.
 
-The references are the developer's bundled 1.2.0/1.2.1 change log, 1.2.1 game manual, and dungeon template data. The newer Windows game uses native compiled code. Except for the dungeon corrections, these are implementations of documented behavior in the older VM game.
+The references are the developer's bundled change log, manual, Gem Combo Poster, dungeon templates, and Windows 1.2.1 build. Its native executable retains named functions and data initializers. Reading those initializers supplied the exact gem recipes, drop weights, rod capacities, and challenge choices recorded in `content_1_2_1.json`. That file identifies the source executable by SHA-256. The gem recipes also match the poster. Gameplay integrations described below adapt those values to the older VM game.
 
 | Change | Included and checked |
 | --- | --- |
@@ -22,27 +22,35 @@ The references are the developer's bundled 1.2.0/1.2.1 change log, 1.2.1 game ma
 | Sword poke, level-three spin, level-two pot breaking | Device tests cover charging, pause, release, movement, interruption, pot breaking and damage across floor boundaries |
 | Hookshot/boomerang in large chests and wishing ponds | Device loot-pool checks |
 | Rod damage and charge limits | Device checks cover boss damage/immunities, per-rod caps and preservation of legacy charges |
+| Topaz and all 55 revised gem recipes | Device checks cover all 100 ordered pairs, poster examples, incomplete pairs, old gem identities, and Topaz save/load |
+| Variable challenges | Device checks cover the three-page menu, heart/defence/slot limits, prices, rupee collection/spending, food stalls, saved settings, and legacy restrictions |
+| Wallmaster challenge | Device checks cover pursuit, pause, attack, damage, falling, safe levels, and entry from all four directions |
+| Food bag, pendant bag, master-key and Wallmaster artwork | Binary artwork patches from 1.2.1, with source/result hashes and compiled sprite bounds/pickup-mask checks |
 | Fairy-orb contents | Implemented distribution described below; compiled and reviewed |
 | Keyboard menu/direction remapping | Device tests complete remapping, persist bindings and restore prior bindings on abort |
 
 ## Adaptations for this patch
 
-Inventory uses pages sized for the 4:3 playfield. Strafe advances a page. Moving up from the first item row focuses the heading, where left/right changes pages. The food and pendant bags reuse existing bag sprites. Slot upgrades use the heart-container price and treasure limiter. Their loot pools support incremental upgrades. This does not reproduce an undisclosed upstream probability table.
+Inventory uses pages sized for the 4:3 playfield. Strafe advances a page. Moving up from the first item row focuses the heading, where left/right changes pages. Slot upgrades use the heart-container price and treasure limiter. Their loot pools support incremental upgrades. This does not reproduce an undisclosed upstream probability table.
 
-The candle occupies the light slot and the oil lamp replaces it when acquired. Dropping either removes its light and prevents torch ignition until you recover a light source.
+The candle occupies the light slot and the oil lamp replaces it when collected. Dropping either removes its light and prevents torch ignition until you recover a light source.
 
-Old saves migrate on load. Dedicated gear moves out of the main bag. Items that do not fit remain accessible on an overflow page and move back when space opens. Migration retains the equipped item and quantities. The installer creates a one-time backup before the first inventory-schema update. This patch writes saves with the new inventory schema.
+Old saves migrate on load. Dedicated gear moves out of the main bag. Items that do not fit remain accessible on an overflow page and move back when space opens. Migration retains the equipped item and quantities. The installer backs up saves before the inventory update and again before content schema 3. Reinstallation preserves those backups.
 
 The sword uses existing poses. Holding the button after a swing keeps the blade out and slows movement to 65%. Charging for 45 frames enables a 16-frame spin with sword level three or higher. Spin damage uses the existing sword damage rules and respects floor levels. These timings and animation are this patch's implementation, not extracted 1.2.1 code.
 
-Rod capacities, in game index order, are 16, 12, 12, 12, 8 and 8 charges. Existing rods keep excess charges until spent. Fairy orbs produce one fairy 80% of the time, two 18%, or three 2%. The upstream notes specify capacities by value and mostly single-fairy orbs without giving numbers. These values are explicit patch choices.
+Rod capacities, in game index order, are 20, 16, 16, 16, 12, and 12 charges, recovered from 1.2.1. Existing rods keep excess charges until spent. Fairy orbs produce one fairy 80% of the time, two 18%, or three 2%. The upstream notes specify mostly single-fairy orbs without giving numbers. The fairy distribution remains a patch choice.
+
+Gem recipes and drop weights use the recovered 1.2.1 values. Topaz uses a new save index so existing gems retain their identities. Pond rewards retain the older engine's fallback rupee formula, with gem ranks adjusted for Topaz.
+
+Challenge choices use the recovered values. Enemy crowds multiply the older engine's encounter budget by one, two, three, or four. The second darkness setting adds 30 percentage points to eligible random dark rooms. Higher settings force darkness, with the highest setting applying the existing restrictions on lights and lamps. Curse settings multiply existing chances by one, two, four, or six. These rules adapt the existing generation code rather than reproduce the native code in full.
+
+Wallmaster uses the recovered artwork, damage, chase speed, attack speed/duration, hover height, and wait values. Its pursuit and collision handling are a VM implementation. It follows Link across dungeon rooms, pauses during menus and transitions, and leaves village levels. It uses normal Link damage and invulnerability rules. A full dungeon run may reveal differences from the native encounter.
 
 `dungeon_fixes.json` is the source for the template corrections. The comparison matched rooms by grid geometry and translated connected-room indices into the 1.1.6 ordering. It excluded cosmetic room/door reordering. The build generates guarded assignments before the game creates rotated and mirrored templates. Each assignment checks its original value.
 
 ## Not included
 
-Variable challenge settings, the Wallmaster challenge, the tenth topaz and revised gem recipes remain unported. They need separate work on rules, menus, save compatibility and content. The existing challenge options and gem recipes remain available.
+The pub slot machine, arcade claw machine, new prisoner, seasonal decorations, and character customization remain unported. Artwork changes beyond those listed above also remain outside this patch. Unspecified upstream tweaks remain unverified.
 
-New arcade games, characters, seasonal decorations and replacement artwork are outside this pass. Unspecified upstream tweaks cannot be claimed as reproduced.
-
-GitHub CI compiles the patch and harness, validates the release delta, and tests installation. The device suite runs in a disposable installation. It does not replace a full generated-dungeon playthrough or verification of every physical controller.
+GitHub CI compiles the patch and runtime tests, validates the release delta, and tests installation. The device suite runs in a disposable installation. It does not replace a full generated-dungeon playthrough or verification of every physical controller.

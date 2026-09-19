@@ -28,10 +28,12 @@ if (Menu_Active && !Bindings_Remap && (keyboard_check_pressed(vk_escape) || (Men
             break;
         case 9:
         case 10:
-        case 11:
             Menu_ActiveIndex = 3;
             MenuWin_Options_MenuIndex = 3;
             Selector_Index_Options = 0;
+            break;
+        case 11:
+            Win_Options_Activate(3);
             break;
         case 13:
         case 14:

@@ -47,10 +47,10 @@ function Inventory_CalculateSlotIndexes(arg0 = global.Inventory_ItemData[2].Inde
     }
 }
 function Inventory_MaxSlots(arg0 = global.Inventory_ItemData[2].Index) {
-    return 15 + clamp(arg0, 0, 5);
+    return 10 + Inventory_MaxSlots_Useable(arg0);
 }
 function Inventory_MaxSlots_Useable(arg0 = global.Inventory_ItemData[2].Index) {
-    return 5 + clamp(arg0, 0, 5);
+    return clamp(5 - global.NovaOption(4) + arg0, 2, 10);
 }
 function Inventory_SlotsPerRow(arg0 = global.Inventory_ItemData[2].Index) {
     return 5;
@@ -91,7 +91,7 @@ function Inventory_TransferGems() {
     }
 }
 function NovaInventoryInit() {
-    global.Inventory_ItemData[2].Index_Max = 5;
+    global.Inventory_ItemData[2].Index_Max = 5 + global.NovaOption(4);
     for (var slot = 38; slot <= 43; slot++) global.Inventory[slot] = {ItemClass: -1, ItemIndex: -1, Amount: 0, Enabled: true};
     global.Inventory[2].ItemClass = 46;
     global.Inventory[2].ItemIndex = 0;
@@ -111,7 +111,7 @@ function NovaInventoryMigrate(save) {
     var old_capacities = [0, 3, 5];
     global.Inventory_ItemData[2].Index = old_capacities[clamp(global.Inventory_ItemData[2].Index, 0, 2)];
     if (global.Inventory_ItemData[2].Index == 0 && global.StartingGear == 2) global.Inventory_ItemData[2].Index = 1;
-    global.Inventory_ItemData[2].Index_Max = 5;
+    global.Inventory_ItemData[2].Index_Max = 5 + global.NovaOption(4);
     global.Inventory = array_create(44);
     for (var slot = 0; slot < 44; slot++) global.Inventory[slot] = {ItemClass: -1, ItemIndex: -1, Amount: 0, Enabled: true};
     global.Inventory_SlotIndex_Equiped = -1;

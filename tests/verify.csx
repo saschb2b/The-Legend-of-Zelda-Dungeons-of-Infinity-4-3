@@ -12,6 +12,14 @@ string Code(string name) {
 Check(Data.Rooms.ByName("Room_Title").Views[0].ViewWidth == 300, "Title must use the 4:3 view");
 Check(Data.Rooms.ByName("Room_Menu").Views[0].ViewHeight == 300, "Menus must fit vertically");
 Check(Data.Sprites.ByName("sNovaPanelHint").Width == 128, "Preserve the full-resolution R3 asset");
+Check(Data.Sprites.ByName("sItem_Gem").Textures.Count == 10, "Topaz texture missing");
+foreach (var name in new[] { "sNovaFoodBag", "sNovaPendantBag" }) {
+    var bag = Data.Sprites.ByName(name);
+    Check(bag.Textures.Count == 1 && bag.Width == 16 && bag.Height == 16, "Bag texture bounds changed: " + name);
+    Check(bag.MarginLeft == 1 && bag.MarginRight == 14 && bag.MarginTop == 0 && bag.MarginBottom == 15, "Bag pickup bounds changed: " + name);
+}
+var hand = Data.Sprites.ByName("sNovaWallmaster");
+Check(hand.Textures.Count == 2 && hand.Width == 24 && hand.Height == 23, "Wallmaster texture bounds changed");
 Check(Code("gml_Object_oTitle_Step_0").Contains("global.CanSkipTitle"), "Title skip option missing");
 Check(Code("gml_Object_oMenu_Step_0").Contains("keyboard_check_pressed(vk_escape)"), "Menu cancel missing");
 Check(Code("gml_Object_oMenu_Game_Step_0").Contains("input_check_pressed(\"action\")"), "Pause cancel missing");

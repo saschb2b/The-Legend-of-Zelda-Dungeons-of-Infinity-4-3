@@ -333,7 +333,7 @@
     "id": "rod-charge-limits",
     "code": "gml_GlobalScript___Inventory",
     "anchor": "function Inventory_MaxAmount(arg0)\n{",
-    "replacement": "function Inventory_MaxAmount(arg0, arg1 = 0)\n{\n    if (arg0 == 39)\n    {\n        var charges = [16, 12, 12, 12, 8, 8];\n        return charges[clamp(arg1, 0, 5)];\n    }"
+    "replacement": "function Inventory_MaxAmount(arg0, arg1 = 0)\n{\n    if (arg0 == 39)\n    {\n        var charges = [20, 16, 16, 16, 12, 12];\n        return charges[clamp(arg1, 0, 5)];\n    }"
   },
   {
     "id": "rod-add-charge-limit",

@@ -113,20 +113,24 @@ def refresh_artwork(ports):
         print('Refresh the Ports game list to display the new entry.', flush=True)
 
 
-def backup_legacy_saves(destination, work):
+def backup_legacy_saves(destination, work, target_schema):
     saves = destination / 'savedata'
     schema = destination / 'save-schema.txt'
-    backup = destination / 'save-backups/before-inventory-v1.zip'
-    if not (saves / 'Users').is_file() or backup.exists() or (schema.exists() and int(schema.read_text()) >= 1):
+    current_schema = int(schema.read_text()) if schema.exists() else 0
+    if not (saves / 'Users').is_file():
         return
-    temporary = work / 'legacy-saves.zip'
-    with ZipFile(temporary, 'w') as archive:
-        for source in sorted(saves.rglob('*')):
-            if source.is_file():
-                archive.write(source, source.relative_to(saves))
-    backup.parent.mkdir(parents=True, exist_ok=True)
-    temporary.replace(backup)
-    print('Saved a copy of the existing saves in save-backups/before-inventory-v1.zip.', flush=True)
+    for required_schema, name in ((1, 'before-inventory-v1.zip'), (3, 'before-content-v3.zip')):
+        backup = destination / 'save-backups' / name
+        if current_schema >= required_schema or target_schema < required_schema or backup.exists():
+            continue
+        temporary = work / name
+        with ZipFile(temporary, 'w') as archive:
+            for source in sorted(saves.rglob('*')):
+                if source.is_file():
+                    archive.write(source, source.relative_to(saves))
+        backup.parent.mkdir(parents=True, exist_ok=True)
+        temporary.replace(backup)
+        print(f'Saved a copy of the existing saves in save-backups/{name}.', flush=True)
 
 
 def install(ports, upstream_path=None, refresh=True):
@@ -177,7 +181,7 @@ def install(ports, upstream_path=None, refresh=True):
         shutil.copyfile(ROOT / 'README.md', stage / 'README.md')
         (stage / 'patch-version.txt').write_text(manifest['version'] + '\n')
         if manifest.get('save_schema', 0) >= 1:
-            backup_legacy_saves(destination, work)
+            backup_legacy_saves(destination, work, manifest['save_schema'])
             (stage / 'save-schema.txt').write_text(str(manifest['save_schema']) + '\n')
         staged_launcher = work / LAUNCHER
         shutil.copyfile(ROOT / LAUNCHER, staged_launcher)

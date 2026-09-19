@@ -2,7 +2,9 @@
 
 A 4:3 layout patch for the Retroid Nova running ROCKNIX, based on the PortMaster **1.1.6 VM** build.
 
-The title screen fills the display while keeping the logo's proportions. Profile menus use the full screen and keep every control visible. During gameplay, a persistent HUD shows health, magic, the equipped item, rupees, bombs, arrows, and keys. Compact side panels start hidden. Backports from the 1.2.x releases add inventory compartments, sword poke/spin, and crash, progression and control fixes. [BACKPORTS.md](BACKPORTS.md) lists the implemented changes, adaptations and remaining gaps.
+The title screen fills the display while keeping the logo's proportions. Profile menus use the full screen and keep every control visible. During gameplay, a persistent HUD shows health, magic, the equipped item, rupees, bombs, arrows, and keys. Compact side panels start hidden.
+
+Backports from the 1.2.x releases add inventory compartments, sword poke/spin, Topaz, revised gem recipes, variable challenges, and a Wallmaster mode. They also include crash, progression, and control fixes. [BACKPORTS.md](BACKPORTS.md) lists the implemented changes, adaptations, and remaining gaps.
 
 ## Install on the Nova
 
@@ -20,11 +22,11 @@ Install PortMaster on ROCKNIX and connect the Nova to Wi-Fi.
 3. Refresh the game list and run **Install Zelda Dungeons of Infinity 4-3** from Ports.
 4. Wait for installation to finish, then launch **Zelda Dungeons of Infinity 4-3**.
 
-The download contains an installer and a binary patch. It contains no game archive, runtime, or game artwork. The installer downloads the official PortMaster package, verifies its checksum, and applies the patch locally. Allow about 300 MiB of free space for installation.
+The download contains an installer and binary patches, including artwork changes. It contains no standalone game or runtime. The installer downloads the official PortMaster package, verifies its checksum, and applies the patch locally. Allow about 300 MiB of free space for installation.
 
 Saves go in `zeldadoi-43/savedata/`. To update, close the game, replace the installer files with the latest release, and run the installer again. It preserves existing saves. Installation failures appear in `zeldadoi-43-installer/install.log`.
 
-Before the first inventory update it also saves a copy in `zeldadoi-43/save-backups/before-inventory-v1.zip`. Existing inventory migrates on load. Excess items remain available on an overflow page. Keep the backup if you need to return to an earlier patch.
+The installer keeps backups in `zeldadoi-43/save-backups/`. The first inventory update creates `before-inventory-v1.zip`. Updating to patch 1.5.0 also creates `before-content-v3.zip`, preserving the saves before Topaz and variable challenges. Reinstallation keeps both backups intact. Existing inventory migrates on load, with excess items available on an overflow page. Keep the backups to return to an earlier patch.
 
 ## Controls and layout
 
@@ -36,7 +38,11 @@ Press the **action button** to back out of a menu, or **Escape** on a keyboard. 
 
 Press **Start** or the confirm button to skip the opening title animation. To require the full animation, create `zeldadoi-43/savedata/options.ini` with `[Preferences]` and `CanSkipTitle=0`. Set it to `1` to allow skipping. If you already have that file, add the key to its Preferences section.
 
-The inventory separates equipment from the main bag. You start with five main slots and can add five more. Food and pendant bags each hold three items. The treasure bag also accepts wishstones. Press **Strafe** to advance pages, or move up to the heading and use left/right. Sword selects an item, Item equips it, and Action goes back. The starting candle occupies the light slot. You can drop it for a darker challenge, or replace it with an oil lamp.
+The inventory separates equipment from the main bag. You start with five main slots and can add five more. Food and pendant bags each hold three items. The treasure bag also accepts wishstones. Press **Strafe** to advance pages, or move up to the heading and use left/right. Sword selects an item, Item equips it, and Action goes back.
+
+The starting candle occupies the light slot. Drop it for a darker challenge, or replace it with an oil lamp. Topaz joins the nine existing gems, with all 55 gem recipes from 1.2.1. Food bags, pendant bags, and the master key use the newer artwork.
+
+Before starting a run, open **Challenges** to adjust hearts, defence, darkness, starting slots, rupee limits, shop prices, enemy crowds, and curses. The last page offers **No map**, **No food**, and **Wall Master**. Confirm cycles a value, left/right cycles in either direction, and **Next page** moves between the three pages. Reduced starting inventory still upgrades to ten slots. Older saved runs keep their original challenge restrictions.
 
 Hold **Sword** after a swing to poke while moving. With a level-three sword or higher, keep holding until the blade flashes, then release for a spin. Level-two swords can break pots.
 

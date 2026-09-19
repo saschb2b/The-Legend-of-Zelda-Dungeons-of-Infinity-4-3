@@ -1,8 +1,10 @@
+#load "content.csx"
 using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Security.Cryptography;
 using UndertaleModLib.Compiler;
 using UndertaleModLib.Models;
 using UndertaleModLib.Util;
@@ -126,6 +128,7 @@ using (var backports = JsonDocument.Parse(File.ReadAllText(Path.Combine(patchDir
         Edit(fix.GetProperty("code").GetString(), fix.GetProperty("anchor").GetString(), fix.GetProperty("replacement").GetString());
     }
 }
+ApplyContent();
 using (var corrections = JsonDocument.Parse(File.ReadAllText(Path.Combine(patchDir, "dungeon_fixes.json")))) {
     var statements = "";
     foreach (var fix in corrections.RootElement.EnumerateArray()) {
@@ -168,7 +171,7 @@ var candleSprite = new UndertaleSprite {
 };
 foreach (var texture in candleArt.Textures) candleSprite.Textures.Add(new UndertaleSprite.TextureEntry { Texture = texture.Texture });
 Data.Sprites.Add(candleSprite);
-foreach (var spec in new[] { ("oNovaFoodBag", "sItem_GemBag"), ("oNovaPendantBag", "sItem_BombBag"), ("oNovaCandle", "sNovaCandle") }) {
+foreach (var spec in new[] { ("oNovaFoodBag", "sNovaFoodBag"), ("oNovaPendantBag", "sNovaPendantBag"), ("oNovaCandle", "sNovaCandle") }) {
     var bag = new UndertaleGameObject {
         Name = Data.Strings.MakeString(spec.Item1),
         Sprite = Data.Sprites.ByName(spec.Item2),

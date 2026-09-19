@@ -24,6 +24,7 @@ try {
         case 3:
             if (!instance_exists(oMenu)) break;
             MenuTests();
+            ContentMenuTests();
             with (oMenu) {
                 User_Save();
                 MenuWin_Main_Shift = false;
@@ -52,6 +53,7 @@ try {
             ProgressionTests();
             InventoryTests();
             SwordTests();
+            ContentTests();
             if (file_exists("nova-capture-enabled.txt")) {
                 CaptureStart();
                 Stage = 7;
