@@ -139,8 +139,8 @@ group.QueueAppend("gml_Object_oLink_Create_0", "NovaCrystalHold = false; NovaCry
 Edit("gml_Object_oLink_Step_0",
     "S = (ItemHolding == -4) ? ((Action[6] && !InDoorPassage) ? RunSpeed : WalkSpeed) : CarryingSpeed;",
     @"S = (ItemHolding == -4) ? ((Action[6] && !InDoorPassage) ? RunSpeed : WalkSpeed) : CarryingSpeed;
-        // ALttP NTSC walking uses 16/24 speed per diagonal axis before collision resolution.
-        if ((Action[0] || Action[1]) && (Action[2] || Action[3])) S = S * 2 / 3;");
+        // ALttP NTSC uses 16/24 for walking and 13/20 for carrying before collision resolution.
+        if ((Action[0] || Action[1]) && (Action[2] || Action[3])) S = ItemHolding == -4 ? S * 2 / 3 : S * 13 / 20;");
 using (var backports = JsonDocument.Parse(File.ReadAllText(Path.Combine(patchDir, "backports.json")))) {
     foreach (var fix in backports.RootElement.EnumerateArray()) {
         Edit(fix.GetProperty("code").GetString(), fix.GetProperty("anchor").GetString(), fix.GetProperty("replacement").GetString());

@@ -48,9 +48,9 @@ function MovementTests() {
     var directions = [["right"], ["left"], ["down"], ["up"], ["right", "down"], ["left", "down"], ["right", "up"], ["left", "up"]];
     var axes = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]];
     var modes = ["walking", "running", "carrying", "sword ready"];
-    // Walking's 1.5 / 1.0 pair is the NTSC SNES reference. DOI's other speeds retain that ratio.
-    var straight = [1.5, 2, 1.25, 0.975];
-    var diagonal = [1, 4 / 3, 5 / 6, 0.65];
+    // NTSC SNES uses 24/16 for walking and 20/13 for carrying and sword-ready, in sixteenths of a pixel.
+    var straight = [1.5, 2, 1.25, 1.25];
+    var diagonal = [1, 4 / 3, 13 / 16, 13 / 16];
     var carried = instance_create_layer(px, py, "Objs_Lower", oPot, {FloorLevel: oLink.FloorLevel});
     carried.mask_index = sEmptyMask;
     global.Inventory_ItemData[44].Index = 0;
@@ -95,7 +95,7 @@ function MovementTests() {
     oLink.ItemHolding = carried;
     global.NovaTestHeld = ["up", "right", "action"];
     MovementTick();
-    Record("run input retains carrying's SNES diagonal ratio", MovementAt(px + 5 / 6, py - 5 / 6));
+    Record("run input retains carrying's SNES diagonal ratio", MovementAt(px + 13 / 16, py - 13 / 16));
     MovementReset(px, py);
     global.NovaTestHeld = ["up", "right", "strafe"];
     MovementTick();
@@ -136,26 +136,37 @@ function MovementTests() {
     oLink.vy = 0.5;
     MovementTick();
     Record("falling over an edge retains its velocity", MovementAt(px + 0.5, py + 0.5));
-    for (var axis = 0; axis < 2; axis++) {
-        for (var wall_dir = -1; wall_dir <= 1; wall_dir += 2) {
-            MovementReset(px, py);
-            var wall = instance_create_layer(px, py, "Objs_Lower", oWall);
-            wall.FloorLevel = oLink.FloorLevel;
-            wall.mask_index = sWallMask;
-            wall.image_xscale = axis == 0 ? 1 : 8;
-            wall.image_yscale = axis == 0 ? 8 : 1;
-            if (axis == 0) {
-                wall.x += wall_dir > 0 ? oLink.bbox_right - wall.bbox_left : oLink.bbox_left - wall.bbox_right;
-                wall.y += py - (wall.bbox_top + wall.bbox_bottom) / 2;
-                global.NovaTestHeld = [wall_dir > 0 ? "right" : "left", "up"];
-            } else {
-                wall.y += wall_dir > 0 ? oLink.bbox_bottom - wall.bbox_top : oLink.bbox_top - wall.bbox_bottom;
-                wall.x += px - (wall.bbox_left + wall.bbox_right) / 2;
-                global.NovaTestHeld = ["right", wall_dir > 0 ? "down" : "up"];
+    var wall_modes = [0, 2, 3];
+    for (var m = 0; m < array_length(wall_modes); m++) {
+        var wall_mode = wall_modes[m];
+        for (var axis = 0; axis < 2; axis++) {
+            for (var wall_dir = -1; wall_dir <= 1; wall_dir += 2) {
+                MovementReset(px, py);
+                if (wall_mode == 2) oLink.ItemHolding = carried;
+                if (wall_mode == 3) {
+                    global.NovaTestHeld = ["sword"];
+                    with (oLink) { UpdateState(12); NovaSwordFinishSwing(); }
+                }
+                var wall = instance_create_layer(px, py, "Objs_Lower", oWall);
+                wall.FloorLevel = oLink.FloorLevel;
+                wall.mask_index = sWallMask;
+                wall.image_xscale = axis == 0 ? 1 : 8;
+                wall.image_yscale = axis == 0 ? 8 : 1;
+                if (axis == 0) {
+                    wall.x += wall_dir > 0 ? oLink.bbox_right - wall.bbox_left : oLink.bbox_left - wall.bbox_right;
+                    wall.y += py - (wall.bbox_top + wall.bbox_bottom) / 2;
+                    global.NovaTestHeld = [wall_dir > 0 ? "right" : "left", "up"];
+                } else {
+                    wall.y += wall_dir > 0 ? oLink.bbox_bottom - wall.bbox_top : oLink.bbox_top - wall.bbox_bottom;
+                    wall.x += px - (wall.bbox_left + wall.bbox_right) / 2;
+                    global.NovaTestHeld = ["right", wall_dir > 0 ? "down" : "up"];
+                }
+                if (wall_mode == 3) array_push(global.NovaTestHeld, "sword");
+                repeat (4) MovementTick();
+                var distance = wall_mode == 0 ? 4 : 3.25;
+                Record(modes[wall_mode] + " slides along wall " + string(axis) + "/" + string(wall_dir), axis == 0 ? MovementAt(px, py - distance) : MovementAt(px + distance, py));
+                with (wall) instance_destroy();
             }
-            repeat (4) MovementTick();
-            Record("wall blocks one axis without accelerating the other " + string(axis) + "/" + string(wall_dir), axis == 0 ? MovementAt(px, py - 4) : MovementAt(px + 4, py));
-            with (wall) instance_destroy();
         }
     }
     with (carried) instance_destroy();

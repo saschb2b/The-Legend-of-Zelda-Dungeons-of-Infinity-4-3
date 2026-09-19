@@ -147,6 +147,8 @@ function SwordTests() {
         return;
     }
     var sword_level = global.Inventory_ItemData[44].Index;
+    var has_readiness = variable_instance_exists(oLink, "NovaSwordIsCharged");
+    Record("sword charge cue shares the attack readiness condition", has_readiness);
     for (var level = 0; level <= 2; level++) {
         global.Inventory_ItemData[44].Index = level;
         global.NovaTestHeld = ["sword"];
@@ -154,9 +156,10 @@ function SwordTests() {
         with (oLink) {
             UpdateState(12);
             NovaSwordFinishSwing();
-            repeat (46) NovaSwordStep();
+            repeat (48) NovaSwordStep();
         }
         Record("level " + string(level + 1) + " can hold a sword poke", oLink.State == 12 && oLink.NovaSwordMode == 1 && instance_exists(oSword));
+        if (has_readiness) Record("charge cue respects sword level " + string(level + 1), oLink.NovaSwordIsCharged() == (level == 2));
         var charge = oLink.NovaSwordCharge;
         global.Paused = true;
         with (oLink) NovaSwordStep();
@@ -170,6 +173,31 @@ function SwordTests() {
             Record("spin finishes and restores facing", oLink.State == 1 && oLink.Facing == 4 && !instance_exists(oSword));
         }
     }
+    var thresholds = [0, 1, 44, 45, 47, 48, 49];
+    for (var i = 0; i < array_length(thresholds); i++) {
+        global.NovaTestHeld = ["sword"];
+        with (oLink) {
+            UpdateState(12);
+            NovaSwordFinishSwing();
+            repeat (thresholds[i]) NovaSwordStep();
+        }
+        var ready = thresholds[i] >= 48;
+        if (has_readiness) Record("charge cue at update " + string(thresholds[i]), oLink.NovaSwordIsCharged() == ready);
+        global.NovaTestHeld = [];
+        with (oLink) NovaSwordStep();
+        Record("spin release at update " + string(thresholds[i]), ready ? oLink.NovaSwordMode == 2 : oLink.State == 1);
+        if (has_readiness) Record("charge cue clears after release at update " + string(thresholds[i]), !oLink.NovaSwordIsCharged());
+    }
+    global.NovaTestHeld = ["sword"];
+    with (oLink) { UpdateState(12); NovaSwordFinishSwing(); repeat (47) NovaSwordStep(); }
+    global.Paused = true;
+    with (oLink) repeat (5) NovaSwordStep();
+    Record("pause cannot advance the last uncharged update", oLink.NovaSwordCharge == 47);
+    if (has_readiness) Record("pause cannot reveal the charge cue early", !oLink.NovaSwordIsCharged());
+    global.Paused = false;
+    with (oLink) NovaSwordStep();
+    Record("charge reaches 48 on the first resumed update", oLink.NovaSwordCharge == 48);
+    if (has_readiness) Record("charge cue appears on the first resumed update", oLink.NovaSwordIsCharged());
     global.NovaTestHeld = ["sword"];
     with (oLink) { UpdateState(12); NovaSwordFinishSwing(); repeat (5) NovaSwordStep(); }
     global.NovaTestHeld = [];

@@ -291,7 +291,7 @@
     "id": "sword-charge-cue",
     "code": "gml_Object_oSword_Draw_0",
     "anchor": "draw_self();",
-    "replacement": "draw_self();\nif (oLink.NovaSwordMode == 1 && oLink.NovaSwordCharge >= 45 && SwordLevel(2))\n{\n    draw_set_color(c_white);\n    draw_circle(x, y, 1 + ((oLink.NovaSwordCharge div 5) mod 2), false);\n}"
+    "replacement": "draw_self();\nif (oLink.NovaSwordIsCharged())\n{\n    draw_set_color(c_white);\n    draw_circle(x, y, 1 + ((oLink.NovaSwordCharge div 5) mod 2), false);\n}"
   },
   {
     "id": "agahnim-edge",

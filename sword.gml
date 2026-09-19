@@ -2,11 +2,14 @@ NovaSwordMode = 0;
 NovaSwordCharge = 0;
 NovaSwordSpinTicks = 0;
 NovaSwordFacing = Facing;
+function NovaSwordIsCharged() {
+    return NovaSwordMode == 1 && SwordLevel(2) && NovaSwordCharge >= 48;
+}
 function NovaSwordStep() {
     if (global.Paused || State != 12) return;
     if (NovaSwordMode == 1) {
         if (!input_check("sword")) {
-            if (SwordLevel(2) && NovaSwordCharge >= 45) {
+            if (NovaSwordIsCharged()) {
                 NovaSwordMode = 2;
                 NovaSwordSpinTicks = 0;
                 audio_play_sound(asset_get_index("Sound_Sword" + string(global.Inventory_ItemData[44].Index + 1)), 1, false);
@@ -17,8 +20,8 @@ function NovaSwordStep() {
         Facing = NovaSwordFacing;
         var move_x = input_check("right") - input_check("left");
         var move_y = input_check("down") - input_check("up");
-        var move_speed = WalkSpeed * 0.65;
-        if (move_x != 0 && move_y != 0) move_speed = move_speed * 2 / 3;
+        // NTSC SNES sword-ready speeds are 20/16 straight and 13/16 per diagonal axis.
+        var move_speed = (move_x != 0 && move_y != 0 ? 13 : 20) / 16;
         vx = move_x * move_speed;
         vy = move_y * move_speed;
         image_index = 6;

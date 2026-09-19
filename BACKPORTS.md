@@ -37,11 +37,13 @@ The candle occupies the light slot and the oil lamp replaces it when collected. 
 
 Old saves migrate on load. Dedicated gear moves out of the main bag. Items that do not fit remain accessible on an overflow page and move back when space opens. Migration retains the equipped item and quantities. The installer backs up saves before the inventory update and again before content schema 3. Reinstallation preserves those backups.
 
-The sword uses existing poses. Holding the button after a swing keeps the blade out and slows movement to 65%. Charging for 45 frames enables a 16-frame spin with sword level three or higher. Spin damage uses the existing sword damage rules and respects floor levels. These timings and animation are this patch's implementation, not extracted 1.2.1 code.
+The sword uses existing poses. Holding the button after a swing keeps the blade out. Charging for 48 active updates enables a 16-frame spin with sword level three or higher. The charge indicator uses the same readiness check as the attack. Spin duration, animation, and collision geometry are this patch's implementation, not extracted 1.2.1 code. Damage uses DOI's sword rules and respects floor levels.
 
 Diagonal movement follows the NTSC SNES walking ratio from [ALttP's reconstructed movement code](https://github.com/snesrev/zelda3/blob/fbbb3f967a51fafe642e6140d0753979e73b4090/src/player.c#L5656-L5745). Its normal walking table uses 24 units straight and 16 per diagonal axis, with 16 units per pixel. DOI therefore walks at 1.5 pixels per frame straight and 1.0 on each diagonal axis. Total diagonal speed is about 6% slower than straight movement.
 
-The patch applies that two-thirds ratio to DOI's existing running, carrying, and sword-ready speeds before wall collision checks. Opposing inputs cancel first. This adapts the SNES walking rule rather than copying its complete terrain and speed tables. Scripted movement, corner assistance, knockback, and falls retain DOI's behavior. This correction is independent of the 1.2.1 backports.
+Carrying and sword-ready movement use the SNES 20/13 speed pair: 1.25 pixels straight and 0.8125 per diagonal axis on normal ground. The 48-update charge threshold follows [ALttP's sword controls](https://github.com/snesrev/zelda3/blob/fbbb3f967a51fafe642e6140d0753979e73b4090/src/player.c#L2198-L2245).
+
+DOI's running speed retains the two-thirds diagonal ratio. Opposing inputs cancel before scaling, and wall collisions resolve afterward. This adapts selected SNES movement states rather than copying its complete terrain and speed tables. Scripted movement, corner assistance, knockback, falls, and protection after damage retain DOI's behavior. These corrections are independent of the 1.2.1 backports.
 
 Rod capacities, in game index order, are 20, 16, 16, 16, 12, and 12 charges, recovered from 1.2.1. Existing rods keep excess charges until spent. Fairy orbs produce one fairy 80% of the time, two 18%, or three 2%. The upstream notes specify mostly single-fairy orbs without giving numbers. The fairy distribution remains a patch choice.
 
