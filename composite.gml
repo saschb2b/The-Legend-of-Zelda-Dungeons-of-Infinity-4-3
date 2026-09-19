@@ -8,14 +8,17 @@ draw_set_alpha(1);
 draw_set_color(c_white);
 // Effects and cameras use the 1600x900 canvas, with the playfield at (288, 0).
 draw_surface_part(application_surface, 288, 0, 1024, 896, 0, 0);
-// Modal screens need the full playfield width for their text and controls.
-var _nova_modal = global.Paused || instance_exists(oInventory) || instance_exists(oMenu_Game) || instance_exists(oDialogueBox);
+// Doorway movement and closing doors keep gameplay paused after the camera stops.
+NovaTransitionHUD = instance_exists(oCamera) && (oCamera.RoomTransition != 0 || (NovaTransitionHUD && global.Paused));
+var _nova_ui = instance_exists(oInventory) || instance_exists(oMenu_Game) || instance_exists(oDialogueBox) || instance_exists(oMap);
+var _nova_modal = global.Paused || _nova_ui;
+var _nova_travel = NovaTransitionHUD || (instance_exists(oLink) && oLink.StairsAutoMove);
 if (global.Users[global.UserIndex].Prefs[2] && !_nova_modal)
 {
     draw_surface_part_ext(application_surface, 0, 304, 288, 592, 16, 436, 0.75, 0.75, c_white, 0.9);
     draw_surface_part_ext(application_surface, 1312, 0, 288, 896, 792, 208, 0.75, 0.75, c_white, 0.9);
 }
-if (instance_exists(oHUD) && (!_nova_modal || global.NovaInventoryHUD()) && !global.ArcadeVP_Show)
+if (instance_exists(oHUD) && ((!_nova_ui && (!global.Paused || _nova_travel)) || global.NovaInventoryHUD()) && !global.ArcadeVP_Show)
 {
     if (!surface_exists(NovaHUD)) NovaHUD = surface_create(256, 224);
     surface_set_target(NovaHUD);

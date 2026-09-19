@@ -35,7 +35,7 @@ python3 build.py --runtime-tests
 python3 tests/run_device.py root@your-device.local
 ```
 
-Optional arguments include `--control-path /path/to/socket`, `--ports-dir /storage/roms/ports`, and `--report-dir .build/device-results`. Add `--capture` to save screenshots of all seven inventory categories, item actions and information, keyboard prompts, CRT mode, and a second overflow page after the assertions. Status captures cover the default binding, CRT mode, a remapped button, and keyboard input. Review the screenshots for clipping, HUD overlap, and incomplete frames. The harness does not compare pixels.
+Optional arguments include `--control-path /path/to/socket`, `--ports-dir /storage/roms/ports`, and `--report-dir .build/device-results`. Add `--capture` to save screenshots of all seven inventory categories, item actions and information, keyboard prompts, CRT mode, and a second overflow page after the assertions. Status captures cover the default binding, CRT mode, a remapped button, and keyboard input. Review the screenshots for clipping, HUD overlap, and incomplete frames. Screenshot comparisons are manual.
 
 The runner creates a disposable game directory under `/storage/.cache/`, with fresh saves, and a temporary Ports launcher. It launches through EmulationStation and runs the suite automatically. It writes the JSON assertion report and game log locally, removes the disposable installation, and compares production save hashes. It never switches the production game to a test build. If SSH disconnects before cleanup, remove the reported `doi43-harness-*` directory and matching `DOI43 Harness *.sh` launcher after closing the test game.
 
@@ -46,6 +46,8 @@ Movement tests measure displacement through Link's compiled Step event over eigh
 Sword tests check release and charge-indicator readiness at 0, 1, 44, 45, 47, 48, and 49 held updates. They check pause and resume at the threshold, sword-level restrictions, and indicator dismissal after release. The build verifier requires the indicator to call the same readiness function as the attack.
 
 Facing tests cover every starting direction against eight movement directions and idle input through Link's compiled Step event. Each case runs with eight random seeds and checks the first three updates while walking, running, carrying, strafing, or holding the sword ready. They also check corner-assist and knockback locks, releasing either diagonal input, and stopping. Expected ordinary turns follow the reconstructed SNES [facing routine](https://github.com/snesrev/zelda3/blob/fbbb3f967a51fafe642e6140d0753979e73b4090/src/player.c#L5932-L5967): keep a facing included in the diagonal, otherwise prefer its vertical direction. DOI's facing locks remain in effect.
+
+HUD tests call the compiled renderer with room-scroll, doorway-exit, door-closing, and stair states. They cover all four scroll directions, CRT on and off, and returning control to the player. Draw counters check HUD and Status-hint visibility. A pixel sample checks that the magic meter stays at its screen position while camera coordinates change. Pause-menu, map, dialogue, inventory, and unrelated-pause cases check visibility outside travel. These fixtures test the renderer's response to transition states, not an entire doorway crossing.
 
 To show that the assertions catch the original regressions:
 

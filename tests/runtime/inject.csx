@@ -10,9 +10,19 @@ var root = Directory.GetCurrentDirectory();
 var group = new CodeImportGroup(Data) { AutoCreateAssets = true };
 group.QueueReplace("gml_Object_oNovaTests_Create_0", File.ReadAllText(Path.Combine(root, "tests/runtime/create.gml")) + "\n" + File.ReadAllText(Path.Combine(root, "tests/runtime/backports.gml")) + "\n" + File.ReadAllText(Path.Combine(root, "tests/runtime/inventory.gml")) + "\n" + File.ReadAllText(Path.Combine(root, "tests/runtime/capture.gml")) + "\n" + File.ReadAllText(Path.Combine(root, "tests/runtime/content.gml")) + "\n" + File.ReadAllText(Path.Combine(root, "tests/runtime/controls.gml")));
 group.QueueAppend("gml_Object_oNovaTests_Create_0", File.ReadAllText(Path.Combine(root, "tests/runtime/movement.gml")));
+group.QueueAppend("gml_Object_oNovaTests_Create_0", File.ReadAllText(Path.Combine(root, "tests/runtime/hud.gml")));
 group.QueueReplace("gml_Object_oNovaTests_Step_0", File.ReadAllText(Path.Combine(root, "tests/runtime/step.gml")));
 group.QueueAppend("gml_Object_oTitle_Create_0", "if (!instance_exists(oNovaTests)) instance_create_depth(0, 0, -100000, oNovaTests);");
 var settings = new Underanalyzer.Decompiler.DecompileSettings();
+var renderName = "gml_Object_oRender_Draw_64";
+var render = GetDecompiledText(renderName, null, settings);
+if (render.Contains("NovaHUD_Draw();")) {
+    render = render.Replace("NovaHUD_Draw();", "NovaHUD_Draw(); global.NovaTestHUDDraws++;");
+    var statusCall = "global.NovaPromptDraw(binding, \"STATUS\",";
+    if (!render.Contains(statusCall)) throw new Exception("Status drawing boundary missing");
+    render = render.Replace(statusCall, "global.NovaTestStatusDraws++; " + statusCall);
+    group.QueueReplace(renderName, render);
+}
 var inputName = "gml_GlobalScript_input_check_pressed";
 var input = GetDecompiledText(inputName, null, settings);
 var pressedBoundary = "return _global.__cleared ? false : _verb_struct.__press;";

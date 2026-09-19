@@ -86,7 +86,7 @@ var marker = "if (global.Users[global.UserIndex].Prefs[3])";
 var position = render.IndexOf(marker);
 if (position < 0) throw new Exception("Final compositor not found");
 group.QueueReplace(renderName, render.Substring(0, position) + File.ReadAllText(Path.Combine(patchDir, "composite.gml")));
-group.QueueAppend("gml_Object_oRender_Create_0", "NovaFrame = -1; NovaHUD = -1; surface_resize(application_surface, 1600, 900); display_set_gui_maximise();");
+group.QueueAppend("gml_Object_oRender_Create_0", "NovaFrame = -1; NovaHUD = -1; NovaTransitionHUD = false; surface_resize(application_surface, 1600, 900); display_set_gui_maximise();");
 group.QueueAppend("gml_Object_oRender_CleanUp_0", "if (surface_exists(NovaFrame)) surface_free(NovaFrame); if (surface_exists(NovaHUD)) surface_free(NovaHUD); display_set_gui_maximise(-1, -1);");
 group.QueueAppend("gml_Object_oRender_Create_0", "function NovaHUD_Draw() { with (oHUD) {\n" + File.ReadAllText(Path.Combine(patchDir, "hud.gml")) + "\n} }");
 var hudName = "gml_Object_oHUD_Draw_0";

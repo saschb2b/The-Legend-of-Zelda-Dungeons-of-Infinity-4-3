@@ -56,6 +56,7 @@ try {
             SwordTests();
             ContentTests();
             ControlTests();
+            HUDTests();
             if (file_exists("nova-capture-enabled.txt")) {
                 CaptureStart();
                 Stage = 7;
