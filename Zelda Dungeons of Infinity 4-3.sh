@@ -34,7 +34,7 @@ export SDL_GAMECONTROLLERCONFIG="$sdl_controllerconfig"
 
 # Display loading splash
 if [ "$CFW_NAME" == "muOS" ]; then
-  $ESUDO ./tools/splash $SPLASHFILE 1 
+  $ESUDO ./tools/splash $SPLASHFILE 1
 fi
 $ESUDO ./tools/splash $SPLASHFILE 5000
 
