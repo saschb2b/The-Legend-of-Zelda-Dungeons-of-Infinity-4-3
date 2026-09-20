@@ -4,18 +4,63 @@ These versions identify the 4:3 patch, independently of the original game's vers
 
 ## Unreleased
 
+## [1.6.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.6.1) - 2026-09-20
+
+Continue your adventure in one press, with a simpler start menu and clearer controls throughout the game.
+
 ### Added
 
-- Show the available interaction beside Status during play, such as Talk, Open, Lift or Throw. Use the current Interact binding, keep Status anchored, and hide the hint while menus, dialogue or scripted movement prevent interaction.
+- Show nearby interactions beside Status: Talk to people, Open chests, Lift pots, Throw carried objects, Read signs, or Inspect shop goods. The hint follows your Interact binding and appears only when the action is available.
 
 ### Changed
 
-- Use the supplied Switch 2 glyphs for controller hints. Group hints at the bottom right with labels before buttons and the primary action (A) before Close (B). Keep inventory actions in fixed positions and L/R beside page headings.
-- Keep the classic centered title reveal, then move its logo into an adventure menu with the last selected player and Continue first.
-- Place the saved name and floor beneath Continue. Show the character and hearts in Change player, grouped with each save.
-- Choose a character, bonus and challenges in one frame. Begin adventure is selected by default, and fresh players start as Link without mandatory name entry.
-- Replace stacked startup windows with a shared scene and one active frame. Keep all five players, records, renaming, controls and credits available. Move Updates into Options.
-- Keep new-run choices separate from saved progress. Confirm before replacing an adventure or deleting a player, with the safe choice selected first. Close restores the originating menu and selection.
+- Keep the classic centered title screen, then animate its logo into the adventure menu. Continue selects your last player, with their name and floor beneath it. Character portraits and hearts stay together in Change player.
+- Choose a character, bonus and challenges in one frame, with Begin adventure selected first. New players start as Link without mandatory name entry.
+- Use one active menu frame over a shared scene. All five players, records, renaming, controls and credits remain available. Find Updates under Options.
+- Confirm before replacing an adventure or deleting a player, with the safe choice selected first. Browsing new-run choices preserves saved progress. Close returns to the previous selection.
+- Use Switch 2 button glyphs, with action labels before buttons in a consistent bottom-right row. Keep A before B Close, inventory actions in fixed positions, and L/R beside page headings.
+
+### Before and after
+
+**From Player Select to Continue.** The saved name and floor sit beneath the action that resumes the run.
+
+<table>
+<tr><th width="50%">Before · v1.6.0</th> <th width="50%">After · v1.6.1</th></tr>
+<tr>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.6.0/screenshots/profile.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.6.0/screenshots/profile.png" alt="Player Select in v1.6.0, with five save slots and Updates" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.6.1/screenshots/profile.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.6.1/screenshots/profile.png" alt="Adventure menu in v1.6.1, with LINK and Floor 5 beneath Continue" width="640"></a></td>
+</tr>
+</table>
+
+**One place for action hints.** The footer stays below the inventory frame, while shoulder buttons stay beside its heading.
+
+<table>
+<tr><th width="50%">Before · v1.6.0</th> <th width="50%">After · v1.6.1</th></tr>
+<tr>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.6.0/screenshots/inventory.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.6.0/screenshots/inventory.png" alt="Inventory in v1.6.0, with colored button hints inside the frame" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.6.1/screenshots/inventory.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.6.1/screenshots/inventory.png" alt="Inventory in v1.6.1, with Switch 2 hints below the frame and L/R beside the heading" width="640"></a></td>
+</tr>
+</table>
+
+**An action when you need it.** Talk appears beside Status when Link faces someone within reach.
+
+<table>
+<tr><th width="50%">Before · v1.6.0</th> <th width="50%">After · v1.6.1</th></tr>
+<tr>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.6.0/screenshots/playfield.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.6.0/screenshots/playfield.png" alt="Gameplay in v1.6.0, with only a Status hint" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.6.1/screenshots/interaction.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.6.1/screenshots/interaction.png" alt="Gameplay in v1.6.1, with Talk and its mapped A button beside Status" width="640"></a></td>
+</tr>
+</table>
+
+Screenshots are unedited captures from a Nova, using test saves. Select an image to view it at full size.
+
+### Update
+
+On v1.6.0, open **Updates** from Player Select. After this update, it lives under **Options > Updates**. The installer preserves saves and migration backups.
+
+For a fresh installation or an older version, use the patch installer ZIP under Assets and follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.6.1/README.md#install-on-the-nova).
+
+[Changes from v1.6.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.6.0...v1.6.1).
 
 ## [1.6.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.6.0) - 2026-09-20
 
