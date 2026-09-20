@@ -4,6 +4,12 @@ These versions identify the 4:3 patch, independently of the original game's vers
 
 ## Unreleased
 
+### Added
+
+- Play the claw machine in the village arcade and Mothula's Money in the pub. Both use the original 1.2.1 artwork, audio, prize pools and payout rules, adapted to the VM game.
+- Use A to play or grab, L/R to change a slot-machine bet, and B to close. Closing a paid spin settles its result once. Closing the claw before grabbing refunds the unused play.
+- Add device regressions for payments, payouts, cancellation, prize delivery and village placement, plus a separate village test launch with physical controls and disposable saves.
+
 ## [1.6.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.6.1) - 2026-09-20
 
 Continue your adventure in one press, with a simpler start menu and clearer controls throughout the game.

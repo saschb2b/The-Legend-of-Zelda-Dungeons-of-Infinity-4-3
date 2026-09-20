@@ -4,3 +4,5 @@ __pycache__/
 *.droid
 *.port
 *.zip
+
+!assets/arcade-resources.zip

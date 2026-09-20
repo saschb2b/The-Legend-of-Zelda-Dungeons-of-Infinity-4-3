@@ -31,7 +31,7 @@ def write_archive(root, output):
 
 
 def validate_production(patched):
-    if b'oNovaTests' in patched or b'NovaTestInput' in patched:
+    if any(name in patched for name in (b'oNovaTests', b'NovaTestInput', b'oNovaVillageTest')):
         raise ValueError('Instrumented test builds cannot be packaged as a release.')
 
 

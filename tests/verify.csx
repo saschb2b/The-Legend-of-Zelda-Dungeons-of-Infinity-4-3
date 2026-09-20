@@ -35,4 +35,19 @@ Check(Code("gml_Object_oEnemy_Pikit_Tongue_Step_0").Contains("oLink.State != 20"
 Check(Code("gml_Object_oSword_Draw_0").Contains("oLink.NovaSwordIsCharged()"), "Sword charge cue must use the attack readiness condition");
 Check(!Data.GameObjects.Any(obj => obj.Name.Content == "oNovaTests"), "Test object leaked into production");
 Check(!Data.Code.Any(code => code.Name.Content.Contains("NovaTest")), "Test code leaked into production");
+Check(!Data.GameObjects.Any(obj => obj.Name.Content == "oNovaVillageTest"), "Village preview leaked into production");
+Check(Data.GameObjects.ByName("oClawMachine").ParentId == Data.GameObjects.ByName("oPopMachine"), "Claw must share interaction and room cleanup with machines");
+Check(Data.GameObjects.ByName("oArcade_Mothula").ParentId == Data.GameObjects.ByName("oArcade"), "Slot must inherit arcade placement");
+Check(Data.Sprites.ByName("sClawMachine_Window").Textures.Count == 6, "Claw prize frames missing");
+Check(Data.Sprites.ByName("sArcade_Mothula_Symbols").Textures.Count == 6, "Slot symbols missing");
+var iconSlice = Data.Sprites.ByName("sArcade_Mothula_Icon_Cherry").V3NineSlice;
+Check(iconSlice != null && iconSlice.Enabled && (int)iconSlice.TileModes[4] == 1, "Slot payout icons must repeat instead of stretching");
+var clawSlice = Data.Sprites.ByName("sClawMachine_Claw").V3NineSlice;
+Check(clawSlice != null && clawSlice.Enabled && clawSlice.Top == 2 && clawSlice.Bottom == 5, "Claw cable must extend without stretching its tips");
+foreach (var name in new[] { "sClawMachine", "sArcade_Mothula" }) {
+    Check(Data.Sprites.ByName(name).CollisionMasks.Count == 1, "Cabinet collision mask missing: " + name);
+}
+foreach (var sound in Data.Sounds.Where(sound => sound.Name.Content.Contains("ClawMachine") || sound.Name.Content.StartsWith("Sound_Slot"))) {
+    Check(sound.AudioFile != null && sound.AudioFile.Data.Length > 44 && sound.GroupID == Data.GetBuiltinSoundGroupID(), "Arcade audio must be embedded: " + sound.Name.Content);
+}
 Console.WriteLine("NOVA BUILD VERIFIED");

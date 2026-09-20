@@ -195,6 +195,6 @@ class ReleaseTests(unittest.TestCase):
 
     def test_instrumented_build_cannot_be_released(self):
         from package_release import validate_production
-        for name in (b'oNovaTests', b'NovaTestInput'):
+        for name in (b'oNovaTests', b'NovaTestInput', b'oNovaVillageTest'):
             with self.subTest(name=name), self.assertRaisesRegex(ValueError, 'Instrumented'):
                 validate_production(b'FORM' + name + b'\0')

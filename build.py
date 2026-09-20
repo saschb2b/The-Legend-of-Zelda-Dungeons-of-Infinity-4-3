@@ -142,6 +142,8 @@ def main():
         run_umt(tool, BUILD / 'game.droid', 'tests/runtime/inject.csx', BUILD / 'runtime-baseline.droid', 'NOVA TEST HARNESS COMPILED')
         verify_runner_format((BUILD / 'runtime-tests.droid').read_bytes())
         verify_runner_format((BUILD / 'runtime-baseline.droid').read_bytes())
+        run_umt(tool, output, 'tests/village.csx', BUILD / 'village-preview.droid', 'NOVA VILLAGE PREVIEW COMPILED')
+        verify_runner_format((BUILD / 'village-preview.droid').read_bytes())
     summary = {'compiled': True, 'release_verified': args.check_release,
                'runtime_harness_compiled': args.runtime_tests,
                'sha256': hashlib.sha256(output.read_bytes()).hexdigest()}

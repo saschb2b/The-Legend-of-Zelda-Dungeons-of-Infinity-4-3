@@ -73,3 +73,5 @@ if (instance_exists(oHUD) && !_nova_modal && !global.ArcadeVP_Show && !global.Us
     global.NovaPromptDraw(binding, "STATUS", 238 * sx - width, 209 * sy, sx, sy, size, 2);
     draw_set_alpha(1);
 }
+
+global.NovaArcadePrompts();

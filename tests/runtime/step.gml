@@ -102,6 +102,13 @@ try {
             HUDTests();
             ShopTests();
             ContextTests();
+            ArcadeTests();
+            ArcadeTravelStart();
+            Stage = 15;
+            break;
+        case 15:
+            if (!ArcadeTravelStep()) break;
+            if (file_exists("nova-arcade-capture-enabled.txt")) { ArcadeCaptureStart(); Stage = 14; break; }
             if (file_exists("nova-context-capture-enabled.txt")) { ContextCaptureStart(); Stage = 13; break; }
             if (file_exists("nova-capture-enabled.txt")) {
                 CaptureStart();
@@ -111,6 +118,9 @@ try {
             Complete = true;
             Flush();
             game_end();
+            break;
+        case 14:
+            ArcadeCaptureStep();
             break;
         case 13:
             ContextCaptureStep();

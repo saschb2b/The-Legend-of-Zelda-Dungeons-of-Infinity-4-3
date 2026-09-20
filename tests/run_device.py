@@ -35,6 +35,7 @@ def main():
     parser.add_argument('--game', type=Path, default=ROOT / '.build/runtime-tests.droid')
     parser.add_argument('--ports-dir', default='/storage/roms/ports')
     parser.add_argument('--capture', action='store_true', help='Capture inventory and Status hints after the assertions.')
+    parser.add_argument('--capture-arcade', action='store_true', help='Capture the village arcade and pub machines.')
     parser.add_argument('--capture-context', action='store_true', help='Capture contextual gameplay hints with controller and keyboard mappings.')
     parser.add_argument('--capture-updates', action='store_true', help='Capture only the updater screens during regression tests.')
     parser.add_argument('--capture-profiles', action='store_true', help='Capture empty and saved profiles with controller and keyboard prompts.')
@@ -63,9 +64,9 @@ print(json.dumps(saves))
 shutil.copytree(source,stage,ignore=shutil.ignore_patterns('savedata','test-savedata','log.txt'))
 config=json.loads((stage/'gmloader.json').read_text())
 config['save_dir']='harness-savedata'
-if CAPTURE or CAPTURE_UPDATES or CAPTURE_PROFILES or CAPTURE_CONTEXT:
+if CAPTURE or CAPTURE_UPDATES or CAPTURE_PROFILES or CAPTURE_CONTEXT or CAPTURE_ARCADE:
  (stage/'harness-savedata').mkdir()
- for enabled,name in [(CAPTURE_CONTEXT,'nova-context-capture-enabled.txt'),(CAPTURE,'nova-capture-enabled.txt'),(CAPTURE_UPDATES,'nova-update-capture-enabled.txt'),(CAPTURE_PROFILES,'nova-profile-capture-enabled.txt')]:
+ for enabled,name in [(CAPTURE_ARCADE,'nova-arcade-capture-enabled.txt'),(CAPTURE_CONTEXT,'nova-context-capture-enabled.txt'),(CAPTURE,'nova-capture-enabled.txt'),(CAPTURE_UPDATES,'nova-update-capture-enabled.txt'),(CAPTURE_PROFILES,'nova-profile-capture-enabled.txt')]:
   if enabled: (stage/'harness-savedata'/name).touch()
 (stage/'gmloader.json').write_text(json.dumps(config))
 text=LAUNCHER_TEXT
@@ -78,7 +79,7 @@ text=text.replace(anchor,'GAMEDIR='+repr(str(stage)))
 launcher.write_text(text)
 launcher.chmod(0o755)
 '''
-        constants = f'CAPTURE_CONTEXT={args.capture_context!r}\nCAPTURE={args.capture!r}\nCAPTURE_UPDATES={args.capture_updates!r}\nCAPTURE_PROFILES={args.capture_profiles!r}\nSOURCE={source!r}\nSTAGE={stage!r}\nLAUNCHER={launcher!r}\nLAUNCHER_TEXT={(ROOT / LAUNCHER).read_text()!r}\n'
+        constants = f'CAPTURE_ARCADE={args.capture_arcade!r}\nCAPTURE_CONTEXT={args.capture_context!r}\nCAPTURE={args.capture!r}\nCAPTURE_UPDATES={args.capture_updates!r}\nCAPTURE_PROFILES={args.capture_profiles!r}\nSOURCE={source!r}\nSTAGE={stage!r}\nLAUNCHER={launcher!r}\nLAUNCHER_TEXT={(ROOT / LAUNCHER).read_text()!r}\n'
         snapshot, staging = setup.split('shutil.copytree', 1)
         before = json.loads(request('python3 -', (constants + snapshot).encode()))
         created = True
@@ -111,8 +112,8 @@ print(urllib.request.urlopen(r,timeout=10).read().decode())
                 if report.get('complete'):
                     break
                 capture = report.get('capture', '')
-                if (args.capture or args.capture_updates or args.capture_profiles or args.capture_context) and capture and capture not in captures:
-                    if not re.fullmatch(r'(inventory|status|updates|profiles|map|context)-[a-z]+', capture):
+                if (args.capture or args.capture_updates or args.capture_profiles or args.capture_context or args.capture_arcade) and capture and capture not in captures:
+                    if not re.fullmatch(r'(inventory|status|updates|profiles|map|context|arcade)-[a-z]+', capture):
                         raise RuntimeError('Invalid screenshot name in test report.')
                     path = stage + '/' + capture + '.png'
                     request('source /etc/profile; grim ' + shlex.quote(path))

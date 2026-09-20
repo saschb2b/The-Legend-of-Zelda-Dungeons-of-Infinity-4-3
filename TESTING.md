@@ -53,6 +53,8 @@ Shop tests use an actual merchant, item, and purchase script with keyboard and c
 
 Interaction-hint tests place real pots, chests, NPCs and shop goods within reach, then invoke Interact to verify that the hint matches the resulting action. They cover facing, floor separation, unavailable objects, carrying priority, remapping, keyboard bindings and modal suppression. Repeated hint queries must preserve inventory, saves, treasure state, merchant selection and random-number state. The build derives the read-only query from the patched interaction predicates and rejects unreviewed function calls or instance-field writes. Add `--capture-context` for Talk, Open, Lift, remapped-controller and keyboard screenshots; review their spacing beside the fixed Status hint.
 
+Village tests enumerate every slot roll and check all stakes and payouts, reel alignment, insufficient funds, wallet limits and repeated settlement. Claw tests cover weighted prize pools, purchase cancellation, payment, movement bounds, grabbing, refunds, losing stakes and item delivery. The suite also walks into and out of both buildings through their real door events. Add `--capture-arcade` for pub, slot, claw and prize screenshots. Review original sprite tiling, reel clipping and footer spacing.
+
 Controller tests check PortMaster's Nintendo A/B mapping and preserve other controls, Xbox mappings, and custom layouts. The device runner uses the repository's launcher and controller adapter. Before release, verify the physical Nova buttons: B swings the sword, A interacts, and menus use A to confirm and B to close. Logical input injection alone cannot verify the controller translation.
 
 Updater tests cover stable-version selection, release URLs, checksums, archive paths, cancellation, insufficient space, installation failure, and recovery after each file-switch step. An integration test downloads fixture bytes and runs the real installer in a separate directory, preserving saves and migration backups.
@@ -78,6 +80,23 @@ The baseline contains the unpatched 1.1.6 game with the same instrumentation. Th
 GitHub-hosted CI compiles the runtime suite but cannot execute the Nova's ARM/GPU runtime. Before releasing, run the suite on a device. Also check the physical confirm/cancel buttons, title animation, remapped Status toggling, shoulder paging, item actions and information, pause layout, CRT mode, and Select + Start. Verify that the glyph matches the button that actually triggers each action. Inspect all three challenge pages, including the longest values and returning to the start menu. Runtime assertions measure the text columns and window bounds, but screenshots still need review. Injected input does not verify physical controller mapping, rendering quality, audio, or an entire generated dungeon run.
 
 For inventory prompts, compare empty slots, equipment, usable items, action lists, and item information. Close must retain its position throughout. Shoulder hints must stay fixed across all page titles, including both overflow pages. Check remapped buttons and keyboard keycaps for overlap. This follows [XAG 112's guidance on consistent prompt locations and order](https://learn.microsoft.com/en-us/xbox/accessibility/xbox-accessibility-guidelines/112). The specific Equip / Close / primary-action row is a design choice for this compact layout.
+
+## Playable village test
+
+After a clean build, this command leaves a separate **DOI Village Test** entry in Ports and launches it:
+
+```sh
+python3 tests/run_village.py root@your-device.local --control-path /path/to/socket
+```
+
+The test starts outside the village arcade with 500 rupees and normal physical controls.
+
+1. Walk through the entrance so the game records the return doorway.
+2. Face the CLAW cabinet and press A. Move left/right and grab with A.
+3. Leave the arcade and enter the pub to try Mothula's Money. Change bets with L/R.
+4. Check both entrances and exits, repeated plays, insufficient funds, prize collection, audio, and B to close.
+
+Each launch starts a fresh village adventure in an isolated save directory. The script checks production save and backup hashes, disables the updater worker, and records the test paths in `.build/village-preview.json`. After closing the test, remove its `DOI Village Test.sh` launcher and the recorded `doi43-village-*` directory. The build and release packager reject the preview object in production binaries.
 
 ## Versioning and release cadence
 

@@ -28,6 +28,7 @@ The references are the developer's bundled change log, manual, Gem Combo Poster,
 | Food bag, pendant bag, master-key and Wallmaster artwork | Binary artwork patches from 1.2.1, with source/result hashes and compiled sprite bounds/pickup-mask checks |
 | Fairy-orb contents | Implemented distribution described below; compiled and reviewed |
 | Keyboard menu/direction remapping | Device tests complete remapping, persist bindings and restore prior bindings on abort |
+| Village claw machine and pub slots | Unreleased; device tests check all slot odds and stakes, animated reel results, payment/settlement guards, claw prize pools, cancellation, item delivery and all five cabinet placements |
 
 ## Adaptations for this patch
 
@@ -55,8 +56,34 @@ Wallmaster uses the recovered artwork, damage, chase speed, attack speed/duratio
 
 `dungeon_fixes.json` is the source for the template corrections. The comparison matched rooms by grid geometry and translated connected-room indices into the 1.1.6 ordering. It excluded cosmetic room/door reordering. The build generates guarded assignments before the game creates rotated and mirrored templates. Each assignment checks its original value.
 
+## Village minigames
+
+The unreleased backport adds the arcade claw cabinet and four Mothula's Money cabinets in the pub. Original DOI 1.2.0 introduced these games. The inspected 1.2.1 build retains them. The village is floor 6, after the sewers.
+
+Mothula's Money accepts stakes of one to five rupees. Its native `irandom(10000)` roll includes both endpoints. The recovered result counts are:
+
+| Result | Outcomes out of 10,001 | Return per rupee staked |
+| --- | ---: | ---: |
+| Loss | 7,275 | 0 |
+| Cherries | 1,600 | 1 |
+| Plums | 500 | 2 |
+| Oranges | 350 | 5 |
+| Bells | 175 | 10 |
+| Sevens | 85 | 25 |
+| Jackpot | 16 | 100 |
+
+The claw costs ten rupees, has five prizes, and uses the original 65% success check. Moving over the prize pile enables Grab. Its precise position does not change that check.
+
+The normal prize pool has 97 entries. Food takes 75, with four each for coupons, gems, kinstones, large magic refills and fairy orbs. Heart containers and wishstones each take one. The recovered pool rules exclude forbidden food and unavailable rare prizes.
+
+`arcade.gml` and `arcade/` adapt these rules and the animations to the older VM. The controller footer follows this patch's bindings. B settles a paid slot result once. For the claw, B refunds a play before Grab; after Grab it settles the chosen outcome without waiting for the animation. These closure rules are patch adaptations. The VM implementation is not a complete native-code transplant.
+
+`assets/arcade-resources.zip` contains resource byte patches and metadata for 17 sprites and 15 sounds. Its manifest records the SHA-256 hashes of the inspected executable, game data and two audio groups. Each resource patch checks its base and reconstructed bytes. Sprites retain original origins, collision bounds and nine-slice settings, including repeated payout symbols and the extending claw cable. The game artwork and audio are extracted originals.
+
+The inspected executable has SHA-256 `f80262606d6932ea2042ef3bb862e2585f06279d965e34b59948c05bcc7f5025`. The source functions include `gml_GlobalScript___MothulaSlot`, `gml_Object_oArcade_Mothula_Create_0`, its Step event, and the claw's Create, Step and Draw events. Full native binaries and decompilation dumps are not part of the repository.
+
 ## Not included
 
-The pub slot machine, arcade claw machine, new prisoner, seasonal decorations, and character customization remain unported. Artwork changes beyond those listed above also remain outside this patch. Unspecified upstream tweaks remain unverified.
+The new prisoner, seasonal decorations, and character customization remain unported. Artwork changes beyond those listed above also remain outside this patch. Unspecified upstream tweaks remain unverified.
 
 GitHub CI compiles the patch and runtime tests, validates the release delta, and tests installation. The device suite runs in a disposable installation. It does not replace a full generated-dungeon playthrough or verification of every physical controller.
