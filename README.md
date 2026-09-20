@@ -69,11 +69,13 @@ The footer keeps Equip on the left, Close in the middle, and the primary action 
 | --- | --- |
 | ![Compact bag inventory below health and counters, with shoulder and colored face-button hints](screenshots/inventory.png) | ![Item action list with a confirm hint that names the highlighted Info action](screenshots/inventory-actions.png) |
 
-The bag screenshot uses a populated test inventory to show full counters and two rows of hearts. All screenshots come from the game running on a Nova.
+Inventory and profile screenshots use test saves to show progress and full inventories. All screenshots come from the game running on a Nova.
 
-| Status at a stick-click | Menus that fit the screen |
+| Status at a stick-click | Choose your player |
 | --- | --- |
-| ![Equipment, map, and dungeon progress over the playfield](screenshots/overlay.png) | ![Profile menu within the Nova's 4:3 display](screenshots/profile.png) |
+| ![Equipment, map, and dungeon progress over the playfield](screenshots/overlay.png) | ![Player Select with character portraits, saved hearts, and floor](screenshots/profile.png) |
+
+Player Select shows all five profiles. Saved runs show their character, hearts, and floor. Empty slots start a new player. Updates and Exit sit below the profiles.
 
 ## Playing and updating
 

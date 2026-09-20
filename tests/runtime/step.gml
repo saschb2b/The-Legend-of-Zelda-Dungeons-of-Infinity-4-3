@@ -25,7 +25,19 @@ try {
             if (!instance_exists(oMenu)) break;
             MenuTests();
             ContentMenuTests();
+            ProfileMenuTests();
             UpdateMenuTests();
+            if (file_exists("nova-capture-enabled.txt") || file_exists("nova-profile-capture-enabled.txt")) {
+                ProfileCaptureStart();
+                Stage = 10;
+                break;
+            }
+            Stage = 11;
+            break;
+        case 10:
+            if (ProfileCaptureStep()) Stage = 11;
+            break;
+        case 11:
             if (file_exists("nova-capture-enabled.txt") || file_exists("nova-update-capture-enabled.txt")) {
                 input_profile_set("gamepad");
                 with (oMenu) NovaUpdateEnter();

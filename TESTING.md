@@ -57,6 +57,10 @@ Updater tests cover stable-version selection, release URLs, checksums, archive p
 
 The runtime suite checks the Updates menu, stale responses, confirmation, cancellation, retry, window bounds, and controller hints. Its launcher disables the network worker so menu fixtures cannot download or install a release. `--capture` includes update-available and error screens. Check the live service separately before release.
 
+Player Select tests cover empty profiles, saved runs, characters, partial hearts, and long names. They navigate all seven rows and enter and close the existing profile flows. Drawing previews must leave profile data unchanged. Keyboard and controller hints must clear the frame.
+
+Use `--capture-profiles` for empty and populated fixture profiles, or `--capture-updates` for the updater. `--capture` includes both. Menu captures include three consecutive samples because remote captures can omit parts of a frame. Inspect the two-row heart display, selected cursor, and footer spacing on the device.
+
 The updater downloads and verifies the installer and upstream package while the game runs. After the game exits, it installs into a separate directory. A recovery journal protects the directory switch and launcher replacement. The launcher restores an interrupted transaction before starting the game. Diagnostics are in `zeldadoi-43/update.log`.
 
 To show that the assertions catch the original regressions:

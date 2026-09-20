@@ -9,6 +9,11 @@ These versions identify the 4:3 patch, independently of the original game's vers
 - Check for stable patch updates from the profile selection screen. Read changes since the installed version, download over Wi-Fi, and install with an automatic restart.
 - Verify update checksums, preserve saves and migration backups, and recover the previous installation after an interrupted update.
 
+### Changed
+
+- Rework Player Select around a spacious Zelda-style frame, original character sprites, and saved hearts and floor. Keep all five profiles visible, with Updates and Exit below them and button hints clear of the frame.
+- Give Updates the same frame position, title panel, and button-hint row as Player Select. Show more release notes per page.
+
 ## [1.5.3](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.5.3) - 2026-09-20
 
 ### Fixed
