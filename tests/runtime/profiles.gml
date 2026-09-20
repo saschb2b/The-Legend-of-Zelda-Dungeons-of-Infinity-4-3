@@ -16,7 +16,7 @@ function ProfileMenuTests() {
     var users = global.Users;
     var user_index = global.UserIndex;
     var profile = input_profile_get();
-    global.Users = [ProfileFixture("LINK", 0, 4, 3.5, 5), ProfileFixture("WWWWWWWW", 8, 16, 16, 99), ProfileFixture("ZELDA", 2, 0, 0, 0), new User_Create(), new User_Create()];
+    global.Users = [ProfileFixture("LINK", 0, 4, 3.5, 5), ProfileFixture("WWWWWWWW", 8, 20, 19.25, 99), ProfileFixture("ZELDA", 2, 0, 0, 0), new User_Create(), new User_Create()];
     global.UserIndex = 0;
     var before = json_stringify(global.Users);
     oMenu.NovaPage = "home";
@@ -26,7 +26,7 @@ function ProfileMenuTests() {
     var saved = oMenu.NovaProfileSummary(0);
     Record("Save preview uses recorded health and floor", saved.saved && saved.hearts == 4 && saved.health == 3.5 && saved.floor == 5);
     var maximum = oMenu.NovaProfileSummary(1);
-    Record("Save preview retains character and maximum hearts", maximum.character == 8 && maximum.hearts == 16 && maximum.health == 16);
+    Record("Save preview retains character and maximum hearts", maximum.character == 8 && maximum.hearts == 20 && maximum.health == 19.25);
     var fresh = oMenu.NovaProfileSummary(2);
     Record("Named player without a run shows no invented progress", !fresh.saved && fresh.hearts == 0);
     var player_rows = oMenu.NovaPlayerRows();
@@ -41,6 +41,11 @@ function ProfileMenuTests() {
         Record("Menu actions precede Close " + string(device), select[0].right < select[1].x && select[1].label == "Close");
         Record("Menu glyphs stay anchored as labels change " + string(device), select[0].icon_x == resume[0].icon_x && select[1].x == resume[1].x && select[1].right == layout.footer_right);
         with (oMenu) NovaAdventureDraw();
+        oMenu.NovaPage = "players";
+        with (oMenu) NovaAdventureDraw();
+        draw_set_font(global.MenuFont_Innactive);
+        Record("Eight-letter names clear the progress column " + string(device), 86 + string_width(maximum.name) + 8 <= 190);
+        oMenu.NovaPage = "home";
     }
     Record("Drawing previews leaves all saves untouched", json_stringify(global.Users) == before);
     with (oMenu) NovaNewDraft();
@@ -89,8 +94,9 @@ function ProfileMenuTests() {
     with (oMenu) NovaContinue();
     Record("Incompatible save cannot be continued", !global.NovaTestContinue && oMenu.NovaPage == "save-error");
     global.Users[0].SaveData.GameVersion = "1.1.6 - VM";
-    with (oMenu) NovaContinue();
-    Record("Continue uses the existing save boundary", global.NovaTestContinue);
+    with (oMenu) NovaGo("home", 0);
+    PressEvent(oMenu, "menu_input", oMenu, ev_step, ev_step_normal);
+    Record("One confirm on Continue resumes the saved adventure", global.NovaTestContinue);
     Record("Continue does not apply discarded character or bonus", global.Users[0].SaveData.LinkCharacterIndex == 0 && oMenu.NovaProfileSummary(0).floor == 5);
     global.UserIndex = 3;
     with (oMenu) NovaNewDraft();
@@ -129,9 +135,13 @@ function ProfileCaptureStep() {
     if (!file_exists("nova-capture-done.txt")) return false;
     file_delete("nova-capture-done.txt");
     if (Capture == "profiles-empty") {
-        global.Users = [ProfileFixture("LINK", 0, 4, 3.5, 5), ProfileFixture("ZELDA", 8, 16, 16, 20), ProfileFixture("HERO", 2, 0, 0, 0), new User_Create(), ProfileFixture("RAVIO", 3, 8, 5.25, 15)];
+        global.Users = [ProfileFixture("LINK", 0, 4, 3.5, 5), ProfileFixture("WWWWWWWW", 8, 20, 19.25, 99), ProfileFixture("HERO", 2, 0, 0, 0), new User_Create(), ProfileFixture("RAVIO", 3, 8, 5.25, 15)];
         Capture = "profiles-saves";
     } else if (Capture == "profiles-saves") {
+        global.UserIndex = 1;
+        Capture = "profiles-maximum";
+    } else if (Capture == "profiles-maximum") {
+        global.UserIndex = 0;
         with (oMenu) NovaNewDraft();
         Capture = "profiles-setup";
     } else if (Capture == "profiles-setup") {

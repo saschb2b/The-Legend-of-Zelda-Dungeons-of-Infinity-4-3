@@ -75,13 +75,13 @@ Inventory and menu screenshots use test saves to show progress and full inventor
 
 | Status at a stick-click | Continue your adventure |
 | --- | --- |
-| ![Equipment, map, and dungeon progress over the playfield](screenshots/overlay.png) | ![Adventure menu with the selected player, saved hearts, and floor](screenshots/profile.png) |
+| ![Equipment, map, and dungeon progress over the playfield](screenshots/overlay.png) | ![Adventure menu with the saved name and floor beneath Continue](screenshots/profile.png) |
 
-The centered title screen leads into an adventure menu with your last selected player. Choose **Continue** to resume a saved run, or **New adventure** to choose a character, bonus and challenges in one frame. **Begin adventure** is selected by default. A fresh player starts as Link, with no required name entry.
+The centered title screen leads into an adventure menu with your last selected player. Their name and floor sit beneath **Continue**, which resumes the saved run in one press. **New adventure** lets you choose a character, bonus and challenges in one frame. **Begin adventure** is selected by default. A fresh player starts as Link, with no required name entry.
 
 ![New adventure setup with character selection, bonus, challenges and Begin adventure](screenshots/adventure-setup.png)
 
-**Change player** keeps all five save slots available. Select a player to return to their adventure, or use **Manage** for records, renaming and deletion. Starting over an existing save asks for confirmation. Options, controls, updates and credits are available before entering the dungeon.
+**Change player** keeps all five save slots available, with each saved adventure's character, floor and hearts grouped in one row. Select a player to return to their adventure, or use **Manage** for records, renaming and deletion. Starting over an existing save asks for confirmation. Options, controls, updates and credits are available before entering the dungeon.
 
 ## Playing and updating
 

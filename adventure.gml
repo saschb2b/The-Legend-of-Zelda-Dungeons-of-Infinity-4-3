@@ -319,13 +319,21 @@ function NovaAdventureDraw() {
         draw_sprite_ext(sTitle, 0, lerp(280 / 3, 32, t), lerp(64 / 3, 14, t) - 38, scale, scale, 0, c_white, 1);
         var summary = NovaProfileSummary(global.UserIndex);
         draw_set_alpha(t);
-        draw_sprite_ext(global.CharacterSprites, summary.character, 274, 7, 2, 2, 0, c_white, t);
-        NovaText(summary.name == "" ? "Link" : summary.name, 290, 102, false, 1, fa_center);
-        NovaText(summary.saved ? "Floor " + string(summary.floor) : "New adventure", 290, 124, false, 0.75, fa_center);
-        NovaHearts(summary, 290 - min(10, summary.hearts) * 4, 146);
         var rows = NovaHomeRows();
         NovaFocus = clamp(NovaFocus, 0, array_length(rows) - 1);
-        for (var i = 0; i < array_length(rows); i++) NovaRow(rows[i], i, 153 + i * 24, "", 55);
+        for (var i = 0; i < array_length(rows); i++) {
+            var py = summary.saved && i > 0 ? 187 + (i - 1) * 20 : 151 + i * 24;
+            NovaRow(rows[i], i, py, "", 55);
+        }
+        if (summary.saved) {
+            draw_set_alpha(t * 0.8);
+            NovaText(summary.name, 55, 169, false, 0.75);
+            var separator = 55 + string_width(summary.name) * 0.75 + 6;
+            // Sprite fonts contain ASCII only; the separator shares the text baseline.
+            draw_rectangle(separator, 169 - 38 + 5, separator + 1, 169 - 38 + 6, false);
+            NovaText("Floor " + string(summary.floor), separator + 8, 169, false, 0.75);
+            draw_set_alpha(t);
+        }
         NovaFooter(NovaFocus == 0 && summary.saved ? "Continue" : "Select");
         draw_set_alpha(1);
         if (variable_global_exists("NovaTitleFrame") && surface_exists(global.NovaTitleFrame) && NovaTransition < 12)
@@ -362,10 +370,14 @@ function NovaAdventureDraw() {
             for (var i = 0; i < array_length(rows); i++) {
                 var summary = NovaProfileSummary(rows[i]);
                 var py = 65 + i * 36;
-                NovaRow(summary.name == "" ? "Create player" : summary.name, i, py);
+                NovaText(summary.name == "" ? "Create player" : summary.name, 86, py, NovaFocus == i);
+                if (NovaFocus == i) draw_sprite(sMenu_Selector_Active, Selector_Frame, 38, py - 38);
                 if (summary.name != "") {
-                    NovaText(summary.saved ? "Floor " + string(summary.floor) : "No saved run", 188, py + 3, false, 0.75);
-                    draw_sprite(global.CharacterSprites, summary.character, 328, py - 38);
+                    NovaText(summary.saved ? "Floor " + string(summary.floor) : "No saved run", 190, py + 3, false, 0.75);
+                    if (summary.saved) {
+                        draw_sprite(global.CharacterSprites, summary.character, 60, py - 38);
+                        NovaHearts(summary, 264, py + 2);
+                    }
                 }
             }
             var chosen = rows[NovaFocus];
