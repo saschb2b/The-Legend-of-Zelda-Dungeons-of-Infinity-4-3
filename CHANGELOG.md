@@ -4,15 +4,21 @@ These versions identify the 4:3 patch, independently of the original game's vers
 
 ## Unreleased
 
+## [1.5.3](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.5.3) - 2026-09-20
+
 ### Fixed
 
-- Restore B for the sword and A for interactions on the Nova by correcting PortMaster's A/B translation. Menus use A to confirm and B to close, with matching glyphs and Controls labels.
-- Close shop dialogs with B or Escape without buying or consuming a coupon. Consume the opening press so it cannot also act inside the dialog.
 - Match ALttP's SNES walking ratio: diagonal movement uses two-thirds speed on each axis, removing DOI's diagonal speed boost. Running uses the same ratio while preserving its straight-line speed.
 - Match SNES sword-ready and carrying speeds on normal ground: 1.25 pixels straight and 0.8125 per diagonal axis.
 - Match the SNES 48-update sword-charge threshold and keep the charge indicator synchronized with spin readiness.
 - Make diagonal turning predictable: retain Link's facing when it matches a held direction, otherwise face vertically. Fix turns that could randomly face away from both held directions.
 - Keep health, magic, the equipped item, and counters visible through room scrolling, doorway exits, closing doors, and stairs. Hide the Status hint until its button is available again.
+- Restore B for the sword and A for interactions on the Nova by correcting PortMaster's A/B translation. Menus use A to confirm and B to close, with matching glyphs and Controls labels.
+- Close shop dialogs with B or Escape without buying or consuming a coupon. Consume the opening press so it cannot also act inside the dialog.
+
+The installer preserves existing saves and migration backups. Follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.5.3/README.md#install-on-the-nova) to update.
+
+[Changes from v1.5.2](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.5.2...v1.5.3).
 
 ## [1.5.2](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.5.2) - 2026-09-19
 
