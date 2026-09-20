@@ -28,7 +28,7 @@ The references are the developer's bundled change log, manual, Gem Combo Poster,
 | Food bag, pendant bag, master-key and Wallmaster artwork | Binary artwork patches from 1.2.1, with source/result hashes and compiled sprite bounds/pickup-mask checks |
 | Fairy-orb contents | Implemented distribution described below; compiled and reviewed |
 | Keyboard menu/direction remapping | Device tests complete remapping, persist bindings and restore prior bindings on abort |
-| Village claw machine and pub slots | Unreleased; device tests check all slot odds and stakes, animated reel results, payment/settlement guards, claw prize pools, cancellation, item delivery and all five cabinet placements |
+| Village claw machine and pub slots | Since patch 1.7.0; device tests check all slot odds and stakes, animated reel results, payment/settlement guards, claw prize pools, cancellation, item delivery and all five cabinet placements |
 
 ## Adaptations for this patch
 
@@ -58,7 +58,7 @@ Wallmaster uses the recovered artwork, damage, chase speed, attack speed/duratio
 
 ## Village minigames
 
-The unreleased backport adds the arcade claw cabinet and four Mothula's Money cabinets in the pub. Original DOI 1.2.0 introduced these games. The inspected 1.2.1 build retains them. The village is floor 6, after the sewers.
+Patch 1.7.0 adds the arcade claw cabinet and four Mothula's Money cabinets in the pub. Original DOI 1.2.0 introduced these games. The inspected 1.2.1 build retains them. The village is floor 6, after the sewers.
 
 Mothula's Money accepts stakes of one to five rupees. Its native `irandom(10000)` roll includes both endpoints. The recovered result counts are:
 

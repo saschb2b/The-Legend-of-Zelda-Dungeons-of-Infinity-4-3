@@ -4,11 +4,43 @@ These versions identify the 4:3 patch, independently of the original game's vers
 
 ## Unreleased
 
+## [1.7.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.7.0) - 2026-09-21
+
+Take a break on floor 6: the village arcade has a claw machine, and the pub has Mothula's Money.
+
 ### Added
 
-- Play the claw machine in the village arcade and Mothula's Money in the pub. Both use the original 1.2.1 artwork, audio, prize pools and payout rules, adapted to the VM game.
-- Use A to play or grab, L/R to change a slot-machine bet, and B to close. Closing a paid spin settles its result once. Closing the claw before grabbing refunds the unused play.
-- Add device regressions for payments, payouts, cancellation, prize delivery and village placement, plus a separate village test launch with physical controls and disposable saves.
+- **Claw machine:** spend ten rupees per play, move the claw left or right, and press A to grab a prize.
+- **Mothula's Money:** play the pub's four slot machines. L/R changes the bet from one to five rupees. A starts a spin.
+- Both games use the original 1.2.1 artwork, audio, prize pools and payout rules, adapted to the PortMaster VM build.
+- Button hints follow your mappings. B closes either game. Closing a paid spin settles its result once. Closing the claw before grabbing refunds the unused play.
+
+### In the village
+
+Reach the village after the sewers on **floor 5**. Enter the arcade and inspect the cabinet marked **CLAW**, or visit the pub for the slots.
+
+<table>
+<tr>
+<th width="50%">Arcade: claw machine</th>
+<th width="50%">Pub: Mothula's Money</th>
+</tr>
+<tr>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.0/screenshots/village-claw.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.0/screenshots/village-claw.png" alt="Link playing the original claw cabinet, with Grab A and Close B hints" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.0/screenshots/village-slots.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.0/screenshots/village-slots.png" alt="Mothula's Money with three reels, payout symbols, balance, bet and controller hints" width="640"></a></td>
+</tr>
+</table>
+
+Unedited Nova captures using a test save. Select either image to view it at full size.
+
+### Update
+
+Choose **Options > Updates** from the adventure menu, or use the patch installer ZIP under Assets. Existing saves and migration backups stay intact.
+
+For a fresh installation, follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.7.0/README.md#install-on-the-nova).
+
+Validation includes 38 unit tests, 1,349 device assertions, both buildings' entry and exit paths, and physical playtesting on the Nova.
+
+[Changes from v1.6.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.6.1...v1.7.0).
 
 ## [1.6.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.6.1) - 2026-09-20
 

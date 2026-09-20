@@ -11,6 +11,7 @@ Play Dungeons of Infinity fullscreen on ROCKNIX, with a classic Zelda HUD and a 
 - The complete playfield fills the display. Title screens and menus fit too.
 - Health and supplies stay visible while status panels open over the game.
 - Selected updates from the newer game include inventory bags, sword poke and spin, Topaz, adjustable challenges, and Wallmaster mode.
+- Visit the village arcade for the claw machine, or play Mothula's Money in the pub.
 
 ## Install on the Nova
 
@@ -84,6 +85,8 @@ The centered title screen leads into an adventure menu with your last selected p
 **Change player** keeps all five save slots available, with each saved adventure's character, floor and hearts grouped in one row. Select a player to return to their adventure, or use **Manage** for records, renaming and deletion. Starting over an existing save asks for confirmation. Options, controls, updates and credits are available before entering the dungeon.
 
 ## Playing and updating
+
+The village on floor 6 has two more minigames. The claw costs ten rupees: move left/right and grab with A. In the pub, L/R changes the slot bet and A plays. B closes either game.
 
 Hold Sword after a swing to poke while moving. With a level-three sword or higher, hold until the blade flashes, then release to spin. Level-two swords can break pots.
 
