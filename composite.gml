@@ -68,6 +68,8 @@ if (instance_exists(oHUD) && !_nova_modal && !global.ArcadeVP_Show && !global.Us
     draw_set_alpha(oHUD.MainAlpha);
     var binding = global.NovaBinding("hud");
     var width = global.NovaPromptWidth(binding, "STATUS", sx, size, 2);
+    var context = global.NovaContextHint(sx, sy, 238 * sx - width);
+    if (context.visible) global.NovaHintDraw(context);
     global.NovaPromptDraw(binding, "STATUS", 238 * sx - width, 209 * sy, sx, sy, size, 2);
     draw_set_alpha(1);
 }

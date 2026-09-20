@@ -4,6 +4,10 @@ These versions identify the 4:3 patch, independently of the original game's vers
 
 ## Unreleased
 
+### Added
+
+- Show the available interaction beside Status during play, such as Talk, Open, Lift or Throw. Use the current Interact binding, keep Status anchored, and hide the hint while menus, dialogue or scripted movement prevent interaction.
+
 ### Changed
 
 - Use the supplied Switch 2 glyphs for controller hints. Group hints at the bottom right with labels before buttons and the primary action (A) before Close (B). Keep inventory actions in fixed positions and L/R beside page headings.

@@ -16,6 +16,7 @@ group.QueueAppend("gml_Object_oNovaTests_Create_0", File.ReadAllText(Path.Combin
 group.QueueAppend("gml_Object_oNovaTests_Create_0", File.ReadAllText(Path.Combine(root, "tests/runtime/profiles.gml")));
 group.QueueReplace("gml_Object_oNovaTests_Step_0", File.ReadAllText(Path.Combine(root, "tests/runtime/step.gml")));
 group.QueueAppend("gml_Object_oTitle_Create_0", "if (!instance_exists(oNovaTests)) instance_create_depth(0, 0, -100000, oNovaTests);");
+group.QueueAppend("gml_Object_oNovaTests_Create_0", File.ReadAllText(Path.Combine(root, "tests/runtime/context.gml")));
 var settings = new Underanalyzer.Decompiler.DecompileSettings();
 var updateMenu = GetDecompiledText("gml_Object_oMenu_Create_0", null, settings);
 if (updateMenu.Contains("NovaUpdateStep")) {

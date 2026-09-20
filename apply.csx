@@ -1,4 +1,5 @@
 #load "content.csx"
+#load "context.csx"
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -227,6 +228,7 @@ Edit("gml_GlobalScript___Input", "function GetInputVerbStr(arg0)\n{",
     "function GetInputVerbStr(arg0)\n{\n    if (arg0 == 12) return \"nova_bag_previous\";\n    if (arg0 == 13) return \"nova_bag_next\";");
 edits["gml_GlobalScript___Input"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "controls.gml"));
 ApplyContent();
+ApplyContextHints();
 using (var corrections = JsonDocument.Parse(File.ReadAllText(Path.Combine(patchDir, "dungeon_fixes.json")))) {
     var statements = "";
     foreach (var fix in corrections.RootElement.EnumerateArray()) {

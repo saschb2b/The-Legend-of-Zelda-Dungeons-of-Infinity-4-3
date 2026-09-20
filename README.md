@@ -59,6 +59,8 @@ Press **B** to close the map, menus, item information, or inventory. Closing an 
 
 At a shop counter, press **A** to inspect an item. In its dialog, A confirms the highlighted choice and **B** closes without buying. Closing also works while reading item information or a purchase refusal.
 
+During play, a hint beside **Status** names the interaction within reach: **Talk**, **Open**, **Lift**, or **Throw** while carrying. Signs show **Read** and shop goods show **Inspect**. The hint follows your Interact binding and disappears when you turn away, open a menu, or lose control during an animation or room transition.
+
 **Actions** opens an object's choices. **Equip** assigns it to the active item button. **Use** activates or consumes it immediately. Gear in dedicated equipment slots is already active. Its action list provides information and, where allowed, Drop.
 
 Use **L/R** to switch inventory pages, or **Page Up/Page Down** on a keyboard. The D-pad stays in the item grid. Health and counters remain visible while browsing or reading item information.

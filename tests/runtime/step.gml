@@ -101,6 +101,8 @@ try {
             ControlTests();
             HUDTests();
             ShopTests();
+            ContextTests();
+            if (file_exists("nova-context-capture-enabled.txt")) { ContextCaptureStart(); Stage = 13; break; }
             if (file_exists("nova-capture-enabled.txt")) {
                 CaptureStart();
                 Stage = 7;
@@ -109,6 +111,9 @@ try {
             Complete = true;
             Flush();
             game_end();
+            break;
+        case 13:
+            ContextCaptureStep();
             break;
         case 7:
             CaptureStep();

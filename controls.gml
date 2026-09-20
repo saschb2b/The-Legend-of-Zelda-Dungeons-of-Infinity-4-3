@@ -198,3 +198,17 @@ global.NovaInventoryPrompts = function(inventory) {
     draw_set_alpha(1);
     }
 };
+
+global.NovaContextAction = function() {
+    if (!instance_exists(oLink) || !instance_exists(oCamera) || global.Paused || global.AltTab || global.ArcadeVP_Show
+        || instance_exists(oInventory) || instance_exists(oMap) || instance_exists(oMenu_Game) || instance_exists(oDialogueBox)
+        || oCamera.RoomTransition != 0 || oLink.StairsAutoMove || oLink.BounceBack
+        || (oLink.State != 1 && oLink.State != 2 && oLink.State != 11)) return "";
+    return oLink.NovaInteractionProbe();
+};
+global.NovaContextHint = function(sx, sy, status_left) {
+    var label = global.NovaContextAction();
+    var prompt = {binding: global.NovaBinding("action"), label: label, visible: label != ""};
+    var hints = global.NovaHintRow([prompt], status_left - 8 * sx, 209 * sy, sx, sy, 12 * min(sx, sy), 0, 224 * sx);
+    return hints[0];
+};
