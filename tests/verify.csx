@@ -25,6 +25,7 @@ Check(Code("gml_Object_oTitle_Step_0").Contains("global.CanSkipTitle"), "Title s
 var menuDraw = Code("gml_Object_oMenu_Draw_0");
 Check(menuDraw.Contains("NovaChallengeDraw()") && menuDraw.Contains("Previous bag") && menuDraw.Contains("Next bag"), "Challenge and control menu patches must coexist");
 Check(Code("gml_Object_oMenu_Step_0").Contains("keyboard_check_pressed(vk_escape)"), "Menu cancel missing");
+Check(Code("gml_Object_oMenu_Create_0").Contains("NovaUpdateOpen = false") && menuDraw.Contains("NovaUpdateDraw()"), "Updater menu initialization and drawing must coexist");
 Check(Code("gml_Object_oMenu_Game_Step_0").Contains("global.NovaCloseVerb()"), "Pause cancel missing");
 Check(Code("gml_Object_oEnemy_Medusa_Alarm_0").Contains("Stoned"), "Medusa status guard missing");
 Check(Code("gml_Object_oEnemy_Cannon_Step_0").Contains("!Stoned"), "Cannon status guard missing");

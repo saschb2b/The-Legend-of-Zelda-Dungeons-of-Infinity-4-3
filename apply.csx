@@ -55,6 +55,17 @@ void Edit(string name, string anchor, string replacement) {
 Edit("gml_Object_oInit_Create_0", "ini_close();",
     "global.CanSkipTitle = ini_read_real(\"Preferences\", \"CanSkipTitle\", 1) == 1;\nini_close();");
 Edit("gml_Object_oTitle_Step_0", "AllowStart || false", "AllowStart || global.CanSkipTitle");
+Edit("gml_Object_oMenu_Create_0", "\"5.\", \"{s}Exit\");", "\"5.\", \"{s}Updates\", \"Exit\");");
+edits["gml_Object_oMenu_Create_0"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "updates.gml"));
+Edit("gml_Object_oMenu_Step_0", "AltTabCheck();", @"
+AltTabCheck();
+if (NovaUpdateOpen) { NovaUpdateStep(); exit; }
+if (Menu_Active && Menu_ActiveIndex == 0 && Selector_Index_Main == global.MaxUsers && input_check_pressed(""menu_input"")) {
+    NovaUpdateEnter();
+    exit;
+}");
+Edit("gml_Object_oMenu_Draw_0", "if (instance_exists(ErrorMsgInst))", "if (NovaUpdateOpen) { NovaUpdateDraw(); exit; }\nif (instance_exists(ErrorMsgInst))");
+
 Edit("gml_Object_oMenu_Step_0", "if (Menu_Active)",
     File.ReadAllText(Path.Combine(patchDir, "menu_cancel.gml")) + "\nif (Menu_Active)");
 Edit("gml_Object_oMenu_Game_Step_0", "if (input_check_pressed(\"menu_access\"))",

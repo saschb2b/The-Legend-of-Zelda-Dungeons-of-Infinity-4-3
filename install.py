@@ -179,7 +179,8 @@ def install(ports, upstream_path=None, refresh=True):
         rebuilt_archive.replace(game_archive)
         shutil.copyfile(ROOT / 'gameinfo.xml', stage / 'gameinfo.xml')
         shutil.copyfile(ROOT / 'README.md', stage / 'README.md')
-        shutil.copyfile(ROOT / 'controller.py', stage / 'controller.py')
+        for helper in ('controller.py', 'updater.py', 'install.py'):
+            shutil.copyfile(ROOT / helper, stage / helper)
         (stage / 'patch-version.txt').write_text(manifest['version'] + '\n')
         if manifest.get('save_schema', 0) >= 1:
             backup_legacy_saves(destination, work, manifest['save_schema'])

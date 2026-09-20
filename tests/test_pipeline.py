@@ -24,7 +24,7 @@ class InstallIntegrationTests(unittest.TestCase):
         self.patched = b'patched game'
         self.delta = binary_patch([(0, len(self.patched), 0)], b'', self.patched, len(self.patched))
         (self.payload / 'patches/game.droid.bsdiff').write_bytes(self.delta)
-        for name in ('README.md', 'controller.py', 'gameinfo.xml', install.LAUNCHER):
+        for name in ('README.md', 'controller.py', 'updater.py', 'install.py', 'gameinfo.xml', install.LAUNCHER):
             (self.payload / name).write_text('fixture')
         self.upstream = self.root / 'upstream.zip'
         self.make_upstream()

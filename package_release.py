@@ -10,7 +10,7 @@ ORIGINAL_HASH = 'd1c7f76420650d27d1abd6003657e81841efe5c28d35f012166a3ec4b981c04
 UPSTREAM_HASH = 'cf13009f3f8f5578a17ca4a45de051ea1315280037f01434c187ebc9d9e91353'
 UPSTREAM_URL = 'https://github.com/PortsMaster-MV/PortMaster-MV-New/releases/download/2024-12-03_1532/zeldadoi.zip'
 
-PAYLOAD_FILES = ('install.py', 'controller.py', 'manifest.json', 'patches/game.droid.bsdiff', 'README.md',
+PAYLOAD_FILES = ('install.py', 'controller.py', 'updater.py', 'manifest.json', 'patches/game.droid.bsdiff', 'README.md',
                  'gameinfo.xml', 'Zelda Dungeons of Infinity 4-3.sh')
 INSTALLER_LAUNCHER = 'Install Zelda Dungeons of Infinity 4-3.sh'
 

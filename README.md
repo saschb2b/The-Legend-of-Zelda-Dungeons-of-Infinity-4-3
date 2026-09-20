@@ -32,6 +32,10 @@ The installer downloads the official PortMaster package and applies the patch au
 
 **Updating:** close the game, replace the installer files with the newer download, and run the installer again. Your saves stay in `zeldadoi-43/savedata/`. The installer preserves them and keeps migration backups in `zeldadoi-43/save-backups/`.
 
+For updates over Wi-Fi, choose **Updates** on the profile selection screen. It shows the installed and available patch versions and the changes since your version. Use LB/RB to page through the notes. Choose **Install update** to download the update and restart the game. Press **B** to close or cancel a download.
+
+The updater checks stable releases only when you open Updates or choose Check again. It verifies downloads before installation and preserves your saves. If installation fails, the previous version remains available. Keep the device powered on during installation.
+
 If installation fails, check `zeldadoi-43-installer/install.log`. For another attempt, run the installer again.
 
 ## Controls

@@ -4,6 +4,11 @@ These versions identify the 4:3 patch, independently of the original game's vers
 
 ## Unreleased
 
+### Added
+
+- Check for stable patch updates from the profile selection screen. Read changes since the installed version, download over Wi-Fi, and install with an automatic restart.
+- Verify update checksums, preserve saves and migration backups, and recover the previous installation after an interrupted update.
+
 ## [1.5.3](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.5.3) - 2026-09-20
 
 ### Fixed

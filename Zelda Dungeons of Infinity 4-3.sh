@@ -19,6 +19,11 @@ get_controls
 # Variables
 GAMEDIR="/$directory/ports/zeldadoi-43"
 SPLASHFILE="splash.png"
+PORT_LAUNCHER="$(readlink -f "${BASH_SOURCE[0]}")"
+RECOVERY="${GAMEDIR%/*}/.${GAMEDIR##*/}-update/recovery.py"
+if [ -f "$RECOVERY" ]; then
+  python3 "$RECOVERY" recover --game-dir "$GAMEDIR" || exit 1
+fi
 
 # CD and set permissions
 cd "$GAMEDIR"
@@ -43,7 +48,26 @@ $ESUDO ./tools/splash $SPLASHFILE 5000
 # Assign configs and load the game
 $GPTOKEYB "gmloadernext.aarch64" &
 pm_platform_helper "gmloadernext.aarch64"
+python3 "$GAMEDIR/updater.py" serve --game-dir "$GAMEDIR" --parent "$$" >> "$GAMEDIR/update.log" 2>&1 &
+updater_pid=$!
+trap 'kill "$updater_pid" 2>/dev/null; wait "$updater_pid" 2>/dev/null' EXIT
 ./gmloadernext.aarch64 -c gmloader.json
+kill "$updater_pid" 2>/dev/null
+wait "$updater_pid" 2>/dev/null
+trap - EXIT
+if [ -f "$GAMEDIR/../.${GAMEDIR##*/}-update/ready.json" ]; then
+  pm_message "Installing update. Keep the device on."
+  python3 "$GAMEDIR/updater.py" apply --game-dir "$GAMEDIR" >> "$GAMEDIR/update.log" 2>&1
+  update_result=$?
+  pm_message_end
+  if [ "$update_result" -eq 1 ]; then
+    pm_show_error "Update failed. Previous version retained. See update.log."
+  fi
+  if [ "$update_result" -eq 10 ] || [ "$update_result" -eq 1 ]; then
+    pm_finish
+    exec "$PORT_LAUNCHER"
+  fi
+fi
 
 # Cleanup
 pm_finish

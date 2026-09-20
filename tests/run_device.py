@@ -35,6 +35,7 @@ def main():
     parser.add_argument('--game', type=Path, default=ROOT / '.build/runtime-tests.droid')
     parser.add_argument('--ports-dir', default='/storage/roms/ports')
     parser.add_argument('--capture', action='store_true', help='Capture inventory and Status hints after the assertions.')
+    parser.add_argument('--capture-updates', action='store_true', help='Capture only the updater screens during regression tests.')
     parser.add_argument('--report-dir', type=Path, default=ROOT / '.build/device-results')
     args = parser.parse_args()
     game_bytes = args.game.read_bytes()
@@ -60,23 +61,27 @@ print(json.dumps(saves))
 shutil.copytree(source,stage,ignore=shutil.ignore_patterns('savedata','test-savedata','log.txt'))
 config=json.loads((stage/'gmloader.json').read_text())
 config['save_dir']='harness-savedata'
-if CAPTURE:
+if CAPTURE or CAPTURE_UPDATES:
  (stage/'harness-savedata').mkdir()
- (stage/'harness-savedata/nova-capture-enabled.txt').touch()
+ (stage/('harness-savedata/nova-capture-enabled.txt' if CAPTURE else 'harness-savedata/nova-update-capture-enabled.txt')).touch()
 (stage/'gmloader.json').write_text(json.dumps(config))
 text=LAUNCHER_TEXT
+service='python3 "$GAMEDIR/updater.py" serve --game-dir "$GAMEDIR" --parent "$$"'
+if text.count(service)!=1: raise RuntimeError('Updater service boundary missing.')
+text=text.replace(service, 'sleep 3600')
 anchor='GAMEDIR="/$directory/ports/zeldadoi-43"'
 if text.count(anchor)!=1: raise RuntimeError('Unrecognised launcher layout.')
 text=text.replace(anchor,'GAMEDIR='+repr(str(stage)))
 launcher.write_text(text)
 launcher.chmod(0o755)
 '''
-        constants = f'CAPTURE={args.capture!r}\nSOURCE={source!r}\nSTAGE={stage!r}\nLAUNCHER={launcher!r}\nLAUNCHER_TEXT={(ROOT / LAUNCHER).read_text()!r}\n'
+        constants = f'CAPTURE={args.capture!r}\nCAPTURE_UPDATES={args.capture_updates!r}\nSOURCE={source!r}\nSTAGE={stage!r}\nLAUNCHER={launcher!r}\nLAUNCHER_TEXT={(ROOT / LAUNCHER).read_text()!r}\n'
         snapshot, staging = setup.split('shutil.copytree', 1)
         before = json.loads(request('python3 -', (constants + snapshot).encode()))
         created = True
         request('python3 -', (constants + 'import json,pathlib,shutil\nsource=pathlib.Path(SOURCE)\nstage=pathlib.Path(STAGE)\nlauncher=pathlib.Path(LAUNCHER)\nshutil.copytree' + staging).encode())
-        copy(args.host, args.control_path, ROOT / 'controller.py', stage + '/controller.py')
+        for helper in ('controller.py', 'updater.py', 'install.py'):
+            copy(args.host, args.control_path, ROOT / helper, stage + '/' + helper)
         with tempfile.TemporaryDirectory() as directory:
             port_path = Path(directory) / 'runtime.port'
             with ZipFile(ROOT / '.build/original.port') as original, ZipFile(port_path, 'w') as port:
@@ -103,8 +108,8 @@ print(urllib.request.urlopen(r,timeout=10).read().decode())
                 if report.get('complete'):
                     break
                 capture = report.get('capture', '')
-                if args.capture and capture and capture not in captures:
-                    if not re.fullmatch(r'(inventory|status)-[a-z]+', capture):
+                if (args.capture or args.capture_updates) and capture and capture not in captures:
+                    if not re.fullmatch(r'(inventory|status|updates)-[a-z]+', capture):
                         raise RuntimeError('Invalid screenshot name in test report.')
                     path = stage + '/' + capture + '.png'
                     request('source /etc/profile; grim ' + shlex.quote(path))

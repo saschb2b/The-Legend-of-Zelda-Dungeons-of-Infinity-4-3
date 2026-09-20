@@ -25,6 +25,36 @@ try {
             if (!instance_exists(oMenu)) break;
             MenuTests();
             ContentMenuTests();
+            UpdateMenuTests();
+            if (file_exists("nova-capture-enabled.txt") || file_exists("nova-update-capture-enabled.txt")) {
+                input_profile_set("gamepad");
+                with (oMenu) NovaUpdateEnter();
+                UpdateStatus("available", oMenu.NovaUpdateId, "An update is available.");
+                with (oMenu) NovaUpdatePoll();
+                Capture = "updates-available";
+                Flush();
+                Stage = 8;
+                break;
+            }
+            Stage = 9;
+            break;
+        case 8:
+            if (!file_exists("nova-capture-done.txt")) break;
+            file_delete("nova-capture-done.txt");
+            if (Capture == "updates-available") {
+                oMenu.NovaUpdateState.state = "error";
+                oMenu.NovaUpdateState.message = "Update failed. Check Wi-Fi and try again.";
+                file_delete("nova-update-status.json");
+                Capture = "updates-error";
+                Flush();
+                break;
+            }
+            with (oMenu) NovaUpdateClose();
+            input_profile_set("keyboard");
+            Capture = "";
+            Stage = 9;
+            break;
+        case 9:
             with (oMenu) {
                 User_Save();
                 MenuWin_Main_Shift = false;
