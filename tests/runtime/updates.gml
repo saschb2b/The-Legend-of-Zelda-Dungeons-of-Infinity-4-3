@@ -16,16 +16,18 @@ function UpdateMenuTests() {
         MenuWin_Main_Shift = false;
         Menu_Active = true;
         Menu_ActiveIndex = 0;
+        NovaPage = "options";
+        NovaFocus = 1;
         Selector_Index_Main = global.MaxUsers;
     }
-    Record("Updates appears after profiles and before Exit", oMenu.Menu[0][global.MaxUsers] == "Updates" && oMenu.Menu[0][global.MaxUsers + 1] == "Exit");
+    Record("Updates is available in Options", oMenu.NovaPage == "options");
     var width = inst_100004.W;
     var height = inst_100004.H;
     PressEvent(oMenu, "menu_input", oMenu, ev_step, ev_step_normal);
     Record("Updates opens without selecting or editing a profile", oMenu.NovaUpdateOpen && global.UserIndex == user);
     var frame = oMenu.NovaUpdateLayout();
-    var profiles = oMenu.NovaProfileLayout();
-    Record("Updates shares the Player Select frame and footer", frame.x == profiles.x && frame.y == profiles.y && frame.width == profiles.width && frame.height == profiles.height && frame.header_y == profiles.header_y && frame.header_width == profiles.header_width && frame.footer_y == profiles.footer_y);
+    var profiles = oMenu.NovaMenuLayout();
+    Record("Updates shares the adventure frame and footer", frame.x == profiles.x && frame.y == profiles.y && frame.width == profiles.width && frame.height == profiles.height && frame.header_y == profiles.header_y && frame.header_width == profiles.header_width && frame.footer_y == profiles.footer_y);
     Record("Updates requests a check without installation", UpdateRequestRead().action == "check");
     Record("Update window stays within the screen", frame.x >= 8 && frame.x + frame.width <= 392 && frame.y + frame.height <= 254);
     UpdateStatus("available", "stale");
@@ -45,8 +47,9 @@ function UpdateMenuTests() {
     for (var device = 0; device < 2; device++) {
         input_profile_set(device == 0 ? "gamepad" : "keyboard");
         var layout = oMenu.NovaUpdateLayout();
-        Record("Update footer clears the frame " + string(device), layout.left >= layout.x + 16 && layout.confirm_x + layout.confirm_width <= layout.x + layout.width - 16 && layout.footer_y - 6 >= layout.y + layout.height + 8 && layout.footer_y + 6 <= 258);
-        Record("Update footer separates close and confirm " + string(device), layout.left + layout.close_width + 24 < layout.confirm_x);
+        var hints = oMenu.NovaFooterLayout("Install update");
+        Record("Update footer clears the frame " + string(device), hints[0].x >= layout.footer_left && hints[1].right <= layout.footer_right && layout.footer_y - 8 >= layout.y + layout.height + 8 && layout.footer_y + 8 <= 258);
+        Record("Update footer orders Install then Close " + string(device), hints[0].right < hints[1].x && hints[0].label == "Install update" && hints[1].label == "Close");
         Record("Update paging stays above the footer " + string(device), layout.pages_y + 12 < layout.footer_y - 8);
         Record("Update notes clear the paging controls " + string(device), layout.y + 12 + 60 + (oMenu.NovaUpdateNoteRows - 1) * 15 + 12 < layout.pages_y - 6);
     }
@@ -75,7 +78,7 @@ function UpdateMenuTests() {
     PressEvent(oMenu, global.NovaCloseVerb(), oMenu, ev_step, ev_step_normal);
     Record("Close wins over a ready update", !global.NovaTestUpdateRestart && UpdateRequestRead().action == "cancel");
     Record("Controller B closes Updates", !oMenu.NovaUpdateOpen);
-    Record("Closing Updates restores Player Select at its Updates row", oMenu.NovaProfileVisible() && oMenu.Selector_Index_Main == global.MaxUsers);
+    Record("Closing Updates restores its Options row", oMenu.NovaPage == "options" && oMenu.NovaFocus == 1);
     input_profile_set(profile);
     file_delete("nova-update-request.json");
     file_delete("nova-update-status.json");

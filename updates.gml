@@ -132,8 +132,8 @@ function NovaUpdateDraw() {
         }
         var pages = max(1, ceil(array_length(NovaUpdateLines) / NovaUpdateNoteRows));
         if (pages > 1) {
-            global.NovaPromptDraw(global.NovaBinding("nova_bag_previous"), "", left, layout.pages_y, 1, 1, 12);
-            global.NovaPromptDraw(global.NovaBinding("nova_bag_next"), "", layout.right - 12, layout.pages_y, 1, 1, 12);
+            global.NovaPromptDraw(global.NovaBinding("nova_bag_previous"), "", 148, layout.pages_y, 0.75, 0.75, 16);
+            global.NovaPromptDraw(global.NovaBinding("nova_bag_next"), "", 236, layout.pages_y, 0.75, 0.75, 16);
             draw_set_valign(fa_middle);
             draw_set_halign(fa_center);
             draw_text_transformed(200, layout.pages_y, string(NovaUpdatePage + 1) + " / " + string(pages), 0.75, 0.75, 0);
@@ -150,10 +150,8 @@ function NovaUpdateDraw() {
         draw_text_transformed(layout.right, top, "Restarts to install.", 0.6, 0.6, 0);
         draw_text_transformed(layout.right, top + 16, "Your saves stay.", 0.6, 0.6, 0);
     }
-    global.NovaPromptDraw(global.NovaBinding(global.NovaCloseVerb()), "Close", left, layout.footer_y, 0.75, 0.75, 12, 4);
     var label = state == "available" ? "Install update" : "Check again";
-    if (state == "available" || state == "current" || state == "error" || state == "idle")
-        global.NovaPromptDraw(NovaMenuConfirmBinding(), label, layout.confirm_x, layout.footer_y, 0.75, 0.75, 12, 4);
+    NovaFooter(state == "available" || state == "current" || state == "error" || state == "idle" ? label : "");
 }
 
 function NovaMenuConfirmBinding() {
@@ -162,15 +160,7 @@ function NovaMenuConfirmBinding() {
 }
 
 function NovaUpdateLayout() {
-    var font = draw_get_font();
-    draw_set_font(global.MenuFont);
-    var confirm = NovaMenuConfirmBinding();
-    var width = max(global.NovaPromptWidth(confirm, "Install update", 0.75, 12), global.NovaPromptWidth(confirm, "Check again", 0.75, 12));
     var layout = NovaMenuLayout();
     layout.pages_y = layout.y + layout.height - 30;
-    layout.confirm_x = layout.right - width;
-    layout.confirm_width = width;
-    layout.close_width = global.NovaPromptWidth(global.NovaBinding(global.NovaCloseVerb()), "Close", 0.75, 12);
-    draw_set_font(font);
     return layout;
 }

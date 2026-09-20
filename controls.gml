@@ -12,6 +12,7 @@ global.NovaGlyph = function(binding) {
     if (value == gp_face2) return 0;
     if (value >= gp_face3 && value <= gp_shoulderrb) return value - gp_face1;
     if (value == gp_select) return 8;
+    if (value == gp_start) return 23;
     if (value == gp_stickl) return 9;
     if (value == gp_stickr) return 10;
     if (value >= gp_padu && value <= gp_padr) return 11 + value - gp_padu;
@@ -52,38 +53,81 @@ global.NovaKeyWidth = function(binding) {
     draw_set_font(font);
     return width;
 };
-global.NovaPromptWidth = function(binding, label, scale_x, size, gap = 4) {
+global.NovaPromptParts = function(binding, label, px, scale_x, size, gap = undefined) {
+    var spacing = gap == undefined ? size / 4 : gap * scale_x;
+    var text_width = string_width(label) * scale_x;
     var icon_width = global.NovaGlyph(binding) >= 0 ? size : global.NovaKeyWidth(binding) * scale_x;
-    return icon_width + (label == "" ? 0 : (gap + string_width(label)) * scale_x);
+    return {text_x: px, icon_x: px + (label == "" ? 0 : text_width + spacing), icon_width: icon_width,
+        width: icon_width + (label == "" ? 0 : text_width + spacing)};
 };
-global.NovaPromptDraw = function(binding, label, px, py, scale_x, scale_y, size, gap = 4) {
-    var frame = global.NovaGlyph(binding);
-    var icon_width = size;
-    draw_set_color(c_white);
+global.NovaPromptWidth = function(binding, label, scale_x, size, gap = undefined) {
+    return global.NovaPromptParts(binding, label, 0, scale_x, size, gap).width;
+};
+global.NovaPromptDraw = function(binding, label, px, py, scale_x, scale_y, size, gap = undefined) {
+    var parts = global.NovaPromptParts(binding, label, px, scale_x, size, gap);
     draw_set_halign(fa_left);
     draw_set_valign(fa_middle);
-    if (frame >= 0) draw_sprite_stretched(sNovaButtons, frame, px, py - size / 2, size, size);
+    if (label != "") {
+        draw_set_color(c_black);
+        draw_text_transformed(parts.text_x + scale_x, py + scale_y, label, scale_x, scale_y, 0);
+        draw_set_color(c_white);
+        draw_text_transformed(parts.text_x, py, label, scale_x, scale_y, 0);
+    }
+    var frame = global.NovaGlyph(binding);
+    var icon_x = parts.icon_x;
+    draw_set_color(c_white);
+    if (frame >= 0) draw_sprite_stretched(sNovaButtons, frame, icon_x, py - size / 2, size, size);
     else {
         var key_label = global.NovaKeyLabel(binding);
-        icon_width = global.NovaKeyWidth(binding) * scale_x;
         draw_set_color(c_black);
-        draw_rectangle(px, py - 6 * scale_y, px + icon_width, py + 6 * scale_y, false);
+        draw_rectangle(icon_x, py - 6 * scale_y, icon_x + parts.icon_width, py + 6 * scale_y, false);
         draw_set_color(c_white);
-        draw_rectangle(px, py - 6 * scale_y, px + icon_width, py + 6 * scale_y, true);
-        // The small HUD font has no Z glyph; the dialogue font covers keyboard letters.
+        draw_rectangle(icon_x, py - 6 * scale_y, icon_x + parts.icon_width, py + 6 * scale_y, true);
         var font = draw_get_font();
         draw_set_font(global.HUDFont);
-        draw_text_transformed(px + 3 * scale_x, py, key_label, scale_x / 2, scale_y / 2, 0);
+        draw_text_transformed(icon_x + 3 * scale_x, py, key_label, scale_x / 2, scale_y / 2, 0);
         draw_set_font(font);
     }
-    if (label != "") {
-        var text_x = px + icon_width + gap * scale_x;
-        draw_set_color(c_black);
-        draw_text_transformed(text_x + scale_x, py + scale_y, label, scale_x, scale_y, 0);
-        draw_set_color(c_white);
-        draw_text_transformed(text_x, py, label, scale_x, scale_y, 0);
-    }
     draw_set_valign(fa_top);
+};
+global.NovaHintWidth = function(prompt, label, sx, size) {
+    var width = global.NovaPromptWidth(prompt.binding, label, sx, size);
+    if (variable_struct_exists(prompt, "binding2")) width += size / 6 + global.NovaPromptWidth(prompt.binding2, "", sx, size);
+    return width;
+};
+global.NovaHintRow = function(prompts, right, py, sx, sy, size, gap, available) {
+    var total = max(0, array_length(prompts) - 1) * gap;
+    for (var i = 0; i < array_length(prompts); i++) {
+        var prompt = prompts[i];
+        var reserve = variable_struct_exists(prompt, "reserve") ? prompt.reserve : prompt.label;
+        total += global.NovaHintWidth(prompt, reserve, sx, size);
+    }
+    var fit = min(1, available / max(1, total));
+    var cursor = right;
+    for (var i = array_length(prompts) - 1; i >= 0; i--) {
+        var prompt = prompts[i];
+        var reserve = variable_struct_exists(prompt, "reserve") ? prompt.reserve : prompt.label;
+        var width = global.NovaHintWidth(prompt, prompt.label, sx * fit, size * fit);
+        var reserved_width = global.NovaHintWidth(prompt, reserve, sx * fit, size * fit);
+        prompt.x = cursor - width;
+        prompt.y = py;
+        prompt.width = width;
+        prompt.right = cursor;
+        prompt.scale_x = sx * fit;
+        prompt.scale_y = sy * fit;
+        prompt.size = size * fit;
+        prompt.icon_x = global.NovaPromptParts(prompt.binding, prompt.label, prompt.x, prompt.scale_x, prompt.size).icon_x;
+        cursor -= reserved_width + gap * fit;
+    }
+    return prompts;
+};
+global.NovaHintDraw = function(prompt) {
+    if (variable_struct_exists(prompt, "visible") && !prompt.visible) return;
+    global.NovaPromptDraw(prompt.binding, prompt.label, prompt.x, prompt.y, prompt.scale_x, prompt.scale_y, prompt.size);
+    if (variable_struct_exists(prompt, "binding2")) {
+        var width = global.NovaPromptWidth(prompt.binding, prompt.label, prompt.scale_x, prompt.size);
+        global.NovaPromptDraw(prompt.binding2, "", prompt.x + width + prompt.size / 6, prompt.y, prompt.scale_x, prompt.scale_y, prompt.size);
+    }
 };
 global.NovaInventoryInfo = function() {
     return instance_exists(oInventory) && oInventory.DB_Started && instance_exists(global.DB_Inst) && global.DB_Inst.Script == oInventory.DBScript_Info;
@@ -110,7 +154,7 @@ global.NovaInventoryPager = function(inventory, sx, sy) {
     var heading_width = string_width(inventory.NovaTitles[6] + " 2");
     for (var i = 0; i < array_length(inventory.NovaTitles); i++) heading_width = max(heading_width, string_width(inventory.NovaTitles[i]));
     var bindings = [global.NovaBinding("nova_bag_previous"), global.NovaBinding("nova_bag_next")];
-    var size = 18 * min(sx, sy);
+    var size = 12 * min(sx, sy);
     var widths = [global.NovaPromptWidth(bindings[0], "", sx, size), global.NovaPromptWidth(bindings[1], "", sx, size)];
     var center = (inventory.X - oCamera.X + inventory.W / 2) * sx;
     var offset = (heading_width / 2 + 8) * sx;
@@ -127,35 +171,12 @@ global.NovaInventoryFooter = function(inventory, sx, sy) {
     var primary = info ? "MORE" : global.NovaInventoryAction(inventory);
     var prompts = [
         {binding: global.NovaBinding("item"), label: "EQUIP", visible: !info && !inventory.MenuEnable && selected.ItemClass >= 0 && global.ItemData[selected.ItemClass].CanEquip},
-        {binding: global.NovaBinding(global.NovaCloseVerb()), label: "CLOSE", visible: true},
-        {binding: global.NovaBinding(global.NovaConfirmVerb()), label: primary, visible: info ? global.DB_Inst.LinesLeft > 3 : primary != ""}
+        {binding: global.NovaBinding(global.NovaConfirmVerb()), label: primary, reserve: "ACTIONS", visible: info ? global.DB_Inst.LinesLeft > 3 : primary != ""},
+        {binding: global.NovaBinding(global.NovaCloseVerb()), label: "CLOSE", visible: true}
     ];
     var font = draw_get_font();
     draw_set_font(global.HUDFont2);
-    var reserves = ["EQUIP", "CLOSE", "ACTIONS"];
-    var size = 18 * min(sx, sy);
-    var available = (inventory.W - 16) * sx;
-    var total = 16 * sx;
-    for (var i = 0; i < 3; i++) total += global.NovaPromptWidth(prompts[i].binding, reserves[i], sx, size);
-    var fit = min(1, available / total);
-    var widths = [];
-    total = 0;
-    for (var i = 0; i < 3; i++) {
-        widths[i] = global.NovaPromptWidth(prompts[i].binding, reserves[i], sx * fit, size * fit);
-        total += widths[i];
-    }
-    // Hidden actions retain their space so changing selection cannot move Close.
-    var gap = (available - total) / 2;
-    var px = (inventory.X - oCamera.X + 8) * sx;
-    for (var i = 0; i < 3; i++) {
-        prompts[i].x = px;
-        prompts[i].y = (inventory.Y - oCamera.Y + 116) * sy;
-        prompts[i].width = widths[i];
-        prompts[i].scale_x = sx * fit;
-        prompts[i].scale_y = sy * fit;
-        prompts[i].size = size * fit;
-        px += widths[i] + gap;
-    }
+    prompts = global.NovaHintRow(prompts, 238 * sx, 209 * sy, sx, sy, 12 * min(sx, sy), 8 * sx, 224 * sx);
     draw_set_font(font);
     return prompts;
 };
@@ -173,10 +194,7 @@ global.NovaInventoryPrompts = function(inventory) {
         }
     }
     var prompts = global.NovaInventoryFooter(id, sx, sy);
-    for (var i = 0; i < array_length(prompts); i++) {
-        var prompt = prompts[i];
-        if (prompt.visible) global.NovaPromptDraw(prompt.binding, prompt.label, prompt.x, prompt.y, prompt.scale_x, prompt.scale_y, prompt.size);
-    }
+    for (var i = 0; i < array_length(prompts); i++) global.NovaHintDraw(prompts[i]);
     draw_set_alpha(1);
     }
 };

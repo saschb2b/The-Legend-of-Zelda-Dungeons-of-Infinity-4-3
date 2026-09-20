@@ -4,6 +4,14 @@ These versions identify the 4:3 patch, independently of the original game's vers
 
 ## Unreleased
 
+### Changed
+
+- Use the supplied Switch 2 glyphs for controller hints. Group hints at the bottom right with labels before buttons and the primary action (A) before Close (B). Keep inventory actions in fixed positions and L/R beside page headings.
+- Keep the classic centered title reveal, then move its logo into an adventure menu with the last selected player and Continue first.
+- Choose a character, bonus and challenges in one frame. Begin adventure is selected by default, and fresh players start as Link without mandatory name entry.
+- Replace stacked startup windows with a shared scene and one active frame. Keep all five players, records, renaming, controls and credits available. Move Updates into Options.
+- Keep new-run choices separate from saved progress. Confirm before replacing an adventure or deleting a player, with the safe choice selected first. Close restores the originating menu and selection.
+
 ## [1.6.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.6.0) - 2026-09-20
 
 ### Added

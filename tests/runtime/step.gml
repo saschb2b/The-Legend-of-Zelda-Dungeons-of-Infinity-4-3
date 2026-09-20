@@ -17,7 +17,7 @@ try {
             Stage = 2;
             break;
         case 2:
-            Record("enabled title skip opens profiles immediately", room == Room_Menu);
+            Record("enabled title skip opens the adventure menu", room == Room_Menu);
             if (room != Room_Menu) room_goto(Room_Menu);
             Stage = 3;
             break;
@@ -72,12 +72,13 @@ try {
                 MenuWin_Main_Shift = false;
                 Menu_Active = true;
                 Menu_ActiveIndex = 0;
+                NovaPage = "home";
             }
             PressEvent(oMenu, "escape", oMenu, ev_step, ev_step_normal);
             Stage = 4;
             break;
         case 4:
-            Record("Escape returns from profiles to the title", room == Room_Title);
+            Record("Escape returns from home to the title", room == Room_Title);
             if (room == Room_Title) PressEvent(oTitle, "menu_input", oTitle, ev_step, ev_step_normal);
             Stage = 5;
             break;

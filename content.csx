@@ -97,22 +97,6 @@ Edit("gml_GlobalScript___Users", "    global.Users[global.UserIndex].SaveData.Ch
 Edit("gml_GlobalScript___Users", "    global.Challenges = StructCopy(global.Users[global.UserIndex].SaveData.Challenges);",
     "    global.Challenges = StructCopy(global.Users[global.UserIndex].SaveData.Challenges);\n    global.NovaLoadChallenges(global.Users[global.UserIndex].SaveData);");
 Edit("gml_Object_oMenu_Create_0", "global.Challenges = array_create(7, false);", "global.NovaResetChallenges();");
-Edit("gml_Object_oMenu_Step_0", "global.Challenges[Selector_Index_Options - 1] = !global.Challenges[Selector_Index_Options - 1];", "NovaChallengeChange(1);");
-Edit("gml_Object_oMenu_Step_0", "Menu_ActiveIndex = 11;\n                        MenuWin_Options_MenuIndex = 11;", "Win_Options_Activate(11);");
-Edit("gml_Object_oMenu_Step_0", "case 11:\n                switch (Selector_Index_Options)\n                {\n                    case 0:\n                        Menu_ActiveIndex = 3;\n                        MenuWin_Options_MenuIndex = 3;", "case 11:\n                switch (Selector_Index_Options)\n                {\n                    case 0:\n                        Win_Options_Activate(3);");
-Edit("gml_Object_oMenu_Step_0", "if (Menu_Active)", @"
-if (Menu_Active && Menu_ActiveIndex == 11 && Selector_Index_Options > 0 && (input_check_pressed(""left"") || input_check_pressed(""right""))) {
-    NovaChallengeChange(input_check_pressed(""left"") ? -1 : 1);
-    exit;
-}
-if (Menu_Active)");
-var drawName = "gml_Object_oMenu_Draw_0";
-var drawCode = edits.ContainsKey(drawName) ? edits[drawName] : FlattenEnums(Read(drawName));
-var caseStart = drawCode.IndexOf("        case 11:");
-var caseEnd = drawCode.IndexOf("        case 13:", caseStart);
-if (caseStart < 0 || caseEnd < 0) throw new Exception("Challenge menu draw case missing");
-edits[drawName] = drawCode.Substring(0, caseStart) + "        case 11:\n            NovaChallengeDraw();\n            break;\n" + drawCode.Substring(caseEnd);
-Edit(drawName, "if (global.Challenges[_ChallengeIndex])", "if (global.NovaChallengeActive())");
 void ContentReplaceAll(string name, string anchor, string replacement, int count) {
     var code = edits.ContainsKey(name) ? edits[name] : FlattenEnums(Read(name));
     if (code.Split(new[] { anchor }, StringSplitOptions.None).Length - 1 != count) throw new Exception("Content anchor count: " + name + " / " + anchor);
@@ -125,7 +109,6 @@ Edit("gml_GlobalScript___Link", "global.Inventory_ItemData[18].Amount = 4;", "gl
 Edit("gml_GlobalScript___Link", "return max(DefensePoints, 0);", "return clamp(DefensePoints, 0, global.NovaChallengeDefense[global.NovaOption(2)]);");
 Edit("gml_GlobalScript___Items", "    return Price;", "    return Price * global.NovaChallengeShopPrices[global.NovaOption(6)];");
 Edit("gml_GlobalScript___Items", "Price = 10 + (arg1 * 3);", "Price = 10 + (global.NovaGemRanks[arg1] * 3);");
-ContentReplaceAll(drawName, "draw_text(_PosX, _PosY - 6, \"16\");", "draw_text(_PosX, _PosY - 6, string(Inventory_MaxAmount(39, 0)));", 2);
 Edit("gml_GlobalScript___Items", "function Item_Allowed(arg0, arg1 = -1, arg2 = 22)\n{",
     "function Item_Allowed(arg0, arg1 = -1, arg2 = 22)\n{\n    if (global.NovaOption(10) && (arg0 == 13 || arg0 == 49)) return false;");
 Edit("gml_Object_oShop_Create_0", "Slots = global.Challenges[5] ? 0 : Shop_GetSlotCount();",

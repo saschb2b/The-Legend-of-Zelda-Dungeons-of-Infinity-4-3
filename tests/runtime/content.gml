@@ -1,52 +1,31 @@
 function ContentMenuTests() {
-    if (!variable_global_exists("NovaOption")) { Record("variable challenges are available", false); return; }
     global.NovaResetChallenges();
-    with (oMenu) {
-        Win_Options_Activate(3);
-        MenuWin_Main_Shift = false;
-        Menu_Active = true;
-        Selector_Index_Options = 3;
-    }
+    with (oMenu) { NovaNewDraft(); NovaFocus = 2; }
     PressEvent(oMenu, "menu_input", oMenu, ev_step, ev_step_normal);
-    Record("opening challenges resizes the actual window", oMenu.Menu_ActiveIndex == 11 && inst_100005.W == 224 && inst_100005.x + inst_100005.W <= 400);
-    var previous_font = draw_get_font();
-    draw_set_font(global.MenuFont);
-    var columns_fit = true;
-    for (var row = 0; row < 12; row++) {
-        var values = oMenu.NovaChallengeValues[row];
-        for (var value = 0; value < array_length(values); value++)
-            columns_fit = columns_fit && string_width(oMenu.NovaChallengeLabels[row]) + string_width(values[value]) + 52 <= inst_100005.W;
-    }
-    draw_set_font(previous_font);
-    Record("challenge labels and every value have separate columns", columns_fit);
-    with (oMenu) {
-        Menu_Active = true;
-        Menu_ActiveIndex = 11;
-        MenuWin_Options_MenuIndex = 11;
-        MenuWin_Main_Active = false;
-        MenuWin_Options_Active = true;
-        MenuWin_Main_Shift = false;
-        NovaChallengePage = 0;
-        NovaChallengeMenu();
-        Selector_Index_Options = 1;
-    }
+    Record("Challenges replace setup in the same frame", oMenu.NovaPage == "challenges");
     PressEvent(oMenu, "left", oMenu, ev_step, ev_step_normal);
-    Record("challenge values wrap backwards", global.NovaOption(0) == 3);
+    Record("Draft challenge wraps backwards", oMenu.NovaDraft.challenges[0] == 3);
+    Record("Draft challenge leaves gameplay settings alone", global.NovaOption(0) == 0);
     PressEvent(oMenu, "menu_input", oMenu, ev_step, ev_step_normal);
-    Record("confirm cycles a challenge value", global.NovaOption(0) == 0);
-    oMenu.Selector_Index_Options = 6;
+    Record("Confirm cycles the draft challenge", oMenu.NovaDraft.challenges[0] == 0);
+    for (var page = 0; page < 3; page++) {
+        oMenu.NovaChallengePage = page;
+        var indexes = oMenu.NovaChallengePages[page];
+        for (var row = 0; row < array_length(indexes); row++) {
+            oMenu.NovaFocus = row;
+            PressEvent(oMenu, "menu_input", oMenu, ev_step, ev_step_normal);
+            Record("Challenge option is reachable " + string(indexes[row]), oMenu.NovaDraft.challenges[indexes[row]] == 1);
+        }
+    }
+    PressEvent(oMenu, "nova_bag_next", oMenu, ev_step, ev_step_normal);
+    Record("Shoulder paging wraps to Survival", oMenu.NovaChallengePage == 0 && oMenu.NovaFocus == 0);
+    PressEvent(oMenu, "nova_bag_previous", oMenu, ev_step, ev_step_normal);
+    Record("Previous shoulder wraps to Restrictions", oMenu.NovaChallengePage == 2);
+    oMenu.NovaFocus = array_length(oMenu.NovaChallengePages[2]);
     PressEvent(oMenu, "menu_input", oMenu, ev_step, ev_step_normal);
-    Record("challenge pages fit the existing menu height", oMenu.NovaChallengePage == 1 && oMenu.Menu_Count[11] == 7);
-    oMenu.Selector_Index_Options = 5;
-    PressEvent(oMenu, "menu_input", oMenu, ev_step, ev_step_normal);
-    oMenu.Selector_Index_Options = 1;
-    PressEvent(oMenu, "menu_input", oMenu, ev_step, ev_step_normal);
-    Record("no-map toggle updates the existing map guard", global.NovaOption(9) == 1 && global.Challenges[3]);
-    oMenu.Selector_Index_Options = 5;
-    PressEvent(oMenu, "menu_input", oMenu, ev_step, ev_step_normal);
-    Record("reset clears every challenge", !global.NovaChallengeActive());
-    MenuCase(11, 3);
-    Record("cancel restores the start-menu window width", inst_100005.W == 144);
+    Record("Reset clears all draft challenges", json_stringify(oMenu.NovaDraft.challenges) == json_stringify(array_create(12, 0)));
+    PressEvent(oMenu, global.NovaCloseVerb(), oMenu, ev_step, ev_step_normal);
+    Record("Closing challenges restores its setup row", oMenu.NovaPage == "setup" && oMenu.NovaFocus == 2);
 }
 function ContentTests() {
     if (!variable_global_exists("NovaOption")) { Record("1.2.1 content is available", false); return; }

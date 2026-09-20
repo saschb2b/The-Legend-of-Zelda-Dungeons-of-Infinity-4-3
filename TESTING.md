@@ -14,7 +14,7 @@ From the repository root:
 
 ```sh
 python3 -m unittest discover -v
-python3 build.py --check-release --runtime-tests
+python3 build.py --runtime-tests
 bash -n ./*.sh
 ```
 
@@ -24,7 +24,7 @@ The unit suite uses temporary synthetic archives and needs no game files or thir
 
 The compiler can exit successfully after a script exception. The build requires completion markers and an output file, then reloads the result for structural checks. The original game's audio alignment warning requires the CLI's verbose flag. The patch pins serialization to the older runner's format and verifies that the FUNC chunk includes a locals-table count. The tool can otherwise misidentify the empty upstream table as newer alignment padding and produce a file that crashes at startup.
 
-`--check-release` requires the checked-in delta to reconstruct exactly the bytes from the clean source build. During development, omit that flag until you regenerate the delta. CI uploads only `.build/build-report.json`. It never uploads full games, runtimes, saves, or instrumented builds.
+`--check-release` requires the checked-in delta to reconstruct exactly the bytes from the clean source build. Branch and pull-request CI builds source and the runtime harness. Version-tag CI also checks the release delta and installer. Before publishing a tag, run `python3 build.py --check-release --runtime-tests` locally. CI uploads only `.build/build-report.json`. It never uploads full games, runtimes, saves, or instrumented builds.
 
 ## Nova runtime suite
 
@@ -35,11 +35,11 @@ python3 build.py --runtime-tests
 python3 tests/run_device.py root@your-device.local
 ```
 
-Optional arguments include `--control-path /path/to/socket`, `--ports-dir /storage/roms/ports`, and `--report-dir .build/device-results`. Add `--capture` to save screenshots of all seven inventory categories, item actions and information, keyboard prompts, CRT mode, and a second overflow page after the assertions. Status captures cover the default binding, CRT mode, a remapped button, and keyboard input. Review the screenshots for clipping, HUD overlap, and incomplete frames. Screenshot comparisons are manual.
+Optional arguments include `--control-path /path/to/socket`, `--ports-dir /storage/roms/ports`, and `--report-dir .build/device-results`. Add `--capture` to save screenshots of all seven inventory categories, item actions and information, keyboard prompts, CRT mode, a second overflow page, curse text, and the map footer after the assertions. Status captures cover the default binding, CRT mode, a remapped button, and keyboard input. Review the screenshots for clipping, HUD overlap, and incomplete frames. Screenshot comparisons are manual.
 
 The runner creates a disposable game directory under `/storage/.cache/`, with fresh saves, and a temporary Ports launcher. It launches through EmulationStation and runs the suite automatically. It writes the JSON assertion report and game log locally, removes the disposable installation, and compares production save hashes. It never switches the production game to a test build. If SSH disconnects before cleanup, remove the reported `doi43-harness-*` directory and matching `DOI43 Harness *.sh` launcher after closing the test game.
 
-The suite calls the compiled game events. It substitutes input at the input-query boundary, creates actual enemy instances, and checks projectiles, timers, inventory, menu state, and profile contents. It tests recovery and normal behavior as well as blocked actions. Control cases cover remapped button and stick glyphs, alternate and empty bindings, old profile imports, shoulder-page wrapping, contextual action labels, simultaneous inputs, item-information closure, and map dismissal. The test object and input substitution exist only in `runtime-tests.droid` and `runtime-baseline.droid`. Packaging rejects either test build.
+The suite calls the compiled game events. It substitutes input at the input-query boundary, creates actual enemy instances, and checks projectiles, timers, inventory, menu state, and profile contents. It tests recovery and normal behavior as well as blocked actions. Control cases cover remapped button and stick glyphs, alternate and empty bindings, old profile imports, label-before-glyph spacing, fixed footer positions, shoulder-page wrapping, contextual action labels, simultaneous inputs, item-information closure, and map dismissal. The test object and input substitution exist only in `runtime-tests.droid` and `runtime-baseline.droid`. Packaging rejects either test build.
 
 Movement tests measure displacement through Link's compiled Step event over eight frames in all eight directions, including walking, running, carrying, and sword-ready movement. They also check opposing inputs, strafe, doorway speed limits, corner assistance, scripted movement, knockback, and falls. Real wall instances check sliding on all four sides while walking, carrying, or holding the sword. Across eight frames, SNES walking covers 12 pixels straight or 8 per diagonal axis. Carrying and sword-ready movement cover 10 straight or 6.5 per diagonal axis. The tests use fresh saves in the starting clearing.
 
@@ -57,9 +57,9 @@ Updater tests cover stable-version selection, release URLs, checksums, archive p
 
 The runtime suite checks the Updates menu, stale responses, confirmation, cancellation, retry, window bounds, and controller hints. Its launcher disables the network worker so menu fixtures cannot download or install a release. `--capture` includes update-available and error screens. Check the live service separately before release.
 
-Player Select tests cover empty profiles, saved runs, characters, partial hearts, and long names. They navigate all seven rows and enter and close the existing profile flows. Drawing previews must leave profile data unchanged. Keyboard and controller hints must clear the frame.
+Startup tests cover empty players, saved runs, partial hearts, remembered selection, direct player switching, renaming and Close behavior. They cycle every character, bonus and challenge option. Browsing a new-run draft must leave saved progress unchanged. Replacement and deletion default to keeping progress. Canceling Create player restores the previous selection without creating a profile. The harness intercepts start/continue at the room-change boundary, then separately enters the dungeon for gameplay regression tests. Keyboard and controller hints must clear the shared frame.
 
-Use `--capture-profiles` for empty and populated fixture profiles, or `--capture-updates` for the updater. `--capture` includes both. Menu captures include three consecutive samples because remote captures can omit parts of a frame. Inspect the two-row heart display, selected cursor, and footer spacing on the device.
+Use `--capture-profiles` for the adventure menu, setup, challenges, players and keyboard controls, or `--capture-updates` for the updater. `--capture` includes both. Menu captures include three consecutive samples because remote captures can omit parts of a frame. Inspect the two-row heart display, selected cursor, and footer spacing on the device.
 
 The updater downloads and verifies the installer and upstream package while the game runs. After the game exits, it installs into a separate directory. A recovery journal protects the directory switch and launcher replacement. The launcher restores an interrupted transaction before starting the game. Diagnostics are in `zeldadoi-43/update.log`.
 

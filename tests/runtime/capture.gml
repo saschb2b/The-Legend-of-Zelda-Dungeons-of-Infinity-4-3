@@ -1,7 +1,7 @@
 Capture = "";
 CaptureTick = 0;
 CaptureIndex = 0;
-CaptureNames = ["inventory-gear", "inventory-items", "inventory-bags", "inventory-treasure", "inventory-food", "inventory-pendants", "inventory-overflow", "inventory-actions", "inventory-info", "inventory-keyboard", "inventory-crt", "inventory-overflowextra", "status-default", "status-crt", "status-remapped", "status-keyboard"];
+CaptureNames = ["inventory-gear", "inventory-items", "inventory-bags", "inventory-treasure", "inventory-food", "inventory-pendants", "inventory-overflow", "inventory-actions", "inventory-info", "inventory-keyboard", "inventory-crt", "inventory-overflowextra", "status-default", "status-crt", "status-remapped", "status-keyboard", "inventory-cursed", "map-default"];
 function CaptureStart() {
     global.ItemData[1].Type = 3;
     global.ItemData[5].Type = 3;
@@ -59,6 +59,29 @@ function CaptureStep() {
         Complete = true;
         Flush();
         game_end();
+        return;
+    }
+    if (CaptureIndex == 17) {
+        with (oInventory) instance_destroy();
+        global.Cursed = false;
+        global.MapInst = instance_create_layer(0, 0, "System", oMap);
+        global.MapInst.Open = false;
+        global.MapInst.Alpha = 1;
+        global.MapInst.LinkAlpha = 90;
+        return;
+    }
+    if (CaptureIndex == 16) {
+        input_profile_set("gamepad");
+        global.Paused = true;
+        global.Cursed = true;
+        global.CurseEffectStr = "MAGIC DRAIN";
+        global.CurseTaskStr = "DEFEAT ENEMIES";
+        global.CurseTaskCount = 12;
+        global.InventoryInst = instance_create_layer(0, 0, "System", oInventory);
+        global.InventoryInst.Open = false;
+        global.InventoryInst.Alpha = 1;
+        global.InventoryInst.NovaPage = 0;
+        with (global.InventoryInst) NovaRefresh();
         return;
     }
     if (CaptureIndex >= 12) {

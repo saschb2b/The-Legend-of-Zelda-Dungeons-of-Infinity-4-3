@@ -55,28 +55,19 @@ void Edit(string name, string anchor, string replacement) {
 Edit("gml_Object_oInit_Create_0", "ini_close();",
     "global.CanSkipTitle = ini_read_real(\"Preferences\", \"CanSkipTitle\", 1) == 1;\nini_close();");
 Edit("gml_Object_oTitle_Step_0", "AllowStart || false", "AllowStart || global.CanSkipTitle");
-Edit("gml_Object_oMenu_Create_0", "\"5.\", \"{s}Exit\");", "\"5.\", \"{s}Updates\", \"Exit\");");
+edits["gml_Object_oMenu_Create_0"] = FlattenEnums(Read("gml_Object_oMenu_Create_0"));
 edits["gml_Object_oMenu_Create_0"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "updates.gml"));
 edits["gml_Object_oMenu_Create_0"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "profiles.gml"));
-Edit("gml_Object_oMenu_Step_0", "AltTabCheck();", @"
-AltTabCheck();
-if (NovaUpdateOpen) { NovaUpdateStep(); exit; }
-if (Menu_Active && Menu_ActiveIndex == 0 && Selector_Index_Main == global.MaxUsers && input_check_pressed(""menu_input"")) {
-    NovaUpdateEnter();
-    exit;
-}");
-Edit("gml_Object_oMenu_Draw_0", "if (instance_exists(ErrorMsgInst))", "if (NovaUpdateOpen) { NovaUpdateDraw(); exit; }\nif (instance_exists(ErrorMsgInst))");
-Edit("gml_Object_oMenu_Draw_0", "var _y = 0;", "if (NovaProfileVisible()) { NovaProfileDraw(); exit; }\nvar _y = 0;");
-Edit("gml_Object_oMenuWin_Draw_0", "draw_sprite_stretched(sprite_index, 0, x, y, W, H);", "if (instance_exists(oMenu) && (oMenu.NovaUpdateOpen || oMenu.NovaProfileVisible())) exit;\ndraw_sprite_stretched(sprite_index, 0, x, y, W, H);");
-
-Edit("gml_Object_oMenu_Step_0", "if (Menu_Active)",
-    File.ReadAllText(Path.Combine(patchDir, "menu_cancel.gml")) + "\nif (Menu_Active)");
 Edit("gml_Object_oMenu_Game_Step_0", "if (input_check_pressed(\"menu_access\"))",
     File.ReadAllText(Path.Combine(patchDir, "pause_cancel.gml")) + "\nif (input_check_pressed(\"menu_access\"))");
 Edit("gml_Object_oGame_Step_1", "if (input_check_pressed(\"hud\"))",
     "if (input_check_pressed(\"hud\") && !global.Paused && !instance_exists(oInventory) && !instance_exists(oMap) && !instance_exists(oMenu_Game) && !instance_exists(oDialogueBox))");
+Edit("gml_Object_oMap_Create_0", "FrameX = oCamera.X + 26;\nFrameY = oCamera.Y + 10;",
+    "NovaFrameSize = 188;\nNovaMapScale = (NovaFrameSize - 12) / 256;\nFrameX = oCamera.X + (256 - NovaFrameSize) / 2;\nFrameY = oCamera.Y + 6;");
+Edit("gml_Object_oMap_Draw_0", "FrameX, FrameY, 204, 204", "FrameX, FrameY, NovaFrameSize, NovaFrameSize");
+Edit("gml_Object_oMap_Draw_0", "MapX, MapY, 0.75, 0.75, 0, c_white, Alpha", "MapX, MapY, NovaMapScale, NovaMapScale, 0, c_white, Alpha");
+Edit("gml_Object_oMap_Draw_0", "MapX, MapY, 0.75, 0.75, 0, c_white, abs(dsin(LinkAlpha)) * Alpha", "MapX, MapY, NovaMapScale, NovaMapScale, 0, c_white, abs(dsin(LinkAlpha)) * Alpha");
 group.QueueAppend("gml_Object_oMap_Step_0", "if (!Open && !Close && (input_check_pressed(global.NovaCloseVerb()) || input_check_pressed(\"menu_access\") || keyboard_check_pressed(vk_escape))) { Close = true; input_clear_momentary(true); }");
-Edit("gml_Object_oMenu_Step_0", "NameEntry_Name != \"\" && input_check_pressed(\"action\")", "NameEntry_Name != \"\" && input_check_pressed(global.NovaCloseVerb())");
 group.QueueAppend("gml_Object_oDialogueBox_Create_0", "NovaShopDialogue = false;");
 Edit("gml_Object_oShop_Step_0", "global.DB_Inst.Script = DB_Script;", @"
 global.DB_Inst.Script = DB_Script;
@@ -147,7 +138,14 @@ menu.Height = 300;
 menu.Views[0].ViewY = -38;
 menu.Views[0].ViewHeight = 300;
 menu.Views[0].PortHeight = 1200;
-group.QueueReplace("gml_Object_oTitle_Draw_0", ReplaceOnce(Read("gml_Object_oTitle_Draw_0"), "draw_text(8, 212,", "draw_text(58, 212,"));
+group.QueueReplace("gml_Object_oTitle_Draw_0", ReplaceOnce(Read("gml_Object_oTitle_Draw_0"), "draw_text(8, 212,", "draw_text(58, 212,") + @"
+if (AllowStart) {
+    draw_set_font(global.MenuFont_Innactive);
+    var binding = input_binding_get(""menu_input"", 0, 1);
+    if (binding.__type == undefined) binding = global.NovaBinding(""menu_input"");
+    var width = global.NovaPromptWidth(binding, ""Begin"", 0.75, 12);
+    global.NovaPromptDraw(binding, ""Begin"", 329 - width, 210, 0.75, 0.75, 12);
+}");
 var credits = Read("gml_Object_oCredits_Create_0");
 credits = ReplaceOnce(credits, "x = (camera_get_view_width(view_camera[0]) - BoxW) / 2;", "x = camera_get_view_x(view_camera[0]) + (camera_get_view_width(view_camera[0]) - BoxW) / 2;");
 credits = ReplaceOnce(credits, "TextSurfaceX = (x * 4) + 20;", "TextSurfaceX = ((x - camera_get_view_x(view_camera[0])) * 4) + 20;");
@@ -228,25 +226,6 @@ Edit("gml_GlobalScript___Input", "global.BindingVerbs[1] = [0, 1, 2, 3, 4, 5, 6,
 Edit("gml_GlobalScript___Input", "function GetInputVerbStr(arg0)\n{",
     "function GetInputVerbStr(arg0)\n{\n    if (arg0 == 12) return \"nova_bag_previous\";\n    if (arg0 == 13) return \"nova_bag_next\";");
 edits["gml_GlobalScript___Input"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "controls.gml"));
-var remapDraw = edits["gml_Object_oMenu_Draw_0"];
-var remapStart = remapDraw.IndexOf("        case 13:");
-var remapEnd = remapDraw.IndexOf("            break;", remapDraw.IndexOf("        case 14:", remapStart)) + "            break;".Length;
-if (remapStart < 0 || remapEnd < remapStart) throw new Exception("Remap menu cases missing");
-edits["gml_Object_oMenu_Draw_0"] = remapDraw.Substring(0, remapStart) + @"
-        case 13:
-        case 14:
-            var device = Menu_ActiveIndex == 13 ? 0 : 1;
-            var labels = [""Sword"", ""Action"", ""Item"", ""Map"", ""Strafe"", ""Inventory"", ""Menu"", ""Status"", ""Up"", ""Down"", ""Left"", ""Right"", ""Previous bag"", ""Next bag""];
-            draw_set_halign(fa_left);
-            var text_scale = device == 0 ? 0.75 : 0.6;
-            for (var i = 0; i < global.BindingIconCount[device]; i++) {
-                var PosX = inst_100005.x + 82;
-                var PosY = inst_100005.y + 10 + i * (device == 0 ? 14 : 10);
-                draw_text_transformed(PosX, PosY, labels[global.BindingVerbs[device][i]] + "":"", text_scale, text_scale, 0);
-                if (Bindings_Remap && i == global.BindingRemap_VerbIndex) draw_rectangle(PosX + 66, PosY, PosX + 110, PosY + 9, false);
-                else draw_text_transformed(PosX + 66, PosY, device == 0 ? global.NovaKeyLabel(global.NovaBinding(GetInputVerbStr(global.BindingVerbs[device][i]), ""gamepad"")) : global.BindingIcons[device][i], text_scale, text_scale, 0);
-            }
-            break;" + remapDraw.Substring(remapEnd);
 ApplyContent();
 using (var corrections = JsonDocument.Parse(File.ReadAllText(Path.Combine(patchDir, "dungeon_fixes.json")))) {
     var statements = "";
@@ -305,6 +284,28 @@ group.QueueReplace("gml_Object_oInventory_Step_0", File.ReadAllText(Path.Combine
 group.QueueReplace("gml_Object_oInventory_Draw_0", File.ReadAllText(Path.Combine(patchDir, "inventory_draw.gml")));
 group.QueueReplace("gml_Object_oInventory_Step_2", "if (Close) { Alpha -= AlphaSpeed; if (Alpha <= 0) instance_destroy(); }");
 string GlobalInventoryCalls(string source) => Regex.Replace(source, @"(?<![.\w])Nova(GearSlot|BagRange|EmptyRange|EmptySlot|InventoryInit|InventoryMigrate|CandleInit)\(", "global.Nova$1(");
+// The startup controller owns the scene; upstream windows remain only as bootstrap data.
+edits["gml_Object_oMenu_Create_0"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "adventure.gml"));
+Edit("gml_Object_oMenu_Create_0", "audio_sound_gain(MenuMusic, 0.5, 0);", "audio_sound_gain(MenuMusic, 0, 0); audio_sound_gain(MenuMusic, 0.5, 350);");
+var creditSource = Read("gml_Object_oCredits_Create_0");
+var creditStart = creditSource.IndexOf("TextArray = [];");
+var creditEnd = creditSource.IndexOf("TextArrayLen =", creditStart);
+if (creditStart < 0 || creditEnd < 0) throw new Exception("Original credits boundary missing");
+edits["gml_Object_oMenu_Create_0"] += "\n" + creditSource.Substring(creditStart, creditEnd - creditStart).Replace("TextArray", "NovaCredits");
+edits["gml_Object_oMenu_Step_0"] = "AltTabCheck(); NovaAdventureStep(input_check_pressed(global.NovaCloseVerb()) || keyboard_check_pressed(vk_escape));";
+edits["gml_Object_oMenu_Draw_0"] = "NovaAdventureDraw();";
+edits["gml_Object_oMenuWin_Draw_0"] = "if (instance_exists(oMenu)) exit; draw_sprite_stretched(sprite_index, 0, x, y, W, H);";
+Edit("gml_Object_oTitle_Step_0", "audio_stop_all();", @"
+if (variable_global_exists(""NovaTitleFrame"") && surface_exists(global.NovaTitleFrame)) surface_free(global.NovaTitleFrame);
+global.NovaTitleFrame = -1;
+if (surface_exists(application_surface)) {
+    global.NovaTitleFrame = surface_create(surface_get_width(application_surface), surface_get_height(application_surface));
+    if (surface_exists(global.NovaTitleFrame)) surface_copy(global.NovaTitleFrame, 0, 0, application_surface);
+}
+if (audio_is_playing(Music)) audio_sound_gain(Music, 0, 350);
+input_clear_momentary(true);");
+group.QueueReplace("gml_Object_oTitle_Alarm_6", "alarm[6] = -1;");
+group.QueueAppend("gml_Object_oMenu_CleanUp_0", "if (variable_global_exists(\"NovaTitleFrame\") && surface_exists(global.NovaTitleFrame)) surface_free(global.NovaTitleFrame);");
 foreach (var edit in edits) group.QueueReplace(edit.Key, GlobalInventoryCalls(edit.Value));
 group.Import();
 Console.WriteLine("4:3 overlay patch compiled.");

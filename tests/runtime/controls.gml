@@ -22,6 +22,7 @@ function ControlTests() {
         input_binding_set("hud", input_binding_gamepad_button(buttons[i]), 0, 0, "gamepad");
         Record("status glyph follows remapped button " + string(buttons[i]), global.NovaGlyph(global.NovaBinding("hud")) == (i < 2 ? 1 - i : i));
     }
+    Record("Start uses the Switch Plus glyph", global.NovaGlyph(input_binding_gamepad_button(gp_start)) == 23);
     for (var axis = gp_axislh; axis <= gp_axisrv; axis++) {
         for (var negative = 0; negative < 2; negative++) {
             var binding = input_binding_gamepad_axis(axis, negative == 1);
@@ -67,7 +68,7 @@ function ControlTests() {
     global.InventoryInst = ui;
     Record("inventory leaves room for the full HUD", global.NovaInventoryHUD() && ui.Y - oCamera.Y >= 64 && ui.X - oCamera.X >= 24 && ui.X + ui.W <= oCamera.X + 232 && ui.Y + ui.H + 23 <= oCamera.Y + 224);
     var footer_empty = global.NovaInventoryFooter(ui, 5, 960 / 224);
-    Record("empty inventory retains only the Close hint", !footer_empty[0].visible && footer_empty[1].visible && !footer_empty[2].visible);
+    Record("empty inventory retains only the Close hint", !footer_empty[0].visible && footer_empty[2].visible && !footer_empty[1].visible);
     var page_before = ui.NovaPage;
     var overflow_before = ui.NovaOverflowPages;
     var pager_before = global.NovaInventoryPager(ui, 5, 960 / 224);
@@ -97,7 +98,7 @@ function ControlTests() {
     Record("confirm opens actions for the highlighted item", ui.MenuEnable);
     Record("active gear has no redundant equip action", !ds_grid_get(ui.MenuItemGrid, 1, 0) && !ds_grid_get(ui.MenuItemGrid, 1, 1));
     var footer_gear = global.NovaInventoryFooter(ui, 5, 960 / 224);
-    Record("item actions keep Close in its empty-inventory position", footer_gear[1].x == footer_empty[1].x && footer_gear[1].y == footer_empty[1].y && !footer_gear[0].visible);
+    Record("item actions keep Close in its empty-inventory position", footer_gear[2].x == footer_empty[2].x && footer_gear[2].y == footer_empty[2].y && !footer_gear[0].visible);
     var action_labels = ["EQUIP", "USE", "DROP", "INFO"];
     for (var action = 0; action < 4; action++) {
         ui.MenuSelectionIndex = action;
@@ -106,7 +107,7 @@ function ControlTests() {
     PressEvent(ui, global.NovaConfirmVerb(), oInventory, ev_step, ev_step_normal);
     Record("item information keeps the HUD visible", global.NovaInventoryInfo() && global.NovaInventoryHUD());
     var footer_info = global.NovaInventoryFooter(ui, 5, 960 / 224);
-    Record("item information preserves the footer positions", footer_info[1].x == footer_empty[1].x && footer_info[2].x == footer_gear[2].x && !footer_info[0].visible);
+    Record("item information preserves the footer positions", footer_info[2].x == footer_empty[2].x && footer_info[1].icon_x == footer_gear[1].icon_x && !footer_info[0].visible);
     PressEvent(global.DB_Inst, global.NovaCloseVerb(), oDialogueBox, ev_step, ev_step_end);
     Record("close dismisses information without closing inventory", !instance_exists(global.DB_Inst) && instance_exists(ui) && !ui.Close && __input_global().__cleared);
     PressEvent(ui, "", oInventory, ev_step, ev_step_normal);
@@ -135,18 +136,18 @@ function ControlTests() {
     with (ui) NovaRefresh();
     Record("empty overflow returns to a valid bag", ui.NovaPage == 1 && global.Inventory_SlotIndex_Selected >= 10 && global.Inventory_SlotIndex_Selected < 15);
     var footer_item = global.NovaInventoryFooter(ui, 5, 960 / 224);
-    Record("equippable items keep Close fixed while exposing Equip", footer_item[0].visible && footer_item[1].x == footer_empty[1].x && footer_item[2].x == footer_gear[2].x);
-    Record("secondary action precedes Close and the primary action", footer_item[0].x + footer_item[0].width < footer_item[1].x && footer_item[1].x + footer_item[1].width < footer_item[2].x);
-    Record("Nova controller prompts keep their full size", footer_item[0].size == 18 * (960 / 224) && footer_item[2].scale_x == 5);
+    Record("equippable items keep Close fixed while exposing Equip", footer_item[0].visible && footer_item[2].x == footer_empty[2].x && footer_item[1].icon_x == footer_gear[1].icon_x);
+    Record("Equip precedes the primary action and Close", footer_item[0].right < footer_item[1].x && footer_item[1].right < footer_item[2].x);
+    Record("Nova controller prompts keep their full size", footer_item[0].size == 12 * (960 / 224) && footer_item[1].scale_x == 5);
     input_binding_set("action", input_binding_gamepad_button(gp_face4), 0, 0, "gamepad");
     input_binding_set("sword", input_binding_gamepad_button(gp_face3), 0, 0, "gamepad");
     var footer_remapped = global.NovaInventoryFooter(ui, 5, 960 / 224);
-    Record("remapped glyphs preserve action order and positions", global.NovaGlyph(footer_remapped[1].binding) == 2 && global.NovaGlyph(footer_remapped[2].binding) == 3 && footer_remapped[1].x == footer_item[1].x && footer_remapped[2].x == footer_item[2].x);
+    Record("remapped glyphs preserve action order and positions", global.NovaGlyph(footer_remapped[2].binding) == 2 && global.NovaGlyph(footer_remapped[1].binding) == 3 && footer_remapped[2].x == footer_item[2].x && footer_remapped[1].x == footer_item[1].x);
     input_profile_import(gamepad_before, "gamepad");
     input_profile_set("keyboard");
     for (var scale = 1; scale <= 5; scale += 4) {
         var footer_keyboard = global.NovaInventoryFooter(ui, scale, scale * 6 / 7);
-        Record("keyboard footer fits at scale " + string(scale), footer_keyboard[0].x >= (ui.X - oCamera.X + 8) * scale && footer_keyboard[2].x + footer_keyboard[2].width <= (ui.X - oCamera.X + ui.W - 8) * scale + 0.01 && footer_keyboard[0].x + footer_keyboard[0].width < footer_keyboard[1].x && footer_keyboard[1].x + footer_keyboard[1].width < footer_keyboard[2].x);
+        Record("keyboard footer fits at scale " + string(scale), footer_keyboard[0].x >= 14 * scale && footer_keyboard[2].right <= 238 * scale + 0.01 && footer_keyboard[0].right < footer_keyboard[1].x && footer_keyboard[1].right < footer_keyboard[2].x);
     }
     var footer_verbs = ["item", "action", "sword"];
     for (var i = 0; i < 3; i++) {
@@ -155,7 +156,14 @@ function ControlTests() {
         input_binding_set(verb, input_binding_empty(), 0, 1, "keyboard");
     }
     var footer_unbound = global.NovaInventoryFooter(ui, 5, 960 / 224);
-    Record("unbound key labels fit without colliding", footer_unbound[0].x + footer_unbound[0].width < footer_unbound[1].x && footer_unbound[1].x + footer_unbound[1].width < footer_unbound[2].x && footer_unbound[2].x + footer_unbound[2].width <= (ui.X - oCamera.X + ui.W - 8) * 5 + 0.01);
+    Record("unbound key labels fit without colliding", footer_unbound[0].x >= 70 && footer_unbound[2].right <= 1190.01);
+    draw_set_font(global.HUDFont2);
+    for (var i = 0; i < 3; i++) {
+        var prompt = footer_unbound[i];
+        Record("hint label precedes glyph " + string(i), prompt.icon_x >= prompt.x + string_width(prompt.label) * prompt.scale_x);
+        Record("footer clears inventory and curse text " + string(i), prompt.y - prompt.size / 2 > (ui.Y - oCamera.Y + ui.H + 23) * (960 / 224));
+        if (i < 2) Record("unbound prompt spacing " + string(i), prompt.right < footer_unbound[i + 1].x);
+    }
     input_profile_import(keyboard_before, "keyboard");
     input_profile_set("gamepad");
     PressEvent(ui, global.NovaCloseVerb(), oInventory, ev_step, ev_step_normal);
@@ -168,6 +176,8 @@ function ControlTests() {
     Record("inventory closure does not leave the HUD in menu mode", !global.NovaInventoryHUD());
     for (var i = 0; i < 3; i++) {
         var map = instance_create_layer(0, 0, "System", oMap);
+        Record("Map frame leaves room for the footer " + string(i), map.FrameY - oCamera.Y + map.NovaFrameSize + 8 <= 203);
+        Record("Map and player marker share the full fitted area " + string(i), map.MapX - map.FrameX == 6 && map.MapY - map.FrameY == 6 && map.NovaMapScale * 256 == map.NovaFrameSize - 12);
         map.Open = false;
         global.MapInst = map;
         var verb = i == 0 ? global.NovaCloseVerb() : (i == 1 ? "menu_access" : "escape");

@@ -20,7 +20,7 @@ var settings = new Underanalyzer.Decompiler.DecompileSettings();
 var updateMenu = GetDecompiledText("gml_Object_oMenu_Create_0", null, settings);
 if (updateMenu.Contains("NovaUpdateStep")) {
     if (!updateMenu.Contains("game_end();")) throw new Exception("Updater restart boundary missing");
-    group.QueueReplace("gml_Object_oMenu_Create_0", updateMenu.Replace("game_end();", "global.NovaTestUpdateRestart = true;"));
+    group.QueueReplace("gml_Object_oMenu_Create_0", updateMenu.Replace("game_end();", "global.NovaTestUpdateRestart = true;").Replace("Menu_StartGame();", "global.NovaTestStart = true;").Replace("Menu_ContinueGame();", "global.NovaTestContinue = true;"));
 }
 var renderName = "gml_Object_oRender_Draw_64";
 var render = GetDecompiledText(renderName, null, settings);

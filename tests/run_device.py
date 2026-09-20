@@ -111,7 +111,7 @@ print(urllib.request.urlopen(r,timeout=10).read().decode())
                     break
                 capture = report.get('capture', '')
                 if (args.capture or args.capture_updates or args.capture_profiles) and capture and capture not in captures:
-                    if not re.fullmatch(r'(inventory|status|updates|profiles)-[a-z]+', capture):
+                    if not re.fullmatch(r'(inventory|status|updates|profiles|map)-[a-z]+', capture):
                         raise RuntimeError('Invalid screenshot name in test report.')
                     path = stage + '/' + capture + '.png'
                     request('source /etc/profile; grim ' + shlex.quote(path))

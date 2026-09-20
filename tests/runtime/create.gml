@@ -29,52 +29,33 @@ function PressEvent(target, verb, object, kind, number) {
     with (target) event_perform_object(object, kind, number);
     global.NovaTestInput = "";
 }
-function MenuCase(index, expected, verb = undefined) {
-    if (verb == undefined) verb = global.NovaCloseVerb();
-    with (oMenu) {
-        MenuWin_Main_Shift = false;
-        Menu_Active = true;
-        Menu_ActiveIndex = index;
-        MenuWin_Main_MenuIndex = index;
-        MenuWin_Options_MenuIndex = index;
-        MenuWin_Main_Active = index <= 2 || index == 4 || index == 6 || index == 12;
-        MenuWin_Options_Active = !MenuWin_Main_Active;
-        Selector_Index_Options = 1;
-        Bindings_Remap = false;
-        ErrorMsgInst = noone;
-    }
-    PressEvent(oMenu, verb, oMenu, ev_step, ev_step_normal);
-    Record("menu " + string(index) + " back via " + verb, oMenu.Menu_ActiveIndex == expected);
-}
 function MenuTests() {
     global.UserIndex = 0;
     global.Users[0] = new User_Create();
     global.Users[0].Name = "HARNESS";
     DungeonSeq_Init(0);
-    var name = global.Users[0].Name;
-    var cases = [[1, 0], [2, 0], [3, 1], [4, 1], [6, 4], [7, 6], [8, 1], [9, 3], [10, 3], [11, 3], [12, 4], [13, 12], [14, 12]];
-    for (var i = 0; i < array_length(cases); i++) MenuCase(cases[i][0], cases[i][1]);
-    Record("cancel deletion keeps the profile", global.Users[0].Name == name);
-    global.StartingGear = 2;
-    MenuCase(10, 3);
-    Record("cancel bonus selection keeps equipped bonus", global.StartingGear == 2);
-    oMenu.NameEntry_Rename = true;
-    oMenu.NameEntry_Name = "UNSAVED";
-    MenuCase(5, 6, "escape");
-    Record("cancel rename keeps the saved name", global.Users[0].Name == name);
-    oMenu.NameEntry_Rename = false;
-    MenuCase(5, 0, "escape");
-    oMenu.NameEntry_Name = "ABC";
-    MenuCase(5, 5);
-    Record("action still deletes one letter", oMenu.NameEntry_Name == "AB");
-    oMenu.MenuWin_Main_Shift = false;
-    oMenu.Menu_Active = true;
-    oMenu.Menu_ActiveIndex = 13;
+    oMenu.NovaTransition = 36;
+    var cases = [["setup", "home"], ["players", "home"], ["options", "home"], ["challenges", "setup"], ["replace", "setup"], ["player", "players"], ["rename", "player"], ["delete", "player"], ["records", "player"], ["controls", "options"], ["credits", "options"], ["gamepad", "controls"], ["keyboard", "controls"]];
+    for (var i = 0; i < array_length(cases); i++) {
+        for (var key = 0; key < 2; key++) {
+            oMenu.NovaPage = cases[i][0];
+            PressEvent(oMenu, key == 0 ? global.NovaCloseVerb() : "escape", oMenu, ev_step, ev_step_normal);
+            Record("Close returns from " + cases[i][0] + " via " + string(key), oMenu.NovaPage == cases[i][1]);
+        }
+    }
+    oMenu.NovaPage = "rename";
+    oMenu.NovaName = "UNSAVED";
+    PressEvent(oMenu, global.NovaCloseVerb(), oMenu, ev_step, ev_step_normal);
+    Record("Closing rename discards the draft", global.Users[0].Name == "HARNESS");
+    oMenu.NovaPage = "delete";
+    oMenu.NovaFocus = 0;
+    PressEvent(oMenu, "menu_input", oMenu, ev_step, ev_step_normal);
+    Record("Default delete choice preserves the player", global.Users[0].Name == "HARNESS");
+    oMenu.NovaPage = "gamepad";
     oMenu.Bindings_Remap = true;
     PressEvent(oMenu, global.NovaCloseVerb(), oMenu, ev_step, ev_step_normal);
-    Record("cancel does not interrupt binding capture", oMenu.Menu_ActiveIndex == 13);
+    Record("Close does not interrupt a binding scan", oMenu.NovaPage == "gamepad");
     oMenu.Bindings_Remap = false;
-    MenuCase(12, 4, "escape");
     var keyboard_before = input_profile_export("keyboard");
     var remap = instance_create_layer(0, 0, "System", oInputRemap, {InputIndex: 1});
     input_binding_scan_set_Success(input_binding_key(ord("Q")));

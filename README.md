@@ -32,7 +32,7 @@ The installer downloads the official PortMaster package and applies the patch au
 
 **Updating:** close the game, replace the installer files with the newer download, and run the installer again. Your saves stay in `zeldadoi-43/savedata/`. The installer preserves them and keeps migration backups in `zeldadoi-43/save-backups/`.
 
-For updates over Wi-Fi, choose **Updates** on the profile selection screen. It shows the installed and available patch versions and the changes since your version. Use LB/RB to page through the notes. Choose **Install update** to download the update and restart the game. Press **B** to close or cancel a download.
+For updates over Wi-Fi, choose **Options > Updates** from the adventure menu. It shows the installed and available patch versions and the changes since your version. Use L/R to page through the notes. Choose **Install update** to download the update and restart the game. Press **B** to close or cancel a download.
 
 The updater checks stable releases only when you open Updates or choose Check again. It verifies downloads before installation and preserves your saves. If installation fails, the previous version remains available. Keep the device powered on during installation.
 
@@ -40,7 +40,7 @@ If installation fails, check `zeldadoi-43-installer/install.log`. For another at
 
 ## Controls
 
-These are the default controller bindings. Change them under **Controls**. Each button hint follows your current mapping, including keyboard bindings.
+These are the default controller bindings. Change them under **Options > Controls**. Each button hint follows your current mapping, including keyboard bindings.
 
 | Button | During play | In the inventory |
 | --- | --- | --- |
@@ -52,30 +52,34 @@ These are the default controller bindings. Change them under **Controls**. Each 
 | Start | Open the inventory | Close the inventory |
 | Select | Pause | Close the inventory |
 | Right-stick click | Show or hide Status | |
-| LB / RB | | Previous / next inventory page |
+| L / R | | Previous / next inventory page |
 | Select + Start | Exit to Ports | Exit to Ports |
 
-Press **B** to close the map, menus, item information, or inventory. Closing an action list or item information returns to the inventory. Closing a pause submenu returns to the pause menu. In name entry, B deletes a letter. On a keyboard, Escape closes or cancels the current view.
+Press **B** to close the map, menus, item information, or inventory. Closing an action list or item information returns to the inventory. Closing a pause submenu returns to the pause menu. In name entry, B closes without saving. Choose **Erase letter** to delete a character. On a keyboard, Escape closes or cancels the current view.
 
 At a shop counter, press **A** to inspect an item. In its dialog, A confirms the highlighted choice and **B** closes without buying. Closing also works while reading item information or a purchase refusal.
 
 **Actions** opens an object's choices. **Equip** assigns it to the active item button. **Use** activates or consumes it immediately. Gear in dedicated equipment slots is already active. Its action list provides information and, where allowed, Drop.
 
-Use **LB/RB** to switch inventory pages, or **Page Up/Page Down** on a keyboard. The D-pad stays in the item grid. Health and counters remain visible while browsing or reading item information.
+Use **L/R** to switch inventory pages, or **Page Up/Page Down** on a keyboard. The D-pad stays in the item grid. Health and counters remain visible while browsing or reading item information.
 
-The footer keeps Equip on the left, Close in the middle, and the primary action on the right. Available actions appear without moving the other hints. The shoulder hints also stay fixed as page titles change.
+Input hints sit together at the bottom right, with each action label followed by its button. The primary action (A) comes before Close (B), which stays at the far right. Equip and the current action keep fixed positions as inventory contents and labels change. L/R stays beside the page heading, with room reserved for the longest title.
 
 | Inventory below the HUD | Contextual item actions |
 | --- | --- |
-| ![Compact bag inventory below health and counters, with shoulder and colored face-button hints](screenshots/inventory.png) | ![Item action list with a confirm hint that names the highlighted Info action](screenshots/inventory-actions.png) |
+| ![Compact bag inventory below health and counters, with Switch 2 button hints below the frame](screenshots/inventory.png) | ![Item action list with a confirm hint that names the highlighted Info action](screenshots/inventory-actions.png) |
 
-Inventory and profile screenshots use test saves to show progress and full inventories. All screenshots come from the game running on a Nova.
+Inventory and menu screenshots use test saves to show progress and full inventories. All screenshots come from the game running on a Nova.
 
-| Status at a stick-click | Choose your player |
+| Status at a stick-click | Continue your adventure |
 | --- | --- |
-| ![Equipment, map, and dungeon progress over the playfield](screenshots/overlay.png) | ![Player Select with character portraits, saved hearts, and floor](screenshots/profile.png) |
+| ![Equipment, map, and dungeon progress over the playfield](screenshots/overlay.png) | ![Adventure menu with the selected player, saved hearts, and floor](screenshots/profile.png) |
 
-Player Select shows all five profiles. Saved runs show their character, hearts, and floor. Empty slots start a new player. Updates and Exit sit below the profiles.
+The centered title screen leads into an adventure menu with your last selected player. Choose **Continue** to resume a saved run, or **New adventure** to choose a character, bonus and challenges in one frame. **Begin adventure** is selected by default. A fresh player starts as Link, with no required name entry.
+
+![New adventure setup with character selection, bonus, challenges and Begin adventure](screenshots/adventure-setup.png)
+
+**Change player** keeps all five save slots available. Select a player to return to their adventure, or use **Manage** for records, renaming and deletion. Starting over an existing save asks for confirmation. Options, controls, updates and credits are available before entering the dungeon.
 
 ## Playing and updating
 
@@ -138,6 +142,6 @@ The CRT option processes the playfield and HUD together. Controller glyphs rende
 
 Justin Bohemier created Dungeons of Infinity. The [PortMaster package](https://github.com/PortsMaster-MV/PortMaster-MV-New/tree/main/ports/zeldadoi) supplies the game files and [GMLoader-next](https://github.com/JohnnyonFlame/gmloader-next) runtime during installation. The installer preserves upstream license files in `zeldadoi-43/license/`.
 
-Controller glyphs are the original PNGs from the supplied icon pack's `XGamepad/Retro` directory, including the colored face buttons. [The asset manifest](assets/buttons/manifest.json) records source filenames and checksums. The patch copies this artwork without redrawing it.
+Controller glyphs use Kenney's Input Prompts 1.5A, from `Nintendo Switch 2/Double`, under [CC0](assets/buttons/LICENSE.txt). [The asset manifest](assets/buttons/manifest.json) records source filenames and checksums. The patch copies this artwork without redrawing it.
 
 The release builder uses [bsdiff4](https://pypi.org/project/bsdiff4/) to create the binary patch.

@@ -1,94 +1,98 @@
 [
   {
-    "file": "T_X_A_Color_Retro.png",
-    "sha256": "167a92d74d30116e3e147b3aea997216d9ecb950ca2c395304fde02e2a52982b"
+    "file": "switch_button_a.png",
+    "sha256": "8cb54cb79449712f2ef7d3c8344197378eb8ec2c31070d69266c5961223a077a"
   },
   {
-    "file": "T_X_B_Color_Retro.png",
-    "sha256": "5179edc03452c7f9eb49eb722a259ffca572b2975022708a24eaf6cd31586f37"
+    "file": "switch_button_b.png",
+    "sha256": "8fb40910582d1ebcdef9471aecef72ae5afad807a6232914f1df80c0bd338efd"
   },
   {
-    "file": "T_X_X_Color_Retro.png",
-    "sha256": "083e5321c10e11240ef5f252719924246380c867a641a44f28ae386b709990d6"
+    "file": "switch_button_x.png",
+    "sha256": "f7e01f4d530e4294fb3c79c51eaeb97229f03172678ca434465562245ff75c92"
   },
   {
-    "file": "T_X_Y_Color_Retro.png",
-    "sha256": "7e0c9df7e898feac836d1c3ba817d2053073cfa52dba3c05617ec1a58596745d"
+    "file": "switch_button_y.png",
+    "sha256": "00d4b498e1aaa2c6712eaa0f350d7f1cf37a0423b1680e1e0e4f358dd777bd05"
   },
   {
-    "file": "T_X_LB_Retro.png",
-    "sha256": "55d359f73c26cef659e97a0f11f8e0536220f057f7a1d13f9cef8edf752bf549"
+    "file": "switch_button_l.png",
+    "sha256": "599fc8174ed368e8114cf401d40da3f3211a52df8ef62610329d2da1502c7c0f"
   },
   {
-    "file": "T_X_RB_Retro.png",
-    "sha256": "237111318f6366b225161ef5dae621d385efbba2a0bf93857b319c41dea87b8d"
+    "file": "switch_button_r.png",
+    "sha256": "7e4c973fe173c051188ec0a714d4e3f4dd4af4f60643fd7f2f18fcf26a888f33"
   },
   {
-    "file": "T_X_LT_Retro.png",
-    "sha256": "7d7dcd6179899aa194c7dbc608c5665676e2f3d512a86acb9f666c975f12dddc"
+    "file": "switch_button_zl.png",
+    "sha256": "b413e7b53d10f5bfb12cea6817d987b90a561eca45ab6fcdd6fb9d15e4fb84ec"
   },
   {
-    "file": "T_X_RT_Retro.png",
-    "sha256": "c6279fe24596e453d15cb2de655366389065c4af0e7de02e538a0524d720024d"
+    "file": "switch_button_zr.png",
+    "sha256": "3407288019fd31a769134f768ce0740b4fe1890a63519c46465ff08956a24529"
   },
   {
-    "file": "T_X_Share_Retro.png",
-    "sha256": "d0a6a48f6b707c7eaf3a121b31469f682f01627cd73888ac87be06af7ba03e16"
+    "file": "switch_button_minus.png",
+    "sha256": "74986ccc4d13df5f2d2db87c4ad14b6e6c27075e1b0011fa6453f3ebbf7c6910"
   },
   {
-    "file": "T_X_Left_Stick_Click_Retro.png",
-    "sha256": "ecda7e03c5b51bd2116ea57f4f22d88035080ae6b3ef8f84b622581653183144"
+    "file": "switch_stick_l_press.png",
+    "sha256": "8c772ed1203af9c4923dd1bb5a67f96814a08d9569130ae8435a49fc3b33ab4e"
   },
   {
-    "file": "T_X_Right_Stick_Click_Retro.png",
-    "sha256": "01a084019bf998edead072b887e0558ab9ed6db73462251892042f0ce953ae48"
+    "file": "switch_stick_r_press.png",
+    "sha256": "f0e502e4868f6d21b4bfb03e544696bbc534649db8be808259096ceefb3968ee"
   },
   {
-    "file": "T_X_Dpad_Up_Retro.png",
-    "sha256": "e36ea163347ca7a02b11a43dad1928cc6eb9e3e37678c023d47753783bdf4fe9"
+    "file": "switch_dpad_up.png",
+    "sha256": "2339abd12ad6b6932a70218b4c0b49432be7144c2dec1454b1f88fd7ce8e7b0d"
   },
   {
-    "file": "T_X_Dpad_Down_Retro.png",
-    "sha256": "9dd2b8e7d99b21b4612d890b4897fb46eff7ce87df9bc1895bbd005f7d3c85cf"
+    "file": "switch_dpad_down.png",
+    "sha256": "c7d431d57ac22b5c64f8d495d35c6b4a0316da24740617ba2f03b00d292e406d"
   },
   {
-    "file": "T_X_Dpad_Left_Retro.png",
-    "sha256": "c273c7f91fe08583a8e89b04868ef531723859f7bfcfe601e450b958fc7d9680"
+    "file": "switch_dpad_left.png",
+    "sha256": "1ef148460fe326b3b433bc3ecdb8eb8bb82a3d5e564e496cdb84564d80b3a5a0"
   },
   {
-    "file": "T_X_Dpad_Right_Retro.png",
-    "sha256": "ea7abc1f745b429565e457a8564d81bd62c023148818e33af69d176b67828d94"
+    "file": "switch_dpad_right.png",
+    "sha256": "8dc4e69d8318590e5bde6760527a25245c2bb6e21c2386485cdf12227d1ef78b"
   },
   {
-    "file": "T_X_L_Left_Retro.png",
-    "sha256": "afa886878036dd4f753f3d5ab35d79a53a56e277320b2066671df53cba609540"
+    "file": "switch_stick_l_left.png",
+    "sha256": "722e4b751fdc4dc22fadc845b0c6d83dd3dfda429c9ddb2a96c9292a3f26eee4"
   },
   {
-    "file": "T_X_L_Right_Retro.png",
-    "sha256": "9ccd6edd25e3dd44e09673c59dd8309afb5a44b9a1ac7ae3fcd6d24197642d3d"
+    "file": "switch_stick_l_right.png",
+    "sha256": "739306973d12bbf17d98f087319565c6a490522b9eccd7a717da02d1aa157fc0"
   },
   {
-    "file": "T_X_L_UP_Retro.png",
-    "sha256": "65a09e3123e531c04d835477234f7a45fe890bc78b6fd3587e0fb1b539fb848c"
+    "file": "switch_stick_l_up.png",
+    "sha256": "fd3fc11c0aa84a26c26ecd9cf59f545b7500c819356193e73e96c051462b33ea"
   },
   {
-    "file": "T_X_L_Down_Retro.png",
-    "sha256": "9d01ced2a9e589a159c8a3f53b0a2a1c48ecd3c9bf63202eb5beffb901ac9f1a"
+    "file": "switch_stick_l_down.png",
+    "sha256": "0adabdf37e08e280ec2921c30223bbdfc36fdb0d6a27298fa9b6cfe680fb0869"
   },
   {
-    "file": "T_X_R_Left_Retro.png",
-    "sha256": "8eaa1820a11c238417d50e79fecb2e470c9abeda6cc0cb21a01cd89098d15ee8"
+    "file": "switch_stick_r_left.png",
+    "sha256": "f599d0ef469ed77955c7de4276464453f0e7bf9f7953c701d786b97095712ce7"
   },
   {
-    "file": "T_X_R_Right_Retro.png",
-    "sha256": "b845e6fbae21430ee54cad5772b2b0ce69a2d21217f939c258c9dfee85905958"
+    "file": "switch_stick_r_right.png",
+    "sha256": "a7cca7c77a257d6fec2040725b80c31df8d619c3540981a6bac588764c55102f"
   },
   {
-    "file": "T_X_R_UP_Retro.png",
-    "sha256": "e6145a93c1659c241f8c64a7e3d7db35b02fc3fee5ae1e5d21f4b2ee8f6db63b"
+    "file": "switch_stick_r_up.png",
+    "sha256": "e597eba5a1a6ef405633173abbb776943e9f85aad8f512dc80a980abdbd0af51"
   },
   {
-    "file": "T_X_R_Down_Retro.png",
-    "sha256": "d45a2946157417d8b1159817d9b94d5e49e5785bf679a396c0daefa1433e903d"
+    "file": "switch_stick_r_down.png",
+    "sha256": "5a0f076217b36e87fe25a6cfd1365ee0a022da95e6f644faf3d3fd10cc295368"
+  },
+  {
+    "file": "switch_button_plus.png",
+    "sha256": "37c4b6e7cdeec5b0fffbd83101fe1dc5bcbb7e151ef9612eeb8c7c1da00a1174"
   }
 ]
