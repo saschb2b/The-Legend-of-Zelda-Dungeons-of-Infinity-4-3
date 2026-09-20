@@ -96,6 +96,8 @@ The test starts outside the village arcade with 500 rupees and normal physical c
 3. Leave the arcade and enter the pub to try Mothula's Money. Change bets with L/R.
 4. Check both entrances and exits, repeated plays, insufficient funds, prize collection, audio, and B to close.
 
+The slot rendering checks compare pixels before the CRT pass: title font and baseline, Bet/Spin buttons, payout suffixes, payline markers and reel-strip wrapping. They also require the CRT shader to compile on the device and produce a dark border with filtered interior pixels. Compare the final capture with the original 1.2.1 screen; a passing economy test does not establish visual parity.
+
 Each launch starts a fresh village adventure in an isolated save directory. The script checks production save and backup hashes, disables the updater worker, and records the test paths in `.build/village-preview.json`. After closing the test, remove its `DOI Village Test.sh` launcher and the recorded `doi43-village-*` directory. The build and release packager reject the preview object in production binaries.
 
 ## Versioning and release cadence

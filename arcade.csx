@@ -8,6 +8,21 @@ using UndertaleModLib.Models;
 using UndertaleModLib.Util;
 
 void ApplyArcade() {
+    // GLES requires global initializers to be constant; aspect depends on a uniform.
+    var crt = Data.Shaders.ByName("shd_CRT");
+    var fragment = crt.GLSL_ES_Fragment.Content;
+    var aspect = "vec2 aspect = uni_crt_sizes.xy / uni_crt_sizes.x;";
+    if (!fragment.Contains(aspect) || !fragment.Contains("float border_corners(vec2 UV) {"))
+        throw new Exception("CRT aspect boundary missing");
+    crt.GLSL_ES_Fragment = Data.Strings.MakeString(fragment.Replace(aspect, "")
+        .Replace("float border_corners(vec2 UV) {", "float border_corners(vec2 UV) {\n  " + aspect));
+    var crtCode = Read("gml_GlobalScript___CRT");
+    foreach (var uniform in new[] { "radial_distortion", "border", "RGB_separation", "scanlines", "noise" }) {
+        var call = "shader_set_uniform_f(global.uni_use_" + uniform + ",";
+        if (crtCode.Split(call).Length != 3) throw new Exception("CRT boolean uniform boundary missing: " + uniform);
+        crtCode = crtCode.Replace(call, "shader_set_uniform_i(global.uni_use_" + uniform + ",");
+    }
+    edits["gml_GlobalScript___CRT"] = crtCode;
     using var file = File.OpenRead(Path.Combine(patchDir, "assets/arcade-resources.zip"));
     using var archive = new ZipArchive(file, ZipArchiveMode.Read);
     JsonDocument ReadSpec(string name) {

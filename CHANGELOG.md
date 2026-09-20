@@ -8,6 +8,8 @@ These versions identify the 4:3 patch, independently of the original game's vers
 
 Take a break on floor 6: the village arcade has a claw machine, and the pub has Mothula's Money.
 
+**Republished with corrected slot-machine visuals.** Mothula's Money uses the original 1.2.1 title font, payout layout, gold Bet/Spin buttons, reel markers, scrolling direction and CRT effect. The first download used an adapted layout and a shader that failed to compile on the Nova.
+
 ### Added
 
 - **Claw machine:** spend ten rupees per play, move the claw left or right, and press A to grab a prize.
@@ -34,7 +36,9 @@ Unedited Nova captures using a test save. Select either image to view it at full
 
 ### Update
 
-Choose **Options > Updates** from the adventure menu, or use the patch installer ZIP under Assets. Existing saves and migration backups stay intact.
+If you already installed v1.7.0, rerun the replacement patch installer ZIP under Assets. The in-game updater cannot detect a replacement with the same version number. Existing saves and migration backups stay intact.
+
+From an earlier version, choose **Options > Updates** from the adventure menu or run the installer.
 
 For a fresh installation, follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.7.0/README.md#install-on-the-nova).
 

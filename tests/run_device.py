@@ -118,7 +118,7 @@ print(urllib.request.urlopen(r,timeout=10).read().decode())
                     path = stage + '/' + capture + '.png'
                     request('source /etc/profile; grim ' + shlex.quote(path))
                     (args.report_dir / (capture + '.png')).write_bytes(request('cat ' + shlex.quote(path)))
-                    if capture.startswith(('profiles-', 'updates-')):
+                    if capture.startswith(('profiles-', 'updates-', 'arcade-')):
                         for sample in range(2):
                             request('source /etc/profile; grim ' + shlex.quote(path))
                             (args.report_dir / f'{capture}-sample{sample + 2}.png').write_bytes(request('cat ' + shlex.quote(path)))

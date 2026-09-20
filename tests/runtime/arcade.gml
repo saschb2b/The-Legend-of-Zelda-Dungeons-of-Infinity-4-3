@@ -1,3 +1,68 @@
+function SlotPixelsMatch(actual, expected, left, top, width, height) {
+    for (var row = top; row < top+height; row++) {
+        for (var column = left; column < left+width; column++) {
+            var offset = (row*200+column)*4;
+            if (buffer_peek(actual,offset,buffer_u32) != buffer_peek(expected,offset,buffer_u32)) return false;
+        }
+    }
+    return true;
+}
+function SlotRenderTests(slots) {
+    var original = global.ArcadeVP_Surface;
+    global.ArcadeVP_Surface = surface_create(200,150);
+    var reference = surface_create(200,150);
+    var actual = buffer_create(200*150*4,buffer_fixed,1);
+    var expected = buffer_create(200*150*4,buffer_fixed,1);
+    slots.ReelPos = [832,816,827];
+    slots.StatusText = "MOTHULA'S MONEY";
+    with (slots) event_perform_object(oArcade_Mothula,ev_draw,73);
+    buffer_get_surface(actual,global.ArcadeVP_Surface,0);
+    surface_set_target(reference);
+    draw_clear(make_color_rgb(6,106,181));
+    draw_set_color(c_white); draw_set_alpha(1);
+    draw_set_valign(fa_top); draw_set_halign(fa_center);
+    draw_set_font(global.ArcadeFont2);
+    // Coordinates and fonts from 1.2.1's Draw GUI End, before the CRT pass.
+    draw_text(100,36,"MOTHULA'S MONEY");
+    draw_sprite(sPoker_Button_Bet,0,132,135);
+    draw_sprite(sPoker_Button_Spin,0,162,135);
+    draw_set_halign(fa_left); draw_set_font(global.HUDFont2); draw_set_color(c_black);
+    draw_text(151,138,"1");
+    draw_set_color(c_white); draw_set_font(global.ArcadeFont);
+    draw_text(50,8,"1x"); draw_text(50,21,"2x");
+    draw_text(107,8,"5x"); draw_text(107,21,"10x");
+    draw_text(170,8,"25x"); draw_text(170,21,"100x");
+    draw_sprite(sArcade_Mothula_ReelLine,0,68,88);
+    draw_sprite(sArcade_Mothula_ReelLine,0,128,88);
+    draw_sprite_stretched(sArcade_Mothula_Reel,0,12,56,56,72);
+    draw_sprite_stretched(sArcade_Mothula_Reel,0,72,56,56,72);
+    draw_sprite_stretched(sArcade_Mothula_Reel,0,132,56,56,72);
+    // The wrapped final symbol is Mothula; the next symbol is cherries.
+    draw_sprite_part(sArcade_Mothula_Symbols,5,0,8,48,16,16,68);
+    draw_sprite_part(sArcade_Mothula_Symbols,5,0,0,48,32,76,76);
+    draw_sprite_part(sArcade_Mothula_Symbols,0,0,0,48,8,76,108);
+    draw_sprite_part(sArcade_Mothula_Symbols,5,0,3,48,29,136,68);
+    draw_sprite_part(sArcade_Mothula_Symbols,0,0,0,48,11,136,97);
+    surface_reset_target();
+    buffer_get_surface(expected,reference,0);
+    Record("slot title uses the original tall font and baseline",SlotPixelsMatch(actual,expected,40,36,120,16));
+    Record("slot Bet and Spin retain original artwork and placement",SlotPixelsMatch(actual,expected,132,135,56,11));
+    Record("slot payline markers sit between the reels",SlotPixelsMatch(actual,expected,68,88,4,8) && SlotPixelsMatch(actual,expected,128,88,4,8));
+    Record("slot payout multipliers follow their native suffix notation",SlotPixelsMatch(actual,expected,50,8,12,21) && SlotPixelsMatch(actual,expected,107,8,18,21) && SlotPixelsMatch(actual,expected,170,8,24,21));
+    Record("slot reel wrap preserves original symbol offsets",SlotPixelsMatch(actual,expected,16,72,48,12) && SlotPixelsMatch(actual,expected,76,76,48,36) && SlotPixelsMatch(actual,expected,136,72,48,36));
+    Record("original CRT shader compiles on this device",shader_is_compiled(shd_CRT));
+    var crt = surface_create(800,600);
+    surface_set_target(reference); draw_clear(c_white); surface_reset_target();
+    surface_set_target(crt);
+    CRT_Do_Stretch(reference,0,0,800,600,[200,150,400,300],true,0.2,true,0.025,80,true,true,true,0.04);
+    surface_reset_target();
+    var corner = surface_getpixel(crt,0,0);
+    var center = surface_getpixel(crt,400,300);
+    Record("CRT border and effects change rendered pixels",color_get_red(corner) < 10 && color_get_red(center) > 50 && center != c_white);
+    surface_free(crt); surface_free(reference); surface_free(global.ArcadeVP_Surface);
+    global.ArcadeVP_Surface = original;
+    buffer_delete(actual); buffer_delete(expected);
+}
 function ArcadeTests() {
     var inventory = StructCopy(global.Inventory);
     var items = StructCopy(global.Inventory_ItemData);
@@ -20,6 +85,7 @@ function ArcadeTests() {
     var slots = instance_create_layer(oLink.x+40,oLink.y,"Objs_Lower",oArcade_Mothula,{RoomIndex:oLink.RoomIndex});
     slots.State = 2;
     global.Arcade_ActiveInst = slots;
+    SlotRenderTests(slots);
     var multipliers = [0,1,2,5,10,25,100];
     for (var bet = 0; bet < 5; bet++) {
         for (var result = 0; result <= 6; result++) {
@@ -41,6 +107,9 @@ function ArcadeTests() {
         slots.StartRound();
         slots.Result = result;
         slots.ResultSymbols = result == 0 ? [0,1,2] : [result,result,result];
+        slots.ReelPos = [0,0,0];
+        PressEvent(slots,"",oArcade_Mothula,ev_step,ev_step_normal);
+        Record("slot reels scroll downward through the strip " + string(result),slots.ReelPos[0] >= 824 && slots.ReelPos[0] <= 826);
         for (var frame = 0; frame < 1000 && slots.Paid; frame++) PressEvent(slots,"",oArcade_Mothula,ev_step,ev_step_normal);
         var aligned = !slots.Paid;
         for (var reel = 0; reel < 3; reel++) aligned = aligned && global.NovaSlotSymbols[floor(slots.ReelPos[reel]/16)] == slots.ResultSymbols[reel];

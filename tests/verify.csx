@@ -40,6 +40,8 @@ Check(Data.GameObjects.ByName("oClawMachine").ParentId == Data.GameObjects.ByNam
 Check(Data.GameObjects.ByName("oArcade_Mothula").ParentId == Data.GameObjects.ByName("oArcade"), "Slot must inherit arcade placement");
 Check(Data.Sprites.ByName("sClawMachine_Window").Textures.Count == 6, "Claw prize frames missing");
 Check(Data.Sprites.ByName("sArcade_Mothula_Symbols").Textures.Count == 6, "Slot symbols missing");
+var spinButton = Data.Sprites.ByName("sPoker_Button_Spin");
+Check(spinButton != null && spinButton.Width == 26 && spinButton.Height == 11, "Original slot Spin button missing");
 var iconSlice = Data.Sprites.ByName("sArcade_Mothula_Icon_Cherry").V3NineSlice;
 Check(iconSlice != null && iconSlice.Enabled && (int)iconSlice.TileModes[4] == 1, "Slot payout icons must repeat instead of stretching");
 var clawSlice = Data.Sprites.ByName("sClawMachine_Claw").V3NineSlice;

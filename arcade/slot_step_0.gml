@@ -11,6 +11,7 @@ if (State == 0) {
     with (oLink) UpdateState(26);
     Music_Fade(0.25,12);
     State = 2;
+    StatusText = "MOTHULA'S MONEY";
     input_clear_momentary(true);
     exit;
 }
@@ -25,11 +26,12 @@ if (!Paid) {
 StopDelay--;
 for (var i = 0; i < 3; i++) {
     if (!ReelSpinning[i]) continue;
-    ReelPos[i] = (ReelPos[i] + ReelSpeed[i]) mod 832;
+    ReelPos[i] = (ReelPos[i] - ReelSpeed[i] + 832) mod 832;
     if (i != StopReel || StopDelay > 0) continue;
     var index = floor(ReelPos[i] / 16);
-    if (global.NovaSlotSymbols[index] == ResultSymbols[i]) {
-        ReelPos[i] = index * 16;
+    if (ReelTarget[i] < 0 && global.NovaSlotSymbols[index] == ResultSymbols[i]) ReelTarget[i] = index * 16;
+    if (ReelTarget[i] >= 0 && (ReelPos[i] <= ReelTarget[i] || ReelPos[i] - ReelSpeed[i] < 0)) {
+        ReelPos[i] = ReelTarget[i];
         ReelSpinning[i] = false;
         audio_play_sound(StopSounds[i],1,false);
         StopReel++;

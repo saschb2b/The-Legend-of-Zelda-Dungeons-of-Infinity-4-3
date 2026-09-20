@@ -1,6 +1,7 @@
 event_inherited();
 CamW = 200; CamH = 150;
 GameSurface = -1;
+ReelSurface = -1;
 State = 0;
 Bet = 0;
 Paid = false;
@@ -8,9 +9,10 @@ Cooldown = 0;
 WinAmount = 0;
 Result = 0;
 ResultSymbols = [1,2,3];
-ReelPos = [16,80,240];
+ReelPos = [irandom(52)*16,irandom(52)*16,irandom(52)*16];
 ReelSpeed = [8,8,8];
 ReelSpinning = [false,false,false];
+ReelTarget = [-1,-1,-1];
 StopReel = 0;
 StopDelay = 45;
 StatusText = "MOTHULA'S MONEY";
@@ -26,6 +28,7 @@ function StartRound() {
     Result = global.NovaSlotResult(irandom(10000));
     ResultSymbols = Result == 0 ? global.NovaSlotLosingSymbols() : [Result,Result,Result];
     ReelSpinning = [true,true,true];
+    ReelTarget = [-1,-1,-1];
     for (var i = 0; i < 3; i++) ReelSpeed[i] = 8 * random_range(0.75,1);
     StopReel = 0;
     StopDelay = 45;
@@ -41,7 +44,7 @@ function SettleRound() {
     global.Inventory_ItemData[40].Amount = global.NovaRupeeLimit(global.Inventory_ItemData[40].Amount + WinAmount);
     audio_stop_sound(Sound_SlotSpin);
     if (WinSounds[Result] != noone) audio_play_sound(WinSounds[Result], 1, false);
-    StatusText = WinAmount > 0 ? "WIN " + string(WinAmount) : "GAME OVER";
+    StatusText = WinAmount > 0 ? "YOU WIN " + string(WinAmount) + "!" : "GAME OVER";
     Cooldown = 10;
     State = 2;
     return true;

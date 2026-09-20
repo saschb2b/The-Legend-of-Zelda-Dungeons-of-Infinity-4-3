@@ -60,7 +60,7 @@ global.NovaArcadePrompts = function() {
     if (instance_exists(machine) && machine.object_index == oArcade_Mothula && machine.State != 0) {
         if (!machine.Paid) {
             array_push(prompts, {binding: global.NovaBinding("nova_bag_previous"), binding2: global.NovaBinding("nova_bag_next"), label:"BET"});
-            array_push(prompts, {binding: global.NovaBinding(global.NovaConfirmVerb()), label:"PLAY"});
+            array_push(prompts, {binding: global.NovaBinding(global.NovaConfirmVerb()), label:"SPIN"});
         }
         array_push(prompts, {binding: global.NovaBinding(global.NovaCloseVerb()), label:"CLOSE"});
     } else {
