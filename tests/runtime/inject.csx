@@ -11,6 +11,7 @@ var group = new CodeImportGroup(Data) { AutoCreateAssets = true };
 group.QueueReplace("gml_Object_oNovaTests_Create_0", File.ReadAllText(Path.Combine(root, "tests/runtime/create.gml")) + "\n" + File.ReadAllText(Path.Combine(root, "tests/runtime/backports.gml")) + "\n" + File.ReadAllText(Path.Combine(root, "tests/runtime/inventory.gml")) + "\n" + File.ReadAllText(Path.Combine(root, "tests/runtime/capture.gml")) + "\n" + File.ReadAllText(Path.Combine(root, "tests/runtime/content.gml")) + "\n" + File.ReadAllText(Path.Combine(root, "tests/runtime/controls.gml")));
 group.QueueAppend("gml_Object_oNovaTests_Create_0", File.ReadAllText(Path.Combine(root, "tests/runtime/movement.gml")));
 group.QueueAppend("gml_Object_oNovaTests_Create_0", File.ReadAllText(Path.Combine(root, "tests/runtime/hud.gml")));
+group.QueueAppend("gml_Object_oNovaTests_Create_0", File.ReadAllText(Path.Combine(root, "tests/runtime/crt.gml")));
 group.QueueAppend("gml_Object_oNovaTests_Create_0", File.ReadAllText(Path.Combine(root, "tests/runtime/shop.gml")));
 group.QueueAppend("gml_Object_oNovaTests_Create_0", File.ReadAllText(Path.Combine(root, "tests/runtime/updates.gml")));
 group.QueueAppend("gml_Object_oNovaTests_Create_0", File.ReadAllText(Path.Combine(root, "tests/runtime/profiles.gml")));

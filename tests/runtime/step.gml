@@ -101,9 +101,15 @@ try {
             ContentTests();
             ControlTests();
             HUDTests();
+            CRTTests();
             ShopTests();
             ContextTests();
             ArcadeTests();
+            CRTBenchmarkStart();
+            Stage = 16;
+            break;
+        case 16:
+            if (!CRTBenchmarkStep()) break;
             ArcadeTravelStart();
             Stage = 15;
             break;

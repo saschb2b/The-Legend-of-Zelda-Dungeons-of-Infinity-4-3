@@ -4,13 +4,14 @@ Ticks = 0;
 Results = [];
 Complete = false;
 Capture = "";
+CRTBenchmark = {};
 global.NovaTestInput = "";
 global.NovaTestHeld = [];
 global.NovaTestHUDDraws = 0;
 global.NovaTestStatusDraws = 0;
 function Flush() {
     var file = file_text_open_write("nova-test-report.json");
-    file_text_write_string(file, json_stringify({complete: Complete, results: Results, capture: Capture}));
+    file_text_write_string(file, json_stringify({complete: Complete, results: Results, capture: Capture, crt_benchmark: CRTBenchmark}));
     file_text_close(file);
 }
 function Record(name, passed) {

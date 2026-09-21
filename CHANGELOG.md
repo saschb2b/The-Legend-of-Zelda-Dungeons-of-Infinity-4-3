@@ -4,8 +4,55 @@ These versions identify the 4:3 patch, independently of the original game's vers
 
 ## Unreleased
 
-- Render the gameplay HUD at a separate integer scale: 3× on the Nova. Smaller meters, counters, hearts and input hints leave more of the dungeon visible. Keep the equipment and counters at the left edge and health at the right. The world retains its full-screen 4:3 presentation.
-- Fade contextual gameplay hints in over 120 ms and out over 100 ms. Keep the interaction button in place while action labels fade out and in, including the change from Lift to Throw. Inputs remain immediate.
+## [1.7.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.7.1) - 2026-09-21
+
+More room for the dungeon, smoother interaction hints, and a CRT-Lottes effect tuned for the Nova.
+
+### Changed
+
+- **Smaller, sharper HUD:** health, magic, equipment, counters and gameplay hints use their own integer scale, 3x on the Nova. The world still fills the 4:3 screen. Four-digit rupees and full heart rows remain visible.
+- **CRT-Lottes:** replace the gameplay CRT effect with Timothy Lottes' shader, adapted from RetroArch. Gamma-correct filtering, shaped scanlines, a phosphor grille and soft bloom preserve dark detail and the full playfield. The HUD stays crisp. Arcade machines keep their original effect.
+- **Smoother input hints:** fade contextual hints in and out. Keep the button in place while its label changes, including Lift to Throw. Input response remains immediate.
+
+### CRT before and after
+
+<table>
+<tr>
+<th width="50%">Previous CRT effect</th>
+<th width="50%">CRT-Lottes</th>
+</tr>
+<tr>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.1/screenshots/crt-before.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.1/screenshots/crt-before.png" alt="Previous CRT effect with prominent horizontal lines" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.1/screenshots/crt-after.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.1/screenshots/crt-after.png" alt="CRT-Lottes with a phosphor grille, soft bloom and a crisp HUD" width="640"></a></td>
+</tr>
+</table>
+
+Both captures use the compact HUD to isolate the shader change. Open an image at full size to inspect the CRT detail.
+
+### Compact HUD
+
+<table>
+<tr>
+<th width="50%">During play</th>
+<th width="50%">In the inventory</th>
+</tr>
+<tr>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.1/screenshots/playfield.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.1/screenshots/playfield.png" alt="Compact HUD leaves more of the village visible, with CRT disabled" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.1/screenshots/inventory.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.1/screenshots/inventory.png" alt="Bag inventory beneath the compact HUD, with controller hints below the frame" width="640"></a></td>
+</tr>
+</table>
+
+Unedited Nova screenshots from test saves.
+
+### Update
+
+Choose **Options > Updates** from the adventure menu, or download the **Nova patch installer ZIP** under Assets. Existing saves remain compatible.
+
+For a fresh installation, follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.7.1/README.md#install-on-the-nova).
+
+Validation: 38 unit tests and 1,482 device assertions passed. The Nova test scene ran at 60 fps with CRT both enabled and disabled.
+
+[Changes from v1.7.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.7.0...v1.7.1).
 
 ## [1.7.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.7.0) - 2026-09-21
 

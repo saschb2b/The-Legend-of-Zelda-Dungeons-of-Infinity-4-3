@@ -141,6 +141,8 @@ Gameplay presents the complete 256×224 playfield at 4:3 with horizontal pixel a
 
 The HUD renders after the playfield at its own integer scale, with square pixels and a smaller footprint. On the Nova's 1280×960 screen, it uses 3× scaling. Equipment and counters sit at the left edge, with hearts at the right. The CRT option affects the world while the HUD and gameplay hints stay crisp. Keyboard prompts use text keycaps.
 
+Enable **CRT** for shaped scanlines, a phosphor grille and soft bloom. The CRT-Lottes port keeps the full playfield visible and preserves dark detail. Arcade machines use their original effect.
+
 </details>
 
 ## Credits
@@ -148,5 +150,7 @@ The HUD renders after the playfield at its own integer scale, with square pixels
 Justin Bohemier created Dungeons of Infinity. The [PortMaster package](https://github.com/PortsMaster-MV/PortMaster-MV-New/tree/main/ports/zeldadoi) supplies the game files and [GMLoader-next](https://github.com/JohnnyonFlame/gmloader-next) runtime during installation. The installer preserves upstream license files in `zeldadoi-43/license/`.
 
 Controller glyphs use Kenney's Input Prompts 1.5A, from `Nintendo Switch 2/Double`, under [CC0](assets/buttons/LICENSE.txt). [The asset manifest](assets/buttons/manifest.json) records source filenames and checksums. The patch copies this artwork without redrawing it.
+
+The gameplay CRT shader adapts Timothy Lottes' public-domain CRT-Lottes shader from RetroArch. [Shader source and tuning notes](shaders/README.md) document the port and its attribution.
 
 The release builder uses [bsdiff4](https://pypi.org/project/bsdiff4/) to create the binary patch.

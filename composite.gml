@@ -30,9 +30,9 @@ if (global.ArcadeVP_Show)
 surface_reset_target();
 var _nova_w = display_get_gui_width();
 var _nova_h = display_get_gui_height();
-if (global.Users[global.UserIndex].Prefs[3])
+if (global.Users[global.UserIndex].Prefs[3] && !global.ArcadeVP_Show)
 {
-    CRT_Do_Stretch(NovaFrame, 0, 0, _nova_w, _nova_h, [256, 224, _nova_w, _nova_h], false, 0.04, false, 0.03, 80, true, false, true, 0.04);
+    NovaCRT_Draw(NovaFrame, _nova_w, _nova_h);
 }
 else
 {

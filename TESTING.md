@@ -28,6 +28,8 @@ The compiler can exit successfully after a script exception. The build requires 
 
 ## Nova runtime suite
 
+CRT checks compile the shader on the device and render black, gray, impulse and edge patterns. They check brightness, neutral grays, bloom, full-frame coverage, native-pixel sampling, stable phosphors, fallback behavior and restored graphics state. The report includes average and 95th-percentile frame times for 120 gameplay frames with CRT disabled and enabled, after a warm-up. Existing HUD checks run with both settings.
+
 Close any running game first. Install this patch on the device and enable SSH access. Use a key or an existing SSH control socket. The test runner contains no credentials.
 
 ```sh
