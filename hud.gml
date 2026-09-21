@@ -5,6 +5,7 @@ draw_set_valign(fa_top);
 var _nova_meter_x = 16;
 var _nova_item_x = _nova_meter_x + 17;
 var _nova_item_y = 20;
+var _nova_heart_x = layout.width - 95;
 draw_set_color(c_black);
 draw_rectangle(_nova_item_x + 1, _nova_item_y + 1, _nova_item_x + 20, _nova_item_y + 20, false);
 draw_set_color(c_white);
@@ -99,14 +100,14 @@ if (_nova_magic > 0)
     draw_set_color(make_color_rgb(248, 248, 248));
     draw_line(_nova_meter_x + 5, 55 - _nova_magic, _nova_meter_x + 10, 55 - _nova_magic);
 }
-draw_sprite_ext(sHUD_Life, 0, 179, 14, 1, 1, 0, HealthLowPulseColor, MainAlpha);
+draw_sprite_ext(sHUD_Life, 0, _nova_heart_x + 18, 14, 1, 1, 0, HealthLowPulseColor, MainAlpha);
 var _nova_capacity = global.Inventory_ItemData[18].Amount;
 var _nova_health = clamp(global.Inventory_ItemData[17].Amount - AddHealth, 0, _nova_capacity);
 for (var _nova_heart = 0; _nova_heart < _nova_capacity; _nova_heart++)
 {
     var _nova_value = clamp(_nova_health - _nova_heart, 0, 1);
     var _nova_frame = _nova_value >= 1 ? 4 : (_nova_value > 0 ? max(1, floor(_nova_value * 4)) : 0);
-    draw_sprite_ext(sHUD_Heart, _nova_frame, 161 + (_nova_heart mod 10) * 8, 24 + (_nova_heart div 10) * 8, 1, 1, 0, HealthLowPulseColor, MainAlpha);
+    draw_sprite_ext(sHUD_Heart, _nova_frame, _nova_heart_x + (_nova_heart mod 10) * 8, 24 + (_nova_heart div 10) * 8, 1, 1, 0, HealthLowPulseColor, MainAlpha);
 }
 draw_set_color(c_white);
 draw_set_alpha(1);

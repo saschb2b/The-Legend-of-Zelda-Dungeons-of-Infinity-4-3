@@ -34,6 +34,9 @@ Check(Code("gml_Object_oEnemy_Cannon_Step_0").Contains("!Stoned"), "Cannon statu
 Check(Code("gml_Object_oEnemy_Pikit_Tongue_Step_0").Contains("oLink.State != 20"), "Pikit falling guard missing");
 Check(Code("gml_Object_oSword_Draw_0").Contains("oLink.NovaSwordIsCharged()"), "Sword charge cue must use the attack readiness condition");
 Check(Code("gml_Object_oRender_Step_2").Contains("global.NovaContextUpdate(delta_time / 1000000)"), "Context animation must advance once per End Step using elapsed time");
+var compositor = Code("gml_Object_oRender_Draw_64");
+Check(compositor.IndexOf("draw_surface_stretched(NovaFrame") < compositor.IndexOf("NovaHUD_Draw(_nova_layout)"), "HUD must be composed after world scaling");
+Check(compositor.Contains("gpu_set_texfilter(false)") && compositor.Contains("gpu_set_texfilter(_nova_filter)"), "HUD must use nearest-neighbor scaling and restore filtering");
 Check(!Data.GameObjects.Any(obj => obj.Name.Content == "oNovaTests"), "Test object leaked into production");
 Check(!Data.Code.Any(code => code.Name.Content.Contains("NovaTest")), "Test code leaked into production");
 Check(!Data.GameObjects.Any(obj => obj.Name.Content == "oNovaVillageTest"), "Village preview leaked into production");

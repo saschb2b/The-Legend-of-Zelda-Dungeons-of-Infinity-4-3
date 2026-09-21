@@ -166,28 +166,29 @@ function ContextTests() {
         oLink.State = 1;
     }
     draw_set_font(global.HUDFont2);
-    var status_width = global.NovaPromptWidth(global.NovaBinding("hud"), "STATUS", 5, 12 * (960 / 224), 2);
+    var layout = global.NovaHUDLayout(1280, 960);
+    var status_width = global.NovaPromptWidth(global.NovaBinding("hud"), "STATUS", layout.scale, 12 * layout.scale, 2);
     global.NovaContextUpdate(0.06);
     var motion_before_draw = json_stringify(oRender.NovaContext);
     var target = surface_create(1280, 960);
     surface_set_target(target);
     draw_set_alpha(0.7);
     var incoming_alpha = draw_get_alpha();
-    repeat (3) global.NovaContextDraw(5, 960 / 224, 1190 - status_width);
+    repeat (3) global.NovaContextDraw(layout, layout.right - status_width);
     Record("drawing hints preserves animation time", json_stringify(oRender.NovaContext) == motion_before_draw);
     Record("drawing hints preserves HUD opacity", draw_get_alpha() == incoming_alpha);
     surface_reset_target();
     surface_free(target);
     draw_set_alpha(1);
-    var hint = global.NovaContextHint(5, 960 / 224, 1190 - status_width);
-    Record("context hint sits left of Status with a fixed gap", hint.visible && hint.label == "OPEN" && abs(hint.right + 40 + status_width - 1190) < 0.01);
+    var hint = global.NovaContextHint(layout, layout.right - status_width);
+    Record("context hint sits left of Status with a fixed gap", hint.visible && hint.label == "OPEN" && abs(hint.right + 8 * layout.scale + status_width - layout.right) < 0.01);
     Record("context hint uses the interaction binding", global.NovaGlyph(hint.binding) == 0);
     input_binding_set("action", input_binding_gamepad_button(gp_face4), 0, 0, "gamepad");
-    var remapped = global.NovaContextHint(5, 960 / 224, 1190 - status_width);
+    var remapped = global.NovaContextHint(layout, layout.right - status_width);
     Record("remapping changes the interaction glyph without shifting it", global.NovaGlyph(remapped.binding) == 3 && remapped.icon_x == hint.icon_x);
     input_profile_set("keyboard");
-    var keyboard = global.NovaContextHint(5, 960 / 224, 1190 - status_width);
-    Record("keyboard hint shows Interact rather than menu Confirm", keyboard.binding.__value == global.NovaBinding("action").__value && global.NovaGlyph(keyboard.binding) == -1 && keyboard.right < 1190 - status_width);
+    var keyboard = global.NovaContextHint(layout, layout.right - status_width);
+    Record("keyboard hint shows Interact rather than menu Confirm", keyboard.binding.__value == global.NovaBinding("action").__value && global.NovaGlyph(keyboard.binding) == -1 && keyboard.right < layout.right - status_width);
     input_profile_import(bindings, "gamepad");
     input_profile_set("gamepad");
     PressEvent(oLink, "action", oLink, ev_step, ev_step_normal);
@@ -243,9 +244,10 @@ function ContextMotionTests() {
     }
     draw_set_font(global.HUDFont2);
     var previous_x = -1;
+    var layout = global.NovaHUDLayout(1280, 960);
     var labels = ["LIFT", "THROW", "TALK", "OPEN", "INSPECT"];
     for (var i = 0; i < array_length(labels); i++) {
-        var hint = global.NovaContextHint(5, 960 / 224, 980, labels[i]);
+        var hint = global.NovaContextHint(layout, 980, labels[i]);
         Record("interaction glyph stays anchored for " + labels[i], previous_x == -1 || abs(hint.icon_x - previous_x) < 0.001);
         previous_x = hint.icon_x;
     }
@@ -342,13 +344,14 @@ function ContextMotionCapture() {
     oRender.NovaContext = global.NovaContextMotion();
     var width = display_get_gui_width();
     var height = display_get_gui_height();
-    var sx = width / 256;
-    var sy = height / 224;
+    var layout = global.NovaHUDLayout(width, height);
+    var sx = layout.scale;
+    var sy = sx;
     var size = 12 * min(sx, sy);
     var preview = surface_create(width, height);
     draw_set_font(global.HUDFont2);
     var binding = global.NovaBinding("hud");
-    var status_left = 238 * sx - global.NovaPromptWidth(binding, "STATUS", sx, size, 2);
+    var status_left = layout.right - global.NovaPromptWidth(binding, "STATUS", sx, size, 2);
     for (var frame = 0; frame < 96; frame++) {
         var label = frame < 12 || frame >= 84 ? "" : (frame < 48 ? "LIFT" : "THROW");
         global.NovaContextAdvance(oRender.NovaContext, label, 1 / 60);
@@ -357,12 +360,12 @@ function ContextMotionCapture() {
         draw_set_alpha(1);
         draw_set_color(c_white);
         draw_surface_stretched(oRender.NovaFrame, 0, 0, width, height);
-        global.NovaContextDraw(sx, sy, status_left);
-        global.NovaPromptDraw(binding, "STATUS", status_left, 209 * sy, sx, sy, size, 2);
+        global.NovaContextDraw(layout, status_left);
+        global.NovaPromptDraw(binding, "STATUS", status_left, layout.footer_y, sx, sy, size, 2);
         surface_reset_target();
         var number = string(frame);
         while (string_length(number) < 3) number = "0" + number;
-        surface_save_part(preview, "nova-context-motion-" + number + ".png", floor(width * 0.48), floor(height * 0.875), floor(width * 0.48), floor(height * 0.11));
+        surface_save_part(preview, "nova-context-motion-" + number + ".png", floor(width * 0.48), floor(height * 0.875), width - floor(width * 0.48), floor(height * 0.11));
     }
     surface_free(preview);
     oRender.NovaContext = saved;

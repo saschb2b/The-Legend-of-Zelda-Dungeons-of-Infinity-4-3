@@ -26,8 +26,8 @@ if (updateMenu.Contains("NovaUpdateStep")) {
 }
 var renderName = "gml_Object_oRender_Draw_64";
 var render = GetDecompiledText(renderName, null, settings);
-if (render.Contains("NovaHUD_Draw();")) {
-    render = render.Replace("NovaHUD_Draw();", "NovaHUD_Draw(); global.NovaTestHUDDraws++;");
+if (render.Contains("NovaHUD_Draw(_nova_layout);")) {
+    render = render.Replace("NovaHUD_Draw(_nova_layout);", "NovaHUD_Draw(_nova_layout); global.NovaTestHUDDraws++;");
     var statusCall = "global.NovaPromptDraw(binding, \"STATUS\",";
     if (!render.Contains(statusCall)) throw new Exception("Status drawing boundary missing");
     render = render.Replace(statusCall, "global.NovaTestStatusDraws++; " + statusCall);

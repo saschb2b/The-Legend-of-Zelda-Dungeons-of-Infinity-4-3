@@ -4,6 +4,7 @@ These versions identify the 4:3 patch, independently of the original game's vers
 
 ## Unreleased
 
+- Render the gameplay HUD at a separate integer scale: 3× on the Nova. Smaller meters, counters, hearts and input hints leave more of the dungeon visible. Keep the equipment and counters at the left edge and health at the right. The world retains its full-screen 4:3 presentation.
 - Fade contextual gameplay hints in over 120 ms and out over 100 ms. Keep the interaction button in place while action labels fade out and in, including the change from Lift to Throw. Inputs remain immediate.
 
 ## [1.7.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.7.0) - 2026-09-21

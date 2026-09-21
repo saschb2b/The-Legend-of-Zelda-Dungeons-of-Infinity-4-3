@@ -202,6 +202,16 @@ global.NovaInventoryPrompts = function(inventory) {
     }
 };
 
+global.NovaHUDLayout = function(width, height) {
+    var fit = min(width / 256, height / 224);
+    var scale = max(1, min(floor(fit), round(fit * 0.75)));
+    var columns = floor(width / scale);
+    var rows = floor(height / scale);
+    var left = floor((width - columns * scale) / 2);
+    var top = floor((height - rows * scale) / 2);
+    return {scale: scale, width: columns, height: rows, x: left, y: top,
+        right: left + (columns - 16) * scale, footer_y: top + (rows - 15) * scale};
+};
 global.NovaContextBlocked = function() {
     return !instance_exists(oLink) || !instance_exists(oCamera) || global.Paused || global.AltTab || global.ArcadeVP_Show
         || instance_exists(oInventory) || instance_exists(oMap) || instance_exists(oMenu_Game) || instance_exists(oDialogueBox)
@@ -211,10 +221,11 @@ global.NovaContextAction = function() {
     if (global.NovaContextBlocked() || (oLink.State != 1 && oLink.State != 2 && oLink.State != 11)) return "";
     return oLink.NovaInteractionProbe();
 };
-global.NovaContextHint = function(sx, sy, status_left, label = undefined) {
+global.NovaContextHint = function(layout, status_left, label = undefined) {
     if (label == undefined) label = global.NovaContextAction();
+    var scale = layout.scale;
     var prompt = {binding: global.NovaBinding("action"), label: label, visible: label != ""};
-    var hints = global.NovaHintRow([prompt], status_left - 8 * sx, 209 * sy, sx, sy, 12 * min(sx, sy), 0, 224 * sx);
+    var hints = global.NovaHintRow([prompt], status_left - 8 * scale, layout.footer_y, scale, scale, 12 * scale, 0, (layout.width - 32) * scale);
     return hints[0];
 };
 
@@ -263,10 +274,10 @@ global.NovaContextUpdate = function(seconds) {
     if (label == "" && oLink.State == 6 && instance_exists(oLink.ItemHolding) && motion.label == "LIFT") label = "LIFT";
     global.NovaContextAdvance(motion, label, seconds);
 };
-global.NovaContextDraw = function(sx, sy, status_left) {
+global.NovaContextDraw = function(layout, status_left) {
     var motion = oRender.NovaContext;
     if (motion.alpha <= 0 || global.NovaContextBlocked()) return;
-    var prompt = global.NovaContextHint(sx, sy, status_left, motion.label);
+    var prompt = global.NovaContextHint(layout, status_left, motion.label);
     var alpha = draw_get_alpha();
     draw_set_alpha(alpha * motion.alpha * motion.text_alpha);
     var text_x = prompt.icon_x - prompt.size / 4 - string_width(motion.shown_label) * prompt.scale_x;

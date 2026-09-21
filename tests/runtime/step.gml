@@ -1,4 +1,5 @@
-Ticks++;
+// Screenshot transfer time is bounded by the host's wall-clock deadline.
+if (Capture == "") Ticks++;
 try {
     switch (Stage) {
         case 0:

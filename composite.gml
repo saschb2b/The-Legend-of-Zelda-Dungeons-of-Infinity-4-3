@@ -18,15 +18,6 @@ if (global.Users[global.UserIndex].Prefs[2] && !_nova_modal)
     draw_surface_part_ext(application_surface, 0, 304, 288, 592, 16, 436, 0.75, 0.75, c_white, 0.9);
     draw_surface_part_ext(application_surface, 1312, 0, 288, 896, 792, 208, 0.75, 0.75, c_white, 0.9);
 }
-if (instance_exists(oHUD) && ((!_nova_ui && (!global.Paused || _nova_travel)) || global.NovaInventoryHUD()) && !global.ArcadeVP_Show)
-{
-    if (!surface_exists(NovaHUD)) NovaHUD = surface_create(256, 224);
-    surface_set_target(NovaHUD);
-    draw_clear_alpha(c_black, 0);
-    NovaHUD_Draw();
-    surface_reset_target();
-    draw_surface_ext(NovaHUD, 0, 0, 4, 4, 0, c_white, 1);
-}
 if (global.ArcadeVP_Show)
 {
     draw_set_color(c_black);
@@ -47,6 +38,21 @@ else
 {
     draw_surface_stretched(NovaFrame, 0, 0, _nova_w, _nova_h);
 }
+var _nova_layout = global.NovaHUDLayout(_nova_w, _nova_h);
+// Compose native HUD pixels after world scaling and CRT distortion.
+if (instance_exists(oHUD) && ((!_nova_ui && (!global.Paused || _nova_travel)) || global.NovaInventoryHUD()) && !global.ArcadeVP_Show)
+{
+    var _nova_filter = gpu_get_texfilter();
+    gpu_set_texfilter(false);
+    if (surface_exists(NovaHUD) && surface_get_width(NovaHUD) != _nova_layout.width) surface_free(NovaHUD);
+    if (!surface_exists(NovaHUD)) NovaHUD = surface_create(_nova_layout.width, 64);
+    surface_set_target(NovaHUD);
+    draw_clear_alpha(c_black, 0);
+    NovaHUD_Draw(_nova_layout);
+    surface_reset_target();
+    draw_surface_ext(NovaHUD, _nova_layout.x, _nova_layout.y, _nova_layout.scale, _nova_layout.scale, 0, c_white, 1);
+    gpu_set_texfilter(_nova_filter);
+}
 // Render glyphs after CRT scaling so their letters remain readable.
 if (instance_exists(oInventory) && (!instance_exists(oDialogueBox) || global.NovaInventoryInfo())) global.NovaInventoryPrompts(oInventory);
 if (instance_exists(oMap) && !oMap.Close) {
@@ -61,15 +67,15 @@ if (instance_exists(oMap) && !oMap.Close) {
     draw_set_alpha(1);
 }
 if (instance_exists(oHUD) && !_nova_modal && !global.ArcadeVP_Show && !global.Users[global.UserIndex].Prefs[2]) {
-    var sx = _nova_w / 256;
-    var sy = _nova_h / 224;
-    var size = 12 * min(sx, sy);
+    var sx = _nova_layout.scale;
+    var sy = sx;
+    var size = 12 * sx;
     draw_set_font(global.HUDFont2);
     draw_set_alpha(oHUD.MainAlpha);
     var binding = global.NovaBinding("hud");
     var width = global.NovaPromptWidth(binding, "STATUS", sx, size, 2);
-    global.NovaContextDraw(sx, sy, 238 * sx - width);
-    global.NovaPromptDraw(binding, "STATUS", 238 * sx - width, 209 * sy, sx, sy, size, 2);
+    global.NovaContextDraw(_nova_layout, _nova_layout.right - width);
+    global.NovaPromptDraw(binding, "STATUS", _nova_layout.right - width, _nova_layout.footer_y, sx, sy, size, 2);
     draw_set_alpha(1);
 }
 
