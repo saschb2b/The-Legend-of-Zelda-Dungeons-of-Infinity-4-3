@@ -465,7 +465,7 @@
     "id": "candle-frame",
     "code": "gml_GlobalScript___Items",
     "anchor": "    image_index = Index;",
-    "replacement": "    image_index = Class == 51 ? 1 : Index;"
+    "replacement": "    image_index = object_index == oNovaCandle ? 1 : Index;"
   },
   {
     "id": "candle-lamp-upgrade",

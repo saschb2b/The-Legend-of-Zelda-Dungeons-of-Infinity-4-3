@@ -91,6 +91,7 @@ try {
             break;
         case 6:
             if (!instance_exists(oHUD) || !instance_exists(oLink) || global.Paused || oLink.State != 1) break;
+            KinstoneTests();
             MovementTests();
             PauseTests();
             EnemyTests();
@@ -110,6 +111,11 @@ try {
             break;
         case 16:
             if (!CRTBenchmarkStep()) break;
+            FloorTravelStart();
+            Stage = 17;
+            break;
+        case 17:
+            if (!FloorTravelStep()) break;
             ArcadeTravelStart();
             Stage = 15;
             break;

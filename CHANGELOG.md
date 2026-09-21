@@ -14,6 +14,10 @@ More room for the dungeon, smoother interaction hints, and a CRT-Lottes effect t
 - **CRT-Lottes:** replace the gameplay CRT effect with Timothy Lottes' shader, adapted from RetroArch. Gamma-correct filtering, shaped scanlines, a phosphor grille and soft bloom preserve dark detail and the full playfield. The HUD stays crisp. Arcade machines keep their original effect.
 - **Smoother input hints:** fade contextual hints in and out. Keep the button in place while its label changes, including Lift to Throw. Input response remains immediate.
 
+### Fixed
+
+- Fix a crash when a new floor generates a Kinstone pedestal, including the transition to floor 3. Keep the candle sprite correction specific to candles.
+
 ### CRT before and after
 
 <table>
@@ -50,7 +54,7 @@ Choose **Options > Updates** from the adventure menu, or download the **Nova pat
 
 For a fresh installation, follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.7.1/README.md#install-on-the-nova).
 
-Validation: 38 unit tests and 1,482 device assertions passed. The Nova test scene ran at 60 fps with CRT both enabled and disabled.
+Validation: 38 unit tests and 1,498 device assertions passed. The Nova test scene ran at 60 fps with CRT both enabled and disabled.
 
 [Changes from v1.7.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.7.0...v1.7.1).
 

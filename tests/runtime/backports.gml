@@ -1,3 +1,59 @@
+function KinstoneTests() {
+    var inventory = StructCopy(global.Inventory);
+    var items = StructCopy(global.Inventory_ItemData);
+    var colors = [[0.15,0.5,0.15], [0.2,0.2,0.6], [0.65,0.25,0.25], [0.6,0.5,0.1]];
+    for (var color = 0; color < 4; color++) {
+        var stone = instance_create_layer(oLink.x + 48, oLink.y, "ObjsHigher_Lower", oItem_Kinstone_Main,
+            {Index: color, RoomIndex: oLink.RoomIndex});
+        Record("Kinstone " + string(color) + " spawns with its original frame", stone.Index == color && stone.image_index == color);
+        var light = global.Level.Rooms[stone.RoomIndex].Lights_RGB;
+        var lit = stone.LightIndex >= 0;
+        if (lit) for (var channel = 0; channel < 3; channel++) lit = lit && abs(light[stone.LightIndex * 3 + channel] - colors[color][channel]) < 0.0001;
+        Record("Kinstone " + string(color) + " has its colored light", lit);
+        Inventory_Add(23, color, 1);
+        var matches = false;
+        with (stone) matches = DBScriptFunction_KinstoneMatch();
+        Record("Kinstone " + string(color) + " recognizes a matching inventory piece", matches);
+        with (stone) instance_destroy();
+    }
+    global.Inventory = inventory;
+    global.Inventory_ItemData = items;
+}
+
+function FloorTravelStart() {
+    FloorTravelSavedCRT = global.Users[global.UserIndex].Prefs[3];
+    FloorTravelCase = 0;
+    FloorTravelPlace();
+}
+
+function FloorTravelPlace() {
+    global.Paused = false;
+    global.SaveLevel = false;
+    global.Continue = false;
+    global.NovaTestHeld = [];
+    global.Users[global.UserIndex].Prefs[3] = (FloorTravelCase mod 2) == 1;
+    with (oIntro) instance_destroy();
+    instance_activate_all();
+    random_set_seed(713 + FloorTravelCase div 2);
+    Dungeon_InitLevel(2);
+    oLink.DescendingLocation = 1 + FloorTravelCase div 2;
+    with (oLink) UpdateState(22);
+    FloorTravelTick = 0;
+}
+
+function FloorTravelStep() {
+    FloorTravelTick++;
+    if (FloorTravelTick > 360) throw "Floor 2 to 3 transition timed out: " + string(FloorTravelCase);
+    if (global.Level.Index != 3 || oLink.State != 1) return false;
+    Record("floor 2 to 3 completes with staircase and CRT combination " + string(FloorTravelCase),
+        !oLink.InitNewDungeon && oLink.DescendingPhase == 0 && !global.SaveLevel
+        && global.CurrentRoomIndex == global.Level.RoomIndex_Entrance && instance_exists(oHUD));
+    FloorTravelCase++;
+    if (FloorTravelCase < 4) { FloorTravelPlace(); return false; }
+    global.Users[global.UserIndex].Prefs[3] = FloorTravelSavedCRT;
+    return true;
+}
+
 function BackportTests() {
     global.Paused = false;
     oLink.Invincible = false;

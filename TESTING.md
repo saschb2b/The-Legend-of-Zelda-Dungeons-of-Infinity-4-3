@@ -61,6 +61,8 @@ Animation cases run at 30, 60 and 120 Hz. They check the 120 ms entrance, 100 ms
 
 Add `--capture-context` for Talk, Open, Lift, remapped-controller and keyboard screenshots. Review their spacing beside Status. The same run exports 96 `nova-context-motion-*.png` frames at simulated 60 Hz through the device's renderer. Play the frames at 60 Hz to inspect appearance, Lift-to-Throw and disappearance. This deterministic rendering preview complements the pickup-state tests. It is not a recording of physical input timing.
 
+Kinstone tests create all four pedestal colors and check their frames, lights and matching inventory pieces. A dropped candle must retain its lit frame. Floor tests run the floor 2-to-3 staircase animation through generation and return to movement, with both staircase orientations and CRT settings.
+
 Village tests enumerate every slot roll and check all stakes and payouts, reel alignment, insufficient funds, wallet limits and repeated settlement. Claw tests cover weighted prize pools, purchase cancellation, payment, movement bounds, grabbing, refunds, losing stakes and item delivery. The suite also walks into and out of both buildings through their real door events. Add `--capture-arcade` for pub, slot, claw and prize screenshots. Review original sprite tiling, reel clipping and footer spacing.
 
 Controller tests check PortMaster's Nintendo A/B mapping and preserve other controls, Xbox mappings, and custom layouts. The device runner uses the repository's launcher and controller adapter. Before release, verify the physical Nova buttons: B swings the sword, A interacts, and menus use A to confirm and B to close. Logical input injection alone cannot verify the controller translation.

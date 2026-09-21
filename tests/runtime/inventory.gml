@@ -27,6 +27,7 @@ function InventoryTests() {
     Record("save and load keep a dropped candle absent", global.Inventory[4].ItemClass == -1 && !global.Inventory_ItemData[51].Owns[0]);
     with (candle_ui) instance_destroy();
     var dropped_candle = instance_find(oNovaCandle, 0);
+    Record("dropped candle keeps the lit frame", dropped_candle.image_index == 1);
     dropped_candle.Spawning = false;
     dropped_candle.Get_Allowed = true;
     var original_x = oLink.x;
