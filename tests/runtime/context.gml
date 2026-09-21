@@ -69,10 +69,28 @@ function ContextTests() {
     var rng = random_get_seed();
     repeat (20) global.NovaContextAction();
     Record("hint queries preserve object and player state", pot.State == 0 && oLink.State == link_state && oLink.ItemHolding == noone && random_get_seed() == rng && json_stringify(global.Users) == saves && json_stringify(global.Inventory) == inventory);
+    ContextMotionTests();
+    oRender.NovaContext = global.NovaContextMotion();
+    global.NovaContextUpdate(0.12);
     PressEvent(oLink, "action", oLink, ev_step, ev_step_normal);
     Record("the hinted interaction lifts the actual pot", oLink.State == 6 && oLink.ItemHolding == pot);
-    oLink.State = 11;
+    var held_hint = true;
+    var lift_frames = 0;
+    repeat (120) {
+        if (oLink.State != 6) break;
+        held_hint = held_hint && global.NovaContextAction() == "";
+        global.NovaContextUpdate(1 / 60);
+        held_hint = held_hint && oRender.NovaContext.alpha == 1 && oRender.NovaContext.label == "LIFT";
+        oLink.image_index = min(oLink.image_number - 1, oLink.image_index + 0.25);
+        with (oLink) event_perform_object(oLink, ev_step, ev_step_normal);
+        lift_frames++;
+    }
+    Record("pickup keeps the accepted Lift visible until carrying is ready", held_hint && lift_frames > 1 && oLink.State != 6 && oLink.ItemHolding == pot);
     Record("carrying changes Lift to Throw", global.NovaContextAction() == "THROW");
+    global.NovaContextUpdate(0.06);
+    Record("pickup changes the label without fading the button", oRender.NovaContext.alpha == 1 && oRender.NovaContext.shown_label == "THROW" && oRender.NovaContext.text_alpha > 0 && oRender.NovaContext.text_alpha < 1);
+    global.NovaContextUpdate(0.06);
+    Record("pickup completes on the available Throw action", oRender.NovaContext.shown_label == "THROW" && oRender.NovaContext.text_alpha > 0.999);
     oLink.InDoor_Facing = true;
     Record("blocked doorway does not advertise Throw", global.NovaContextAction() != "THROW");
     oLink.InDoor_Facing = false;
@@ -91,8 +109,11 @@ function ContextTests() {
     npc.DB_Delay = true;
     Record("conversation cooldown hides Talk", global.NovaContextAction() == "");
     npc.DB_Delay = false;
+    oRender.NovaContext = global.NovaContextMotion();
+    global.NovaContextUpdate(0.03);
+    Record("Talk begins fading in before the interaction", oRender.NovaContext.alpha > 0 && oRender.NovaContext.alpha < 1);
     PressEvent(oLink, "action", oLink, ev_step, ev_step_normal);
-    Record("the hinted interaction starts the selected conversation", npc.DB_Init);
+    Record("the hinted interaction starts the conversation during its fade", npc.DB_Init);
     npc.DB_Init = false;
     with (npc) instance_destroy();
     MovementReset(px, py);
@@ -118,9 +139,14 @@ function ContextTests() {
     oLink.State = 1;
     global.Paused = true;
     Record("paused game hides interaction hint", global.NovaContextAction() == "");
+    global.NovaContextUpdate(1 / 60);
+    Record("pause clears pending label transitions", oRender.NovaContext.alpha == 0 && oRender.NovaContext.shown_label == "");
     global.Paused = false;
+    global.NovaContextUpdate(0.12);
     oCamera.RoomTransition = 1;
     Record("room scrolling hides interaction hint", global.NovaContextAction() == "");
+    global.NovaContextUpdate(1 / 60);
+    Record("room changes cannot carry a stale hint into the next room", oRender.NovaContext.alpha == 0);
     oCamera.RoomTransition = 0;
     oLink.BounceBack = true;
     Record("knockback hides interaction hint", global.NovaContextAction() == "");
@@ -130,14 +156,29 @@ function ContextTests() {
     oLink.StairsAutoMove = false;
     var modal_objects = [oMenu_Game, oMap, oInventory, oDialogueBox];
     for (var i = 0; i < array_length(modal_objects); i++) {
+        global.NovaContextUpdate(0.12);
         var modal = instance_create_layer(0, 0, "System", modal_objects[i]);
         Record("modal hides interaction " + object_get_name(modal_objects[i]), global.NovaContextAction() == "");
+        global.NovaContextUpdate(1 / 60);
+        Record("modal clears animated interaction " + object_get_name(modal_objects[i]), oRender.NovaContext.alpha == 0);
         with (modal) instance_destroy();
         global.Paused = false;
         oLink.State = 1;
     }
     draw_set_font(global.HUDFont2);
     var status_width = global.NovaPromptWidth(global.NovaBinding("hud"), "STATUS", 5, 12 * (960 / 224), 2);
+    global.NovaContextUpdate(0.06);
+    var motion_before_draw = json_stringify(oRender.NovaContext);
+    var target = surface_create(1280, 960);
+    surface_set_target(target);
+    draw_set_alpha(0.7);
+    var incoming_alpha = draw_get_alpha();
+    repeat (3) global.NovaContextDraw(5, 960 / 224, 1190 - status_width);
+    Record("drawing hints preserves animation time", json_stringify(oRender.NovaContext) == motion_before_draw);
+    Record("drawing hints preserves HUD opacity", draw_get_alpha() == incoming_alpha);
+    surface_reset_target();
+    surface_free(target);
+    draw_set_alpha(1);
     var hint = global.NovaContextHint(5, 960 / 224, 1190 - status_width);
     Record("context hint sits left of Status with a fixed gap", hint.visible && hint.label == "OPEN" && abs(hint.right + 40 + status_width - 1190) < 0.01);
     Record("context hint uses the interaction binding", global.NovaGlyph(hint.binding) == 0);
@@ -161,6 +202,53 @@ function ContextTests() {
     global.StatsToAdd = stats;
     random_set_seed(seed);
     MovementReset(start_x, start_y);
+    oRender.NovaContext = global.NovaContextMotion();
+}
+
+function ContextMotionTests() {
+    var motion = global.NovaContextMotion();
+    global.NovaContextAdvance(motion, "TALK", 0);
+    Record("hint appearance starts transparent", motion.alpha == 0);
+    global.NovaContextAdvance(motion, "TALK", 0.06);
+    Record("hint fades in over time", abs(motion.alpha - 0.5) < 0.001);
+    global.NovaContextAdvance(motion, "TALK", 0.06);
+    Record("hint reaches full opacity after 120 ms", motion.alpha == 1);
+    global.NovaContextAdvance(motion, "LIFT", 0.02);
+    Record("label change fades the old word while keeping the glyph opaque", motion.alpha == 1 && motion.shown_label == "TALK" && abs(motion.text_alpha - 0.5) < 0.001);
+    global.NovaContextAdvance(motion, "TALK", 0);
+    Record("reversing a label transition preserves visible text opacity", motion.shown_label == "TALK" && abs(motion.text_alpha - 0.5) < 0.001);
+    global.NovaContextAdvance(motion, "OPEN", 0.03);
+    Record("rapid target changes show only the latest word after fade-out", motion.shown_label == "OPEN" && motion.text_alpha > 0 && motion.text_alpha < 0.5 && motion.alpha == 1);
+    global.NovaContextAdvance(motion, "OPEN", 0.12);
+    Record("latest action finishes fully readable", motion.shown_label == "OPEN" && motion.text_alpha == 1);
+    global.NovaContextAdvance(motion, "", 0.05);
+    Record("hint fades out over time", abs(motion.alpha - 0.5) < 0.001);
+    var alpha = motion.alpha;
+    global.NovaContextAdvance(motion, "OPEN", 0);
+    Record("reacquiring an interaction never resets its opacity", motion.alpha == alpha);
+    global.NovaContextAdvance(motion, "OPEN", 0.06);
+    Record("reacquired hint returns to full opacity", motion.alpha == 1);
+    global.NovaContextAdvance(motion, "", 0.10);
+    Record("hidden hints discard their labels after 100 ms", motion.alpha == 0 && motion.label == "" && motion.shown_label == "");
+    global.NovaContextAdvance(motion, "LIFT", 0.06);
+    Record("new interaction cannot revive an unrelated old label", motion.shown_label == "LIFT" && motion.text_alpha == 1);
+    for (var hz = 30; hz <= 120; hz *= 2) {
+        motion = global.NovaContextMotion();
+        repeat (ceil(hz * 0.12)) global.NovaContextAdvance(motion, "LIFT", 1 / hz);
+        Record("hint entrance finishes at " + string(hz) + " Hz", motion.alpha > 0.999);
+        repeat (ceil(hz * 0.12)) global.NovaContextAdvance(motion, "THROW", 1 / hz);
+        Record("label change finishes at " + string(hz) + " Hz", motion.shown_label == "THROW" && motion.text_alpha > 0.999);
+        repeat (ceil(hz * 0.10) + 1) global.NovaContextAdvance(motion, "", 1 / hz);
+        Record("hint exit finishes at " + string(hz) + " Hz", motion.alpha == 0);
+    }
+    draw_set_font(global.HUDFont2);
+    var previous_x = -1;
+    var labels = ["LIFT", "THROW", "TALK", "OPEN", "INSPECT"];
+    for (var i = 0; i < array_length(labels); i++) {
+        var hint = global.NovaContextHint(5, 960 / 224, 980, labels[i]);
+        Record("interaction glyph stays anchored for " + labels[i], previous_x == -1 || abs(hint.icon_x - previous_x) < 0.001);
+        previous_x = hint.icon_x;
+    }
 }
 
 function ContextShopTests(px, py) {
@@ -235,7 +323,11 @@ function ContextCaptureNext() {
 }
 function ContextCaptureStep() {
     ContextCaptureTicks++;
-    if (ContextCaptureTicks == 240) { Capture = ContextCaptureName; Flush(); }
+    if (ContextCaptureTicks == 240) {
+        if (ContextCaptureIndex == 2) ContextMotionCapture();
+        Capture = ContextCaptureName;
+        Flush();
+    }
     if (!file_exists("nova-capture-done.txt")) return;
     file_delete("nova-capture-done.txt");
     ContextCaptureTicks = 0;
@@ -243,4 +335,35 @@ function ContextCaptureStep() {
     Capture = "";
     if (ContextCaptureIndex == 5) { Complete = true; Flush(); game_end(); return; }
     ContextCaptureNext();
+}
+
+function ContextMotionCapture() {
+    var saved = oRender.NovaContext;
+    oRender.NovaContext = global.NovaContextMotion();
+    var width = display_get_gui_width();
+    var height = display_get_gui_height();
+    var sx = width / 256;
+    var sy = height / 224;
+    var size = 12 * min(sx, sy);
+    var preview = surface_create(width, height);
+    draw_set_font(global.HUDFont2);
+    var binding = global.NovaBinding("hud");
+    var status_left = 238 * sx - global.NovaPromptWidth(binding, "STATUS", sx, size, 2);
+    for (var frame = 0; frame < 96; frame++) {
+        var label = frame < 12 || frame >= 84 ? "" : (frame < 48 ? "LIFT" : "THROW");
+        global.NovaContextAdvance(oRender.NovaContext, label, 1 / 60);
+        surface_set_target(preview);
+        draw_clear_alpha(c_black, 1);
+        draw_set_alpha(1);
+        draw_set_color(c_white);
+        draw_surface_stretched(oRender.NovaFrame, 0, 0, width, height);
+        global.NovaContextDraw(sx, sy, status_left);
+        global.NovaPromptDraw(binding, "STATUS", status_left, 209 * sy, sx, sy, size, 2);
+        surface_reset_target();
+        var number = string(frame);
+        while (string_length(number) < 3) number = "0" + number;
+        surface_save_part(preview, "nova-context-motion-" + number + ".png", floor(width * 0.48), floor(height * 0.875), floor(width * 0.48), floor(height * 0.11));
+    }
+    surface_free(preview);
+    oRender.NovaContext = saved;
 }

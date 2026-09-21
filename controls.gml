@@ -63,16 +63,19 @@ global.NovaPromptParts = function(binding, label, px, scale_x, size, gap = undef
 global.NovaPromptWidth = function(binding, label, scale_x, size, gap = undefined) {
     return global.NovaPromptParts(binding, label, 0, scale_x, size, gap).width;
 };
-global.NovaPromptDraw = function(binding, label, px, py, scale_x, scale_y, size, gap = undefined) {
-    var parts = global.NovaPromptParts(binding, label, px, scale_x, size, gap);
+global.NovaPromptLabelDraw = function(label, px, py, scale_x, scale_y) {
     draw_set_halign(fa_left);
     draw_set_valign(fa_middle);
     if (label != "") {
         draw_set_color(c_black);
-        draw_text_transformed(parts.text_x + scale_x, py + scale_y, label, scale_x, scale_y, 0);
+        draw_text_transformed(px + scale_x, py + scale_y, label, scale_x, scale_y, 0);
         draw_set_color(c_white);
-        draw_text_transformed(parts.text_x, py, label, scale_x, scale_y, 0);
+        draw_text_transformed(px, py, label, scale_x, scale_y, 0);
     }
+};
+global.NovaPromptDraw = function(binding, label, px, py, scale_x, scale_y, size, gap = undefined) {
+    var parts = global.NovaPromptParts(binding, label, px, scale_x, size, gap);
+    global.NovaPromptLabelDraw(label, parts.text_x, py, scale_x, scale_y);
     var frame = global.NovaGlyph(binding);
     var icon_x = parts.icon_x;
     draw_set_color(c_white);
@@ -199,16 +202,76 @@ global.NovaInventoryPrompts = function(inventory) {
     }
 };
 
-global.NovaContextAction = function() {
-    if (!instance_exists(oLink) || !instance_exists(oCamera) || global.Paused || global.AltTab || global.ArcadeVP_Show
+global.NovaContextBlocked = function() {
+    return !instance_exists(oLink) || !instance_exists(oCamera) || global.Paused || global.AltTab || global.ArcadeVP_Show
         || instance_exists(oInventory) || instance_exists(oMap) || instance_exists(oMenu_Game) || instance_exists(oDialogueBox)
-        || oCamera.RoomTransition != 0 || oLink.StairsAutoMove || oLink.BounceBack
-        || (oLink.State != 1 && oLink.State != 2 && oLink.State != 11)) return "";
+        || oCamera.RoomTransition != 0 || oLink.StairsAutoMove || oLink.BounceBack;
+};
+global.NovaContextAction = function() {
+    if (global.NovaContextBlocked() || (oLink.State != 1 && oLink.State != 2 && oLink.State != 11)) return "";
     return oLink.NovaInteractionProbe();
 };
-global.NovaContextHint = function(sx, sy, status_left) {
-    var label = global.NovaContextAction();
+global.NovaContextHint = function(sx, sy, status_left, label = undefined) {
+    if (label == undefined) label = global.NovaContextAction();
     var prompt = {binding: global.NovaBinding("action"), label: label, visible: label != ""};
     var hints = global.NovaHintRow([prompt], status_left - 8 * sx, 209 * sy, sx, sy, 12 * min(sx, sy), 0, 224 * sx);
     return hints[0];
+};
+
+global.NovaContextMotion = function() {
+    return {visibility: 0, alpha: 0, label: "", shown_label: "", text_visibility: 1, text_alpha: 1};
+};
+global.NovaContextAdvance = function(motion, label, seconds) {
+    seconds = max(0, seconds);
+    if (label != "") {
+        if (motion.visibility == 0) {
+            motion.shown_label = label;
+            motion.text_visibility = 1;
+        }
+        motion.label = label;
+    }
+    // Fade through keeps pixel lettering legible without overlapping two words.
+    var remaining = seconds;
+    if (motion.shown_label != motion.label) {
+        var fade_out = min(remaining, motion.text_visibility * 0.04);
+        motion.text_visibility = max(0, motion.text_visibility - fade_out / 0.04);
+        remaining -= fade_out;
+        if (motion.text_visibility <= 0) {
+            motion.text_visibility = 0;
+            motion.shown_label = motion.label;
+        }
+    }
+    if (motion.shown_label == motion.label) motion.text_visibility = min(1, motion.text_visibility + remaining / 0.08);
+    motion.text_alpha = motion.text_visibility * motion.text_visibility * (3 - 2 * motion.text_visibility);
+    motion.visibility = clamp(motion.visibility + seconds * (label == "" ? -1 / 0.10 : 1 / 0.12), 0, 1);
+    motion.alpha = motion.visibility * motion.visibility * (3 - 2 * motion.visibility);
+    if (motion.visibility == 0) {
+        motion.label = "";
+        motion.shown_label = "";
+        motion.text_visibility = 1;
+        motion.text_alpha = 1;
+    }
+};
+global.NovaContextUpdate = function(seconds) {
+    if (global.NovaContextBlocked() || !instance_exists(oHUD) || global.Users[global.UserIndex].Prefs[2]) {
+        oRender.NovaContext = global.NovaContextMotion();
+        return;
+    }
+    var motion = oRender.NovaContext;
+    var label = global.NovaContextAction();
+    // State 6 finishes the accepted lift before Interact can become Throw.
+    if (label == "" && oLink.State == 6 && instance_exists(oLink.ItemHolding) && motion.label == "LIFT") label = "LIFT";
+    global.NovaContextAdvance(motion, label, seconds);
+};
+global.NovaContextDraw = function(sx, sy, status_left) {
+    var motion = oRender.NovaContext;
+    if (motion.alpha <= 0 || global.NovaContextBlocked()) return;
+    var prompt = global.NovaContextHint(sx, sy, status_left, motion.label);
+    var alpha = draw_get_alpha();
+    draw_set_alpha(alpha * motion.alpha * motion.text_alpha);
+    var text_x = prompt.icon_x - prompt.size / 4 - string_width(motion.shown_label) * prompt.scale_x;
+    global.NovaPromptLabelDraw(motion.shown_label, text_x, prompt.y, prompt.scale_x, prompt.scale_y);
+    draw_set_alpha(alpha * motion.alpha);
+    global.NovaPromptDraw(prompt.binding, "", prompt.icon_x, prompt.y, prompt.scale_x, prompt.scale_y, prompt.size);
+    draw_set_alpha(alpha);
 };

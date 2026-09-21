@@ -1,5 +1,6 @@
 import argparse
 import hashlib
+import io
 import json
 import re
 import shlex
@@ -130,6 +131,20 @@ print(urllib.request.urlopen(r,timeout=10).read().decode())
             time.sleep(2)
         if not report or not report.get('complete'):
             raise RuntimeError('No complete runtime report within 180 seconds.')
+        if args.capture_context:
+            frames = request('python3 -', f'''import io,pathlib,sys,zipfile
+output=io.BytesIO()
+with zipfile.ZipFile(output,'w') as archive:
+ for path in sorted(pathlib.Path({stage + '/harness-savedata'!r}).glob('nova-context-motion-*.png')):
+  archive.write(path,path.name)
+sys.stdout.buffer.write(output.getvalue())
+'''.encode())
+            with ZipFile(io.BytesIO(frames)) as archive:
+                expected = [f'nova-context-motion-{frame:03}.png' for frame in range(96)]
+                if sorted(archive.namelist()) != expected:
+                    raise RuntimeError('Context animation capture is incomplete.')
+                for name in expected:
+                    (args.report_dir / name).write_bytes(archive.read(name))
         (args.report_dir / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
         failures = [case['name'] for case in report['results'] if not case['passed']]
         print(f'{len(report["results"])} runtime assertions; {len(failures)} failed', flush=True)

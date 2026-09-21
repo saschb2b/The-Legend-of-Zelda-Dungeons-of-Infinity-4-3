@@ -33,6 +33,7 @@ Check(Code("gml_Object_oEnemy_Medusa_Alarm_0").Contains("Stoned"), "Medusa statu
 Check(Code("gml_Object_oEnemy_Cannon_Step_0").Contains("!Stoned"), "Cannon status guard missing");
 Check(Code("gml_Object_oEnemy_Pikit_Tongue_Step_0").Contains("oLink.State != 20"), "Pikit falling guard missing");
 Check(Code("gml_Object_oSword_Draw_0").Contains("oLink.NovaSwordIsCharged()"), "Sword charge cue must use the attack readiness condition");
+Check(Code("gml_Object_oRender_Step_2").Contains("global.NovaContextUpdate(delta_time / 1000000)"), "Context animation must advance once per End Step using elapsed time");
 Check(!Data.GameObjects.Any(obj => obj.Name.Content == "oNovaTests"), "Test object leaked into production");
 Check(!Data.Code.Any(code => code.Name.Content.Contains("NovaTest")), "Test code leaked into production");
 Check(!Data.GameObjects.Any(obj => obj.Name.Content == "oNovaVillageTest"), "Village preview leaked into production");

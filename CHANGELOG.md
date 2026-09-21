@@ -4,6 +4,8 @@ These versions identify the 4:3 patch, independently of the original game's vers
 
 ## Unreleased
 
+- Fade contextual gameplay hints in over 120 ms and out over 100 ms. Keep the interaction button in place while action labels fade out and in, including the change from Lift to Throw. Inputs remain immediate.
+
 ## [1.7.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.7.0) - 2026-09-21
 
 Take a break on floor 6: the village arcade has a claw machine, and the pub has Mothula's Money.
