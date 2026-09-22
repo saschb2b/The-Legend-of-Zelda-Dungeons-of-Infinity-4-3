@@ -4,6 +4,24 @@ These versions identify the 4:3 patch, independently of the original game's vers
 
 ## Unreleased
 
+## [1.7.3](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.7.3) - 2026-09-22
+
+In-game updates install again.
+
+### Fixed
+
+- Fix in-game updates failing with "Close the 4:3 edition before installing the update." The launcher's controller helper, gptokeyb, keeps running during installation and was mistaken for the game.
+
+### Updating from v1.6.0 through v1.7.2
+
+The update step uses the check from the installed version, so **Options > Updates** cannot install this release. Install it once with the **Nova patch installer ZIP** under Assets, following the [update instructions](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.7.3/README.md#install-on-the-nova). Later releases will install from the adventure menu. The game itself is unchanged from v1.7.2. Existing saves remain compatible.
+
+Validation: 39 unit tests passed. On the Nova, the update step installed a release while a controller helper with the game's arguments was running, and preserved saves.
+
+For a fresh installation, follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.7.3/README.md#install-on-the-nova).
+
+[Changes from v1.7.2](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.7.2...v1.7.3).
+
 ## [1.7.2](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.7.2) - 2026-09-21
 
 Menu hints now match the compact gameplay HUD.
@@ -31,7 +49,7 @@ Unedited Nova captures from test saves. Existing saves remain compatible.
 
 Validation: 38 unit tests and 1,535 device assertions passed. The [testing guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.7.2/TESTING.md#nova-runtime-suite) records a separate, pre-existing native shutdown fault after test completion.
 
-Choose **Options > Updates** from the adventure menu, or run the **Nova patch installer ZIP** under Assets.
+Run the **Nova patch installer ZIP** under Assets. **Options > Updates** cannot install this release; [v1.7.3](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.7.3) fixes in-game updates.
 
 For a fresh installation, follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.7.2/README.md#install-on-the-nova).
 

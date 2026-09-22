@@ -67,15 +67,16 @@ def apply_patch(original, patch, expected_size):
     return bytes(output)
 
 
-def ensure_game_stopped(destination):
-    proc = Path('/proc')
+def ensure_game_stopped(destination, proc=Path('/proc')):
     if not proc.exists():
         return
     for entry in proc.iterdir():
         if not entry.name.isdigit():
             continue
         try:
-            if b'gmloadernext' in (entry / 'cmdline').read_bytes():
+            # Match the executable only; gptokeyb names gmloadernext in its arguments and outlives the game.
+            program = (entry / 'cmdline').read_bytes().split(b'\0', 1)[0]
+            if Path(program.decode(errors='replace')).name.startswith('gmloadernext'):
                 if (entry / 'cwd').resolve() == destination.resolve():
                     raise RuntimeError('Close the 4:3 edition before installing the update.')
         except (OSError, PermissionError):

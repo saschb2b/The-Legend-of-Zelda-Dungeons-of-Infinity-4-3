@@ -71,7 +71,7 @@ Village tests enumerate every slot roll and check all stakes and payouts, reel a
 
 Controller tests check PortMaster's Nintendo A/B mapping and preserve other controls, Xbox mappings, and custom layouts. The device runner uses the repository's launcher and controller adapter. Before release, verify the physical Nova buttons: B swings the sword, A interacts, and menus use A to confirm and B to close. Logical input injection alone cannot verify the controller translation.
 
-Updater tests cover stable-version selection, release URLs, checksums, archive paths, cancellation, insufficient space, installation failure, and recovery after each file-switch step. An integration test downloads fixture bytes and runs the real installer in a separate directory, preserving saves and migration backups.
+Updater tests cover stable-version selection, release URLs, checksums, archive paths, cancellation, insufficient space, installation failure, and recovery after each file-switch step. An integration test downloads fixture bytes and runs the real installer in a separate directory, preserving saves and migration backups. The running-game check must ignore gptokeyb, which the launcher leaves running during installation with the game executable in its arguments. Unit tests replace this check, so verify **Options > Updates** through the real launcher on the Nova before release.
 
 The runtime suite checks the Updates menu, stale responses, confirmation, cancellation, retry, window bounds, and controller hints. Its launcher disables the network worker so menu fixtures cannot download or install a release. `--capture` includes update-available and error screens. Check the live service separately before release.
 

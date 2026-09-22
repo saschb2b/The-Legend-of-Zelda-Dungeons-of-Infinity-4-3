@@ -37,6 +37,31 @@ class InstallerTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             install.apply_patch(b'ABCDE', data, 6)
 
+    def test_running_game_blocks_install_but_input_helper_does_not(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            game = root / 'zeldadoi-43'
+            game.mkdir()
+            proc = root / 'proc'
+
+            def process(pid, *argv, cwd=game):
+                entry = proc / str(pid)
+                entry.mkdir(parents=True)
+                (entry / 'cmdline').write_bytes(b'\0'.join(argv) + b'\0')
+                (entry / 'cwd').symlink_to(cwd)
+                return entry
+
+            # The Ports launcher keeps gptokeyb running after the game exits.
+            process(10715, b'/roms/ports/PortMaster/gptokeyb', b'-1', b'gmloadernext.aarch64')
+            process(10716, b'./gmloadernext.aarch64', b'-c', b'gmloader.json', cwd=root)
+            (proc / 'self').mkdir()
+            install.ensure_game_stopped(game, proc)
+            game_process = process(10717, b'./gmloadernext.aarch64', b'-c', b'gmloader.json')
+            with self.assertRaisesRegex(RuntimeError, 'Close the 4:3 edition'):
+                install.ensure_game_stopped(game, proc)
+            (game_process / 'cmdline').write_bytes(b'')
+            install.ensure_game_stopped(game, proc)
+
     def test_bad_download_keeps_existing_install(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
