@@ -116,7 +116,7 @@ function NovaUpdateWrapNotes() {
     draw_set_font(font);
 }
 function NovaUpdateDraw() {
-    NovaMenuFrame("Updates");
+    NovaMenuFrame(["Options", "About", "Updates"]);
     var layout = NovaUpdateLayout();
     var left = layout.left;
     var top = layout.y + 12;
@@ -151,7 +151,7 @@ function NovaUpdateDraw() {
         draw_text_transformed(layout.right, top + 16, "Your saves stay.", 0.6, 0.6, 0);
     }
     var label = state == "available" ? "Install update" : "Check again";
-    NovaFooter(state == "available" || state == "current" || state == "error" || state == "idle" ? label : "");
+    NovaFooter(state == "available" || state == "current" || state == "error" || state == "idle" ? label : "", undefined, "Back");
 }
 
 function NovaMenuConfirmBinding() {

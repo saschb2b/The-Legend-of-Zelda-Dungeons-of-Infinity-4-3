@@ -63,7 +63,7 @@ Preserve these decisions unless the requested change explicitly revises them:
 - Use the checked-in **Kenney Nintendo Switch 2/Double** glyphs. Retain their filenames, checksums and license. Do not redraw or invent replacements.
 - Place action hints at the bottom right, label before glyph. A precedes B Close. Keep L/R beside page headings and reserve space for the longest label.
 - Size gameplay, inventory, map and arcade prompts from `NovaHUDLayout`. Anchor footer rows to its `right`, `footer_y` and `footer_width`. Keep page glyphs beside their headings on whole screen pixels. Title and adventure menus use their own scale.
-- Keep one Options screen, `src/gml/menus/options.gml`, for the adventure and pause menus. Settings apply immediately and explain themselves below the list. Defaults restores one tab after confirmation. Pause draws the screen after the CRT pass.
+- Keep one Options screen, `src/gml/menus/options.gml`, for the adventure and pause menus. Settings apply immediately and explain themselves below the list. Defaults restores one tab after confirmation. Nested pages keep the tab strip, name their parents in the header breadcrumb and label B as **Back**. Confirmations open as a dialog over the page they affect. Pause draws the screen after the CRT pass.
 - Use **Status** for the collapsible HUD panels and **Close** for dismissal. Actions, Equip and Use have distinct meanings documented in the README.
 - Keep the centered title logo, then transition to the adventure menu. Continue resumes the selected player's save. Keep setup within one active frame.
 - Match the game's existing fonts, sprites and window frames. Use original artwork for backports and record its provenance. Distinguish recovered behavior from patch adaptations.

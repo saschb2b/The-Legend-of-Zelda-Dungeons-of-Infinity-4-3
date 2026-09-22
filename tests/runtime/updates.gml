@@ -49,9 +49,9 @@ function UpdateMenuTests() {
     for (var device = 0; device < 2; device++) {
         input_profile_set(device == 0 ? "gamepad" : "keyboard");
         var layout = oMenu.NovaUpdateLayout();
-        var hints = oMenu.NovaFooterLayout("Install update");
+        var hints = oMenu.NovaFooterLayout("Install update", undefined, "Back");
         Record("Update footer clears the frame " + string(device), hints[0].x >= layout.footer_left && hints[1].right <= layout.footer_right && layout.footer_y - 8 >= layout.y + layout.height + 8 && layout.footer_y + 8 <= 258);
-        Record("Update footer orders Install then Close " + string(device), hints[0].right < hints[1].x && hints[0].label == "Install update" && hints[1].label == "Close");
+        Record("Update footer orders Install then Back " + string(device), hints[0].right < hints[1].x && hints[0].label == "Install update" && hints[1].label == "Back");
         Record("Update paging stays above the footer " + string(device), layout.pages_y + 12 < layout.footer_y - 8);
         Record("Update notes clear the paging controls " + string(device), layout.y + 12 + 60 + (oMenu.NovaUpdateNoteRows - 1) * 15 + 12 < layout.pages_y - 6);
     }

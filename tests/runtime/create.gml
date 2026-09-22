@@ -94,7 +94,6 @@ function PauseTests() {
     var keyboard_before = input_profile_export("keyboard");
     pause.NovaOptions.page = "device";
     pause.NovaOptions.device = 1;
-    pause.NovaOptions.device_focus = 0;
     PressEvent(pause, "menu_input", oMenu_Game, ev_step, ev_step_normal);
     Record("pause starts remapping without the adventure menu", global.NovaRemapping && instance_exists(oInputRemap) && !instance_exists(oMenu));
     PressEvent(pause, global.NovaCloseVerb(), oMenu_Game, ev_step, ev_step_normal);

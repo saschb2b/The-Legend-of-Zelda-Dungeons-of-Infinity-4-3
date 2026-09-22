@@ -86,7 +86,7 @@ The centered title screen leads into an adventure menu with your last selected p
 
 ![Options with Game, Display, Audio, Controls and About tabs, volume bars and a description of the selected setting](docs/screenshots/options.png)
 
-**Options** opens the same screen from the adventure menu and the pause menu. L/R switch between Game, Display, Audio and Controls, and left/right changes the highlighted setting. Changes apply immediately, and a line below the list explains each setting. **Defaults** restores the current tab after confirmation. Music and sound effects have ten volume steps; zero mutes them. Controls, CRT and item messages are saved for each player. Volume, blood and title skipping apply to the whole device. Updates and credits are under **About** in the adventure menu.
+**Options** opens the same screen from the adventure menu and the pause menu. L/R switch between Game, Display, Audio and Controls, and left/right changes the highlighted setting. Changes apply immediately, and a line below the list explains each setting. **Defaults** restores the current tab after confirmation. Gamepad and Keyboard open inside the same panel, with the path shown in the header; choose **Remap all** to assign each action in turn. Music and sound effects have ten volume steps; zero mutes them. Controls, CRT and item messages are saved for each player. Volume, blood and title skipping apply to the whole device. Updates and credits are under **About** in the adventure menu.
 
 ## Playing and updating
 

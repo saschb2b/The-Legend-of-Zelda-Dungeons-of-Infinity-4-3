@@ -170,6 +170,25 @@ function ProfileCaptureStep() {
         oMenu.NovaOptions.device = 1;
         input_profile_set("keyboard");
         Capture = "profiles-keyboard";
+    } else if (Capture == "profiles-keyboard") {
+        input_profile_set("gamepad");
+        oMenu.NovaOptions.device = 0;
+        Capture = "options-gamepad";
+    } else if (Capture == "options-gamepad") {
+        // Show the scan highlight without starting a real binding scan.
+        global.NovaRemapping = true;
+        global.BindingRemap_VerbIndex = 2;
+        Capture = "options-remapping";
+    } else if (Capture == "options-remapping") {
+        global.NovaRemapping = false;
+        oMenu.NovaOptions.page = "confirm";
+        oMenu.NovaOptions.confirm = "device";
+        Capture = "options-gamepaddefaults";
+    } else if (Capture == "options-gamepaddefaults") {
+        oMenu.NovaOptions.page = "list";
+        oMenu.NovaCreditPage = 0;
+        oMenu.NovaPage = "credits";
+        Capture = "options-credits";
     } else {
         oMenu.NovaOptions = global.NovaOptionsState("title");
         global.Users = ProfileCaptureUsers;

@@ -247,21 +247,22 @@ function NovaRow(label, row, py, value = "", px = 60) {
     if (value != "") NovaText(value, 340, py, false, 0.85, fa_right);
     if (NovaFocus == row) draw_sprite(sMenu_Selector_Active, Selector_Frame, px - 22, py - 38);
 }
-function NovaFooterLayout(label = "Select", extra = undefined) {
+// Pages reached from Options say Back, matching the Options screen's nested pages.
+function NovaFooterLayout(label = "Select", extra = undefined, close = "Close") {
     var font = draw_get_font();
     draw_set_font(global.MenuFont_Innactive);
     var layout = NovaMenuLayout();
     var prompts = [];
     if (extra != undefined) array_push(prompts, extra);
     if (label != "") array_push(prompts, {binding: NovaMenuConfirmBinding(), label: label, reserve: label == "Install update" || label == "Check again" ? "Install update" : "Continue"});
-    array_push(prompts, {binding: global.NovaBinding(global.NovaCloseVerb()), label: "Close"});
+    array_push(prompts, {binding: global.NovaBinding(global.NovaCloseVerb()), label: close});
     prompts = global.NovaHintRow(prompts, layout.footer_right, layout.footer_y, 0.75, 0.75, 16, 12, layout.footer_right - layout.footer_left);
     draw_set_font(font);
     return prompts;
 }
-function NovaFooter(label = "Select", extra = undefined) {
+function NovaFooter(label = "Select", extra = undefined, close = "Close") {
     draw_set_font(global.MenuFont_Innactive);
-    var prompts = NovaFooterLayout(label, extra);
+    var prompts = NovaFooterLayout(label, extra, close);
     for (var i = 0; i < array_length(prompts); i++) global.NovaHintDraw(prompts[i]);
 }
 function NovaPageHeading(label) {
@@ -328,7 +329,7 @@ function NovaAdventureDraw() {
             draw_surface_ext(global.NovaTitleFrame, 0, -38, 400 / surface_get_width(global.NovaTitleFrame), 300 / surface_get_height(global.NovaTitleFrame), 0, c_white, 1 - NovaTransition / 12);
         return;
     }
-    var titles = {setup: "New adventure", players: "Players", player: "Player", challenges: "Challenges", replace: "New adventure", delete: "Delete player", rename: "Your name", records: "Records", credits: "Credits"};
+    var titles = {setup: "New adventure", players: "Players", player: "Player", challenges: "Challenges", replace: "New adventure", delete: "Delete player", rename: "Your name", records: "Records", credits: ["Options", "About", "Credits"]};
     NovaMenuFrame(variable_struct_exists(titles, NovaPage) ? variable_struct_get(titles, NovaPage) : "Saved adventure");
     switch (NovaPage) {
         case "setup":
@@ -415,7 +416,7 @@ function NovaAdventureDraw() {
                 var index = NovaCreditPage * 10 + i;
                 if (index < array_length(NovaCredits)) NovaText(NovaCredits[index], 200, 88 + i * 16, false, 0.65, fa_center);
             }
-            NovaFooter("");
+            NovaFooter("", undefined, "Back");
             break;
         case "save-error":
             NovaText("This save uses a different game version.", 200, 110, false, 0.8, fa_center);

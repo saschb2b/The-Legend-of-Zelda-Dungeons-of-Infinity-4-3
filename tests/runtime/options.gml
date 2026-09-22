@@ -87,13 +87,22 @@ function OptionsMenuTests() {
     var keyboard_before = input_profile_export("keyboard");
     input_binding_set("sword", input_binding_key(ord("Q")), 0, 0, "keyboard");
     OptionsPress("menu_input");
-    Record("Keyboard opens its remapping page", state.page == "device" && state.device == 1 && state.device_focus == 0);
-    OptionsPress("right");
-    OptionsPress("menu_input");
+    Record("Keyboard opens its remapping page", state.page == "device" && state.device == 1);
+    var trail = global.NovaOptionsTrail(state);
+    Record("device page names its place in Options", array_length(trail) == 3 && trail[0] == "Options" && trail[1] == "Controls" && trail[2] == "Keyboard");
+    var device_footer = global.NovaOptionsFooter(state);
+    Record("device page offers Defaults, Remap all and Back", device_footer[0].label == "Defaults" && device_footer[1].label == "Remap all" && device_footer[2].label == "Back");
+    OptionsPress("nova_bag_next");
+    Record("tabs stay put on a nested page", state.tab == 3 && state.page == "device");
+    OptionsPress("item");
     Record("restoring one device asks first", state.page == "confirm" && state.confirm == "device");
+    var confirm_trail = global.NovaOptionsTrail(state);
+    Record("device confirmation keeps the device breadcrumb", array_length(confirm_trail) == 3);
+    OptionsPress("left");
+    Record("confirmation choices move vertically", state.confirm_focus == 0);
     OptionsPress(global.NovaCloseVerb());
     Record("Close returns from the device confirmation", state.page == "device" && input_binding_get("sword", 0, 0, "keyboard").__value == ord("Q"));
-    OptionsPress("menu_input");
+    OptionsPress("item");
     OptionsPress("down");
     OptionsPress("menu_input");
     Record("restoring a device resets and saves its bindings", state.page == "device" && input_binding_get("sword", 0, 0, "keyboard").__value != ord("Q") && json_stringify(global.Users[0].InputProfile_Keyboard) == input_profile_export("keyboard"));
@@ -113,6 +122,18 @@ function OptionsMenuTests() {
     var layout = global.NovaOptionsLayout();
     var menu = global.NovaMenuLayout();
     var tabs = global.NovaOptionsTabs(state);
+    var trails = [["Options", "Controls", "Keyboard"], ["Options", "Controls", "Gamepad"], ["Options", "About", "Updates"], ["Options", "About", "Credits"]];
+    for (var t = 0; t < array_length(trails); t++) {
+        var parts = global.NovaMenuTitleParts(trails[t]);
+        var last_part = parts[array_length(parts) - 1];
+        Record("breadcrumb fits the header: " + trails[t][2] + " " + trails[t][1], last_part.current && last_part.x + last_part.width <= menu.x + menu.width - 8);
+    }
+    var glyphs = true;
+    for (var i = 0; i < global.BindingIconCount[0]; i++) glyphs = glyphs && global.NovaGlyph(global.NovaBinding(GetInputVerbStr(global.BindingVerbs[0][i]), "gamepad")) >= 0;
+    Record("default gamepad bindings all draw as glyphs", glyphs);
+    var dialog = global.NovaOptionsDialog();
+    Record("confirmation dialog sits inside the Options panel", dialog.x > menu.x && dialog.x + dialog.width < menu.x + menu.width && dialog.y > layout.rule_y && dialog.y + dialog.height < layout.help_rule_y);
+    Record("binding list stays above the help text", layout.bindings_y + 7 * layout.binding_height <= layout.help_rule_y + 2);
     Record("tab strip fits between the shoulder glyphs", tabs[0].x >= 64 && tabs[array_length(tabs) - 1].x + tabs[array_length(tabs) - 1].width <= 336.01);
     for (var t = 0; t < array_length(state.tabs); t++) {
         var tab_rows = global.NovaOptionRows(state.tabs[t]);

@@ -6,7 +6,7 @@ function NovaMenuFrame(title) {
     draw_set_alpha(1);
     draw_set_color(c_white);
     draw_sprite_stretched(sMenuWin, 0, layout.x, layout.y, layout.width, layout.height);
-    NovaText(title, layout.left, 18, false, 1.25);
+    global.NovaMenuTitle(title);
     draw_set_font(global.MenuFont_Innactive);
     draw_set_halign(fa_left);
     draw_set_valign(fa_top);
