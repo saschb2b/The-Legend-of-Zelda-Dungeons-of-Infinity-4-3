@@ -5,7 +5,8 @@ function ControlTests() {
     var keyboard_before = input_profile_export("keyboard");
     var buttons = [gp_face1, gp_face2, gp_face3, gp_face4, gp_shoulderl, gp_shoulderr, gp_shoulderlb, gp_shoulderrb, gp_select, gp_stickl, gp_stickr, gp_padu, gp_padd, gp_padl, gp_padr];
     input_profile_set("gamepad");
-    Record("Nova A confirms and B closes with the original gameplay bindings", global.NovaConfirmVerb() == "action" && global.NovaCloseVerb() == "sword" && global.NovaGlyph(global.NovaBinding("sword")) == 1 && global.NovaGlyph(global.NovaBinding("action")) == 0);
+    Record("Nova A confirms and B closes through fixed menu verbs", global.NovaConfirmVerb() == "nova_confirm" && global.NovaCloseVerb() == "nova_back" && global.NovaGlyph(global.NovaBinding("nova_confirm")) == 0 && global.NovaGlyph(global.NovaBinding("nova_back")) == 1);
+    Record("gameplay Sword and Interact default to the same B and A buttons", global.NovaGlyph(global.NovaBinding("sword")) == 1 && global.NovaGlyph(global.NovaBinding("action")) == 0);
     Record("Controls names the same A and B buttons as the glyphs", global.NovaKeyLabel(global.NovaBinding("sword")) == "B" && global.NovaKeyLabel(global.NovaBinding("action")) == "A");
     var old_confirm = json_parse(gamepad_before);
     old_confirm.menu_input[1].__value = gp_face1;
@@ -35,7 +36,7 @@ function ControlTests() {
     input_binding_set("hud", input_binding_empty(), 0, 1, "gamepad");
     Record("unbound status never claims R3", global.NovaGlyph(global.NovaBinding("hud")) == -1 && global.NovaKeyLabel(global.NovaBinding("hud")) == "UNBOUND");
     input_profile_set("keyboard");
-    Record("keyboard confirm and close keep their original verbs", global.NovaConfirmVerb() == "sword" && global.NovaCloseVerb() == "action");
+    Record("keyboard confirm and close keep Ctrl and Alt", global.NovaBinding("nova_confirm").__value == vk_control && global.NovaBinding("nova_back").__value == vk_alt);
     input_binding_set("hud", input_binding_key(ord("K")), 0, 0, "keyboard");
     Record("keyboard status uses the remapped key", global.NovaGlyph(global.NovaBinding("hud")) == -1 && global.NovaKeyLabel(global.NovaBinding("hud")) == "K");
     input_profile_import(gamepad_before, "gamepad");
@@ -57,6 +58,14 @@ function ControlTests() {
     variable_struct_remove(legacy, "nova_bag_next");
     input_profile_import(legacy, "keyboard");
     Record("old keyboard profiles gain page keys without losing bindings", input_profile_export("keyboard") == keyboard_before);
+    for (var device = 0; device < 2; device++) {
+        var name = device == 0 ? "gamepad" : "keyboard";
+        legacy = json_parse(device == 0 ? gamepad_before : keyboard_before);
+        variable_struct_remove(legacy, "nova_confirm");
+        variable_struct_remove(legacy, "nova_back");
+        input_profile_import(legacy, name);
+        Record("old " + name + " profiles gain fixed menu Confirm and Back", input_profile_export(name) == (device == 0 ? gamepad_before : keyboard_before));
+    }
 
     var inventory_before = StructCopy(global.Inventory);
     var items_before = StructCopy(global.Inventory_ItemData);
@@ -118,7 +127,7 @@ function ControlTests() {
     Record("gear prompt opens actions without claiming to equip", global.NovaInventoryAction(ui) == "ACTIONS");
     with (ui) NovaItemMenu();
     var before_close = json_stringify(global.Inventory);
-    PressEvent(ui, ["action", "sword"], oInventory, ev_step, ev_step_normal);
+    PressEvent(ui, ["action", "sword", "nova_confirm", "nova_back"], oInventory, ev_step, ev_step_normal);
     Record("close dismisses item actions without executing them", !ui.MenuEnable && !ui.Close && json_stringify(global.Inventory) == before_close);
     with (ui) NovaItemMenu();
     PressEvent(ui, ["nova_bag_next", global.NovaConfirmVerb()], oInventory, ev_step, ev_step_normal);
@@ -151,7 +160,7 @@ function ControlTests() {
     input_binding_set("action", input_binding_gamepad_button(gp_face4), 0, 0, "gamepad");
     input_binding_set("sword", input_binding_gamepad_button(gp_face3), 0, 0, "gamepad");
     var footer_remapped = global.NovaInventoryFooter(ui, layout);
-    Record("remapped glyphs preserve action order and positions", global.NovaGlyph(footer_remapped[2].binding) == 2 && global.NovaGlyph(footer_remapped[1].binding) == 3 && footer_remapped[2].x == footer_item[2].x && footer_remapped[1].x == footer_item[1].x);
+    Record("menu Confirm and Back stay fixed when gameplay actions move", global.NovaGlyph(footer_remapped[2].binding) == 1 && global.NovaGlyph(footer_remapped[1].binding) == 0 && footer_remapped[2].x == footer_item[2].x && footer_remapped[1].x == footer_item[1].x);
     input_profile_import(gamepad_before, "gamepad");
     input_profile_set("keyboard");
     var footer_sizes = [[256, 224], [640, 480], [1280, 960], [1920, 1440]];

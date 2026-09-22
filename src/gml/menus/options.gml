@@ -13,13 +13,14 @@ global.NovaOptionsLayout = function() {
     return {tabs_y: 21, tabs_left: 72, tabs_right: 328, rule_y: 42, rows_y: 56, row_height: 28,
         label_x: 60, value_center: 285, arrow_left: 236, arrow_right: 334,
         bar_x: 246, bar_segment: 8, help_rule_y: 184, help_y: 192, help_x: 44, help_width: 316,
-        bindings_y: 52, binding_height: 18};
+        list_top: 47, list_bottom: 181, header_height: 13, binding_height: 16};
 };
 global.NovaOptionsState = function(context) {
     var tabs = ["Game", "Display", "Audio", "Controls"];
     if (context == "title") array_push(tabs, "About");
     return {context: context, tabs: tabs, tab: 0, focus: 0, memory: array_create(array_length(tabs), 0),
-        page: "list", device: 0, confirm: "", confirm_focus: 0};
+        page: "list", device: 0, confirm: "", confirm_focus: 0,
+        bind_focus: 1, bind_scroll: 0, capture: false, notice: "", notice_time: 0};
 };
 global.NovaOptionRows = function(tab) {
     switch (tab) {
@@ -103,6 +104,7 @@ global.NovaResetBindings = function(device) {
 global.NovaOptionsReset = function(state) {
     if (state.confirm == "device") {
         global.NovaResetBindings(state.device);
+        global.NovaRemapNotice(state, "Every action uses its default again.");
         return;
     }
     var tab = state.tabs[state.tab];
@@ -115,11 +117,183 @@ global.NovaOptionsReset = function(state) {
     for (var i = 0; i < array_length(rows); i++) global.NovaOptionSet(rows[i], global.NovaOptionInfo(rows[i]).fallback);
     User_Save();
 };
-global.NovaRemapStart = function(device) {
-    // Gameplay rooms deactivate instances outside the camera; keep the scanner inside it.
-    var px = instance_exists(oCamera) ? oCamera.X + 8 : -100;
-    var py = instance_exists(oCamera) ? oCamera.Y + 8 : -100;
-    instance_create_depth(px, py, 0, oInputRemap, {InputIndex: device});
+// Remapper: one action at a time. Menu Confirm, Back and Pause stay fixed so a player cannot lock themselves out.
+global.NovaRemapProfile = function(device) { return device == 0 ? "gamepad" : "keyboard"; };
+global.NovaRemapItems = function(device) {
+    var items = [];
+    var groups = device == 1 ? [["Movement", [["up", "Up"], ["down", "Down"], ["left", "Left"], ["right", "Right"]]]] : [];
+    array_push(groups,
+        ["Combat", [["sword", "Sword"], ["item", "Item"], ["strafe", "Strafe"]]],
+        ["World", [["action", "Interact"], ["map", "Map"], ["hud", "Status"]]],
+        ["Menus", [["inventory", "Inventory"], ["nova_bag_previous", "Previous bag"], ["nova_bag_next", "Next bag"]]]);
+    for (var g = 0; g < array_length(groups); g++) {
+        array_push(items, {kind: "header", label: groups[g][0]});
+        var actions = groups[g][1];
+        for (var a = 0; a < array_length(actions); a++) array_push(items, {kind: "action", verb: actions[a][0], label: actions[a][1]});
+    }
+    array_push(items, {kind: "reset", label: "Restore all defaults"});
+    array_push(items, {kind: "header", label: "Fixed"});
+    array_push(items, {kind: "fixed", verb: "nova_confirm", label: "Confirm"}, {kind: "fixed", verb: "nova_back", label: "Back"}, {kind: "fixed", verb: "menu_access", label: "Pause"});
+    return items;
+};
+global.NovaRemapFocusable = function(item) { return item.kind == "action" || item.kind == "reset"; };
+global.NovaRemapVerbs = function(device) {
+    var verbs = [];
+    var items = global.NovaRemapItems(device);
+    for (var i = 0; i < array_length(items); i++) if (items[i].kind == "action") array_push(verbs, items[i].verb);
+    return verbs;
+};
+global.NovaDefaultBindings = undefined;
+global.NovaDefaultBinding = function(verb, device) {
+    if (global.NovaDefaultBindings == undefined) global.NovaDefaultBindings = __input_config_verbs();
+    var set = device == 0 ? global.NovaDefaultBindings.gamepad : global.NovaDefaultBindings.keyboard;
+    if (!variable_struct_exists(set, verb)) return input_binding_empty();
+    var value = variable_struct_get(set, verb);
+    return is_array(value) ? value[0] : value;
+};
+global.NovaBindingKey = function(binding) {
+    if (!is_struct(binding) || binding.__type == undefined) return "none";
+    var value = binding.__value;
+    // Left and right modifier keys count as the same key.
+    if (binding.__type == "key") {
+        if (value == 160 || value == 161) value = vk_shift;
+        if (value == 162 || value == 163) value = vk_control;
+        if (value == 164 || value == 165) value = vk_alt;
+    }
+    var axis = variable_struct_exists(binding, "__axis_negative") && binding.__type == "gamepad axis" ? string(binding.__axis_negative) : "";
+    return string(binding.__type) + ":" + string(value) + ":" + axis;
+};
+global.NovaRemapBinding = function(verb, device) {
+    return input_binding_get(verb, 0, 0, global.NovaRemapProfile(device));
+};
+global.NovaRemapChanged = function(verb, device) {
+    return global.NovaBindingKey(global.NovaRemapBinding(verb, device)) != global.NovaBindingKey(global.NovaDefaultBinding(verb, device));
+};
+global.NovaRemapCustom = function(device) {
+    var verbs = global.NovaRemapVerbs(device);
+    for (var i = 0; i < array_length(verbs); i++) if (global.NovaRemapChanged(verbs[i], device)) return true;
+    return false;
+};
+global.NovaRemapLabel = function(verb, device) {
+    var items = global.NovaRemapItems(device);
+    for (var i = 0; i < array_length(items); i++) if (items[i].kind != "header" && items[i].verb == verb) return items[i].label;
+    return verb;
+};
+// Assigning a button another action already uses swaps the two, so no action is left without one.
+global.NovaRemapAssign = function(verb, binding, device) {
+    var profile = global.NovaRemapProfile(device);
+    var previous = input_binding_get(verb, 0, 0, profile);
+    var moved = "";
+    var verbs = global.NovaRemapVerbs(device);
+    for (var i = 0; i < array_length(verbs); i++) {
+        if (verbs[i] == verb || global.NovaBindingKey(input_binding_get(verbs[i], 0, 0, profile)) != global.NovaBindingKey(binding)) continue;
+        input_binding_set(verbs[i], previous.__type == undefined ? input_binding_empty() : previous, 0, 0, profile);
+        moved = global.NovaRemapLabel(verbs[i], device);
+    }
+    input_binding_set(verb, binding, 0, 0, profile);
+    User_SaveControls();
+    Bindings_GetIcons(device);
+    return moved;
+};
+global.NovaRemapNotice = function(state, text) {
+    state.notice = text;
+    state.notice_time = current_time;
+};
+global.NovaRemapState = undefined;
+global.NovaRemapEnd = function() {
+    global.NovaRemapping = false;
+    input_binding_scan_abort();
+    input_binding_scan_params_clear();
+    input_clear_momentary(true);
+};
+global.NovaRemapSuccess = function(binding) {
+    var state = global.NovaRemapState;
+    if (!is_struct(state) || !state.capture) return;
+    var items = global.NovaRemapItems(state.device);
+    var item = items[state.bind_focus];
+    var moved = global.NovaRemapAssign(item.verb, binding, state.device);
+    state.capture = false;
+    global.NovaRemapEnd();
+    global.NovaRemapNotice(state, item.label + " changed." + (moved == "" ? "" : " " + moved + " took its old " + (state.device == 0 ? "button." : "key.")));
+    audio_play_sound(Sound_TextDone, 1, false);
+};
+global.NovaRemapFailure = function(code) {
+    var state = global.NovaRemapState;
+    if (!is_struct(state) || !state.capture) return;
+    // An ignored or momentarily invalid source restarts the scan without leaving it.
+    if (code == -10 || code == -11 || code == -21) {
+        input_binding_scan_start(global.NovaRemapSuccess, global.NovaRemapFailure);
+        return;
+    }
+    var items = global.NovaRemapItems(state.device);
+    var item = items[state.bind_focus];
+    state.capture = false;
+    global.NovaRemapEnd();
+    global.NovaRemapNotice(state, (code == -20 ? "Nothing pressed. " : "Stopped. ") + item.label + " is unchanged.");
+};
+global.NovaRemapBegin = function(state) {
+    var device = state.device;
+    if (device == 0) input_binding_scan_params_set([gp_axislh, gp_axislv, gp_axisrh, gp_axisrv, gp_padl, gp_padr, gp_padu, gp_padd],
+        [gp_face1, gp_face2, gp_face3, gp_face4, gp_start, gp_shoulderl, gp_shoulderr, gp_shoulderlb, gp_shoulderrb, gp_stickl, gp_stickr]);
+    else input_binding_scan_params_set([], [37, 39, 38, 40, 162, 163, 164, 165, 32, 16, 13, 36, 35, 33, 34, 45, 46, 188, 190, 220, 222, 189, 187, 186, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 110, 111, 106, 109, 107, "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]);
+    state.capture = true;
+    state.notice = "";
+    global.NovaRemapState = state;
+    global.NovaRemapping = true;
+    input_binding_scan_start(global.NovaRemapSuccess, global.NovaRemapFailure);
+};
+global.NovaRemapCancelPressed = function() {
+    if (keyboard_check_pressed(vk_escape) || input_check_pressed("menu_access")) return true;
+    for (var pad = 0; pad < gamepad_get_device_count(); pad++) if (gamepad_is_connected(pad) && gamepad_button_check_pressed(pad, gp_select)) return true;
+    return false;
+};
+global.NovaRemapMove = function(state, delta) {
+    var items = global.NovaRemapItems(state.device);
+    var count = array_length(items);
+    var index = state.bind_focus;
+    repeat (count) {
+        index = (index + delta + count) mod count;
+        if (global.NovaRemapFocusable(items[index])) break;
+    }
+    state.bind_focus = index;
+    global.NovaRemapScroll(state);
+};
+global.NovaRemapStep = function(state, close, confirm, vertical, reset) {
+    if (state.capture) {
+        if (global.NovaRemapCancelPressed()) {
+            input_binding_scan_abort();
+            state.capture = false;
+            global.NovaRemapEnd();
+            global.NovaRemapNotice(state, "Cancelled.");
+            audio_play_sound(Sound_Throw, 1, false);
+        }
+        return;
+    }
+    var items = global.NovaRemapItems(state.device);
+    if (!global.NovaRemapFocusable(items[clamp(state.bind_focus, 0, array_length(items) - 1)])) global.NovaRemapMove(state, 1);
+    var item = items[state.bind_focus];
+    if (close) {
+        state.page = "list";
+        audio_play_sound(Sound_Throw, 1, false);
+        input_clear_momentary(true);
+    } else if (vertical != 0) {
+        global.NovaRemapMove(state, vertical);
+        state.notice = "";
+        audio_play_sound(Sound_Text, 1, false);
+    } else if (reset && item.kind == "action" && global.NovaRemapChanged(item.verb, state.device)) {
+        var moved = global.NovaRemapAssign(item.verb, global.NovaDefaultBinding(item.verb, state.device), state.device);
+        global.NovaRemapNotice(state, item.label + " restored." + (moved == "" ? "" : " " + moved + " took its old " + (state.device == 0 ? "button." : "key.")));
+        audio_play_sound(Sound_TextDone, 1, false);
+        input_clear_momentary(true);
+    } else if (confirm) {
+        input_clear_momentary(true);
+        if (item.kind == "reset") {
+            if (global.NovaRemapCustom(state.device)) global.NovaOptionsConfirmOpen(state, "device");
+        } else {
+            audio_play_sound(Sound_TextDone, 1, false);
+            global.NovaRemapBegin(state);
+        }
+    }
 };
 global.NovaOptionsConfirmOpen = function(state, kind) {
     state.confirm = kind;
@@ -129,7 +303,7 @@ global.NovaOptionsConfirmOpen = function(state, kind) {
     input_clear_momentary(true);
 };
 global.NovaOptionsStep = function(state, close) {
-    if (global.NovaRemapping) return "";
+    if (global.NovaRemapping && !(state.page == "device" && state.capture)) return "";
     var confirm = !keyboard_check(vk_alt) && input_check_pressed("menu_input");
     var vertical = input_check_pressed("down") - input_check_pressed("up");
     var horizontal = input_check_pressed("right") - input_check_pressed("left");
@@ -155,16 +329,7 @@ global.NovaOptionsStep = function(state, close) {
         return "";
     }
     if (state.page == "device") {
-        if (close) {
-            state.page = "list";
-            audio_play_sound(Sound_Throw, 1, false);
-            input_clear_momentary(true);
-        } else if (defaults) global.NovaOptionsConfirmOpen(state, "device");
-        else if (confirm) {
-            global.NovaRemapStart(state.device);
-            audio_play_sound(Sound_TextDone, 1, false);
-            input_clear_momentary(true);
-        }
+        global.NovaRemapStep(state, close, confirm, vertical, defaults);
         return "";
     }
     if (close) {
@@ -208,16 +373,20 @@ global.NovaOptionsStep = function(state, close) {
     else if (row == "gamepad" || row == "keyboard") {
         state.device = row == "gamepad" ? 0 : 1;
         state.page = "device";
+        state.bind_focus = 1;
+        state.bind_scroll = 0;
+        state.notice = "";
     } else if (info.kind == "link") return row;
     return "";
 };
 
-global.NovaOptText = function(text, px, py, active = false, scale = 1, align = fa_left) {
-    draw_set_color(c_white);
+global.NovaOptText = function(text, px, py, active = false, scale = 1, align = fa_left, color = c_white) {
+    draw_set_color(color);
     draw_set_halign(align);
     draw_set_valign(fa_top);
     draw_set_font(active ? global.MenuFont : global.MenuFont_Innactive);
     draw_text_transformed(px, py, text, scale, scale, 0);
+    draw_set_color(c_white);
 };
 global.NovaOptArrow = function(px, py, direction) {
     draw_triangle(px - direction * 5, py - 4, px - direction * 5, py + 4, px, py, false);
@@ -267,7 +436,7 @@ global.NovaOptionsFooter = function(state) {
     var prompts = [];
     var select = {binding: global.NovaMenuConfirmBinding(), label: "Select"};
     var defaults = {binding: global.NovaBinding("item"), label: "Defaults"};
-    if (global.NovaRemapping) return prompts;
+    if (global.NovaRemapping && !(state.page == "device" && state.capture)) return prompts;
     if (state.page == "list") {
         var rows = global.NovaOptionRows(state.tabs[state.tab]);
         var info = global.NovaOptionInfo(rows[clamp(state.focus, 0, array_length(rows) - 1)]);
@@ -275,9 +444,15 @@ global.NovaOptionsFooter = function(state) {
         if (state.tabs[state.tab] != "About") array_push(prompts, defaults);
         if (info.kind == "link") array_push(prompts, select);
     } else if (state.page == "device") {
-        array_push(prompts, defaults, {binding: global.NovaMenuConfirmBinding(), label: "Remap all"});
+        var items = global.NovaRemapItems(state.device);
+        var item = items[clamp(state.bind_focus, 0, array_length(items) - 1)];
+        if (state.capture) array_push(prompts, {binding: global.NovaBinding("menu_access"), label: "Cancel"});
+        else {
+            if (item.kind == "action" && global.NovaRemapChanged(item.verb, state.device)) array_push(prompts, {binding: global.NovaBinding("item"), label: "Reset"});
+            array_push(prompts, {binding: global.NovaMenuConfirmBinding(), label: item.kind == "reset" ? "Select" : "Remap"});
+        }
     } else array_push(prompts, select);
-    array_push(prompts, {binding: global.NovaBinding(global.NovaCloseVerb()), label: state.page == "list" ? "Close" : "Back"});
+    if (!(state.page == "device" && state.capture)) array_push(prompts, {binding: global.NovaBinding(global.NovaCloseVerb()), label: state.page == "list" ? "Close" : "Back"});
     var layout = global.NovaMenuLayout();
     var font = draw_get_font();
     draw_set_font(global.MenuFont_Innactive);
@@ -361,6 +536,11 @@ global.NovaOptionsDrawList = function(state, selector, show_focus = true) {
             draw_set_alpha(focused ? 1 : 0.7);
             global.NovaOptText(string(value), 356, py + 1, false, 0.75, fa_right);
         }
+        if (rows[i] == "gamepad" || rows[i] == "keyboard") {
+            var custom = global.NovaRemapCustom(rows[i] == "gamepad" ? 0 : 1);
+            draw_set_alpha(focused ? 1 : 0.7);
+            global.NovaOptText(custom ? "Custom" : "Default", layout.value_center, py + 1, false, 0.85, fa_center, custom ? global.NovaRemapChangedColor : c_white);
+        }
         draw_set_alpha(focused ? 1 : 0.45);
         if (info.kind == "link") global.NovaOptArrow(layout.arrow_right, cy, 1);
         else if (focused) {
@@ -371,38 +551,101 @@ global.NovaOptionsDrawList = function(state, selector, show_focus = true) {
     }
     global.NovaOptionsHelp(global.NovaOptionInfo(rows[focus]).help);
 };
-global.NovaOptionsBindingLabels = ["Sword", "Interact", "Item", "Map", "Strafe", "Inventory", "Menu", "Status", "Up", "Down", "Left", "Right", "Previous bag", "Next bag"];
-global.NovaOptionsDrawDevice = function(state) {
+global.NovaRemapChangedColor = make_color_rgb(248, 208, 96);
+global.NovaRemapRows = function(state) {
+    var layout = global.NovaOptionsLayout();
+    var items = global.NovaRemapItems(state.device);
+    var rows = [];
+    var cursor = 0;
+    for (var i = 0; i < array_length(items); i++) {
+        var height = items[i].kind == "header" ? layout.header_height : layout.binding_height;
+        array_push(rows, {item: items[i], y: cursor, height: height});
+        cursor += height;
+    }
+    return {rows: rows, total: cursor, visible: layout.list_bottom - layout.list_top};
+};
+// Keeps the highlighted action, and the group heading above it, inside the list area.
+global.NovaRemapScroll = function(state) {
+    var list = global.NovaRemapRows(state);
+    var row = list.rows[state.bind_focus];
+    var top = row.y;
+    if (state.bind_focus > 0 && list.rows[state.bind_focus - 1].item.kind == "header") top = list.rows[state.bind_focus - 1].y;
+    if (top < state.bind_scroll) state.bind_scroll = top;
+    if (row.y + row.height > state.bind_scroll + list.visible) state.bind_scroll = row.y + row.height - list.visible;
+    state.bind_scroll = clamp(state.bind_scroll, 0, max(0, list.total - list.visible));
+};
+global.NovaBindingDraw = function(binding, right, py, alpha) {
+    draw_set_alpha(alpha);
+    if (global.NovaGlyph(binding) >= 0) draw_sprite_stretched_ext(sNovaButtons, global.NovaGlyph(binding), right - 14, py - 1, 14, 14, c_white, alpha);
+    else global.NovaOptText(binding.__type == undefined ? "-" : global.NovaKeyLabel(binding), right, py, false, 0.6, fa_right);
+    draw_set_alpha(1);
+};
+global.NovaOptionsDrawDevice = function(state, selector) {
     var layout = global.NovaOptionsLayout();
     var device = state.device;
-    var profile = device == 0 ? "gamepad" : "keyboard";
-    var scanning_label = "";
-    for (var i = 0; i < global.BindingIconCount[device]; i++) {
-        var px = 48 + (i div 7) * 160;
-        var py = layout.bindings_y + (i mod 7) * layout.binding_height;
-        var scanning = global.NovaRemapping && i == global.BindingRemap_VerbIndex;
-        var label = global.NovaOptionsBindingLabels[global.BindingVerbs[device][i]];
-        if (scanning) {
-            scanning_label = label;
+    var list = global.NovaRemapRows(state);
+    var custom = global.NovaRemapCustom(device);
+    for (var i = 0; i < array_length(list.rows); i++) {
+        var row = list.rows[i];
+        var item = row.item;
+        var py = layout.list_top + row.y - state.bind_scroll;
+        if (py < layout.list_top - 0.5 || py + row.height > layout.list_bottom + 0.5) continue;
+        var focused = i == state.bind_focus && state.page == "device";
+        if (item.kind == "header") {
+            draw_set_alpha(0.55);
+            global.NovaOptText(string_upper(item.label), 44, py + 3, false, 0.55);
+            draw_set_alpha(1);
+            continue;
+        }
+        var capturing = focused && state.capture;
+        if (capturing) {
             draw_set_alpha(0.15);
-            draw_rectangle(px - 6, py - 2, px + 148, py + layout.binding_height - 5, false);
+            draw_rectangle(52, py - 1, 346, py + row.height - 3, false);
             draw_set_alpha(1);
         }
-        global.NovaOptText(label, px, py, scanning, 0.75);
-        var binding = global.NovaBinding(GetInputVerbStr(global.BindingVerbs[device][i]), profile);
-        if (scanning) global.NovaOptText("Press...", px + 142, py, true, 0.6, fa_right);
-        else if (global.NovaGlyph(binding) >= 0) {
-            // Controller bindings use the same glyphs as every button hint.
-            draw_sprite_stretched(sNovaButtons, global.NovaGlyph(binding), px + 128, py - 1, 14, 14);
-        } else if (binding.__type == undefined) {
-            draw_set_alpha(0.5);
-            global.NovaOptText("-", px + 142, py, false, 0.6, fa_right);
+        if (focused && !state.capture) draw_sprite(sMenu_Selector_Active, selector, 38, py - 1);
+        if (item.kind == "reset") {
+            draw_set_alpha(custom ? 1 : 0.4);
+            global.NovaOptText(item.label, 60, py, focused, 0.75);
             draw_set_alpha(1);
-        } else global.NovaOptText(global.NovaKeyLabel(binding), px + 142, py, false, 0.6, fa_right);
+            continue;
+        }
+        var binding = global.NovaRemapBinding(item.verb, device);
+        if (item.kind == "fixed") {
+            draw_set_alpha(0.45);
+            global.NovaOptText(item.label, 60, py, false, 0.75);
+            global.NovaBindingDraw(binding, 330, py, 0.45);
+            continue;
+        }
+        var changed = global.NovaRemapChanged(item.verb, device);
+        // Changed actions use both a colour and a dot, so the cue does not rely on colour alone.
+        global.NovaOptText(item.label, 60, py, focused, 0.75, fa_left, changed && !focused ? global.NovaRemapChangedColor : c_white);
+        if (changed) {
+            draw_set_color(global.NovaRemapChangedColor);
+            draw_circle(339, py + 6, 2, false);
+            draw_set_color(c_white);
+        }
+        if (capturing) global.NovaOptText("Press...", 330, py, true, 0.6, fa_right);
+        else global.NovaBindingDraw(binding, 330, py, 1);
     }
-    global.NovaOptionsHelp(global.NovaRemapping
-        ? "Press the new " + (device == 0 ? "button" : "key") + " for " + scanning_label + "."
-        : "Remap all asks for a new " + (device == 0 ? "button" : "key") + " for each action in order. Saved for this player.");
+    draw_set_alpha(0.6);
+    if (state.bind_scroll > 0) draw_triangle(352, layout.list_top + 6, 360, layout.list_top + 6, 356, layout.list_top + 1, false);
+    if (state.bind_scroll < list.total - list.visible) draw_triangle(352, layout.list_bottom - 6, 360, layout.list_bottom - 6, 356, layout.list_bottom - 1, false);
+    draw_set_alpha(1);
+    var noun = device == 0 ? "button" : "key";
+    var item = list.rows[state.bind_focus].item;
+    if (state.capture) {
+        var seconds = ceil(max(0, input_binding_scan_time_remaining()) / 1000);
+        global.NovaOptionsHelp("Press the new " + noun + " for " + item.label + ". " + (device == 0 ? "Select" : "Esc") + " cancels." + (seconds > 0 ? " " + string(seconds) : ""));
+    } else if (state.notice != "" && current_time - state.notice_time < 4000) global.NovaOptionsHelp(state.notice);
+    else if (item.kind == "reset") global.NovaOptionsHelp(custom ? "Return every action on this page to its default." : "Every action already uses its default.");
+    else if (global.NovaRemapChanged(item.verb, device)) {
+        var text = "Changed. Default:";
+        global.NovaOptionsHelp(text);
+        draw_set_font(global.MenuFont_Innactive);
+        var right = layout.help_x + string_width(text) * 0.6 + 20;
+        global.NovaBindingDraw(global.NovaDefaultBinding(item.verb, device), right, layout.help_y, 0.85);
+    } else global.NovaOptionsHelp("Remap to choose a new " + noun + ". One already in use swaps with this action.");
 };
 // Confirmations open over the dimmed page they affect instead of replacing it.
 global.NovaOptionsDrawConfirm = function(state, selector) {
@@ -445,7 +688,7 @@ global.NovaOptionsDraw = function(state, selector) {
     global.NovaMenuTitle(global.NovaOptionsTrail(state));
     global.NovaOptionsDrawChrome(state);
     var underneath = state.page == "confirm" ? (state.confirm == "device" ? "device" : "list") : state.page;
-    if (underneath == "device") global.NovaOptionsDrawDevice(state);
+    if (underneath == "device") global.NovaOptionsDrawDevice(state, selector);
     else global.NovaOptionsDrawList(state, selector, state.page != "confirm");
     if (state.page == "confirm") global.NovaOptionsDrawConfirm(state, selector);
     draw_set_font(global.MenuFont_Innactive);

@@ -54,24 +54,14 @@ function MenuTests() {
     Record("Default delete choice preserves the player", global.Users[0].Name == "HARNESS");
     oMenu.NovaPage = "options";
     oMenu.NovaOptions.page = "device";
-    oMenu.Bindings_Remap = true;
+    oMenu.NovaOptions.device = 1;
+    oMenu.NovaOptions.capture = true;
     global.NovaRemapping = true;
     PressEvent(oMenu, global.NovaCloseVerb(), oMenu, ev_step, ev_step_normal);
-    Record("Close does not interrupt a binding scan", oMenu.NovaPage == "options" && oMenu.NovaOptions.page == "device");
-    oMenu.Bindings_Remap = false;
-    global.NovaRemapping = false;
+    Record("Close does not interrupt a binding scan", oMenu.NovaPage == "options" && oMenu.NovaOptions.page == "device" && oMenu.NovaOptions.capture);
+    PressEvent(oMenu, "menu_access", oMenu, ev_step, ev_step_normal);
+    Record("Pause cancels a binding scan", !oMenu.NovaOptions.capture && !global.NovaRemapping && oMenu.NovaOptions.page == "device");
     oMenu.NovaOptions.page = "list";
-    var keyboard_before = input_profile_export("keyboard");
-    var remap = instance_create_layer(0, 0, "System", oInputRemap, {InputIndex: 1});
-    Record("remapping blocks the Options screen", global.NovaRemapping && oMenu.Bindings_Remap);
-    input_binding_scan_set_Success(input_binding_key(ord("Q")));
-    input_binding_scan_set_Failure(-20);
-    Record("aborted remapping restores every previous binding", input_profile_export("keyboard") == keyboard_before && !instance_exists(remap) && !global.NovaRemapping && !oMenu.Bindings_Remap);
-    remap = instance_create_layer(0, 0, "System", oInputRemap, {InputIndex: 1});
-    var keys = [ord("Z"), ord("X"), ord("C"), ord("M"), ord("S"), ord("I"), vk_escape, vk_f1, vk_up, vk_down, vk_left, vk_right, vk_pageup, vk_pagedown];
-    for (var k = 0; k < array_length(keys); k++) input_binding_scan_set_Success(input_binding_key(keys[k]));
-    Record("completed keyboard remapping saves menu and directions", input_binding_get("menu_access", undefined, undefined, "keyboard").__value == vk_escape && input_binding_get("right", undefined, undefined, "keyboard").__value == vk_right && json_stringify(global.Users[0].InputProfile_Keyboard) == input_profile_export("keyboard"));
-    input_profile_import(keyboard_before, "keyboard");
     global.StartingGear = 0;
 }
 function PauseTests() {
@@ -94,14 +84,13 @@ function PauseTests() {
     var keyboard_before = input_profile_export("keyboard");
     pause.NovaOptions.page = "device";
     pause.NovaOptions.device = 1;
+    pause.NovaOptions.bind_focus = 1;
     PressEvent(pause, "menu_input", oMenu_Game, ev_step, ev_step_normal);
-    Record("pause starts remapping without the adventure menu", global.NovaRemapping && instance_exists(oInputRemap) && !instance_exists(oMenu));
+    Record("pause remaps one action without the adventure menu", global.NovaRemapping && pause.NovaOptions.capture && !instance_exists(oMenu));
     PressEvent(pause, global.NovaCloseVerb(), oMenu_Game, ev_step, ev_step_normal);
+    Record("Back during a pause remap keeps Options open", pause.NovaOptionsOpen && pause.NovaOptions.capture && !pause.Close);
     PressEvent(pause, "menu_access", oMenu_Game, ev_step, ev_step_normal);
-    Record("buttons during a pause remap do not leave Options", pause.NovaOptionsOpen && pause.NovaOptions.page == "device" && !pause.Close);
-    input_binding_scan_set_Success(input_binding_key(ord("Q")));
-    input_binding_scan_set_Failure(-20);
-    Record("aborted pause remap restores the keyboard", !global.NovaRemapping && !instance_exists(oInputRemap) && input_profile_export("keyboard") == keyboard_before);
+    Record("Select cancels a pause remap without leaving pause", pause.NovaOptionsOpen && !pause.NovaOptions.capture && !global.NovaRemapping && !pause.Close && input_profile_export("keyboard") == keyboard_before);
     pause.NovaOptions.page = "list";
     PressEvent(pause, "menu_access", oMenu_Game, ev_step, ev_step_normal);
     Record("Select leaves pause from Options", !pause.NovaOptionsOpen && pause.Close && !pause.Quitting);

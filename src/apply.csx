@@ -219,10 +219,10 @@ using (var backports = JsonDocument.Parse(File.ReadAllText(Path.Combine(patchDir
     }
 }
 Edit("gml_GlobalScript___input_config_verbs", "hud: input_binding_key(112)",
-    "hud: input_binding_key(112), nova_bag_previous: input_binding_key(vk_pageup), nova_bag_next: input_binding_key(vk_pagedown)");
+    "hud: input_binding_key(112), nova_bag_previous: input_binding_key(vk_pageup), nova_bag_next: input_binding_key(vk_pagedown), nova_confirm: input_binding_key(vk_control), nova_back: input_binding_key(vk_alt)");
 Edit("gml_GlobalScript___input_config_verbs", "menu_input: [input_binding_gamepad_button(32778), input_binding_gamepad_button(32769)]", "menu_input: [input_binding_gamepad_button(gp_start), input_binding_gamepad_button(gp_face2)]");
 Edit("gml_GlobalScript___input_config_verbs", "hud: input_binding_gamepad_button(32780)",
-    "hud: input_binding_gamepad_button(32780), nova_bag_previous: input_binding_gamepad_button(gp_shoulderl), nova_bag_next: input_binding_gamepad_button(gp_shoulderr)");
+    "hud: input_binding_gamepad_button(32780), nova_bag_previous: input_binding_gamepad_button(gp_shoulderl), nova_bag_next: input_binding_gamepad_button(gp_shoulderr), nova_confirm: input_binding_gamepad_button(gp_face2), nova_back: input_binding_gamepad_button(gp_face1)");
 Edit("gml_GlobalScript_input_profile_import", "    return _global.__players[arg2].__profile_import(arg0, arg1);", @"
     var profile = is_string(arg0) ? json_parse(arg0) : arg0;
     if (is_struct(profile) && (arg1 == ""gamepad"" || arg1 == ""keyboard"")) {
@@ -237,9 +237,10 @@ Edit("gml_GlobalScript_input_profile_import", "    return _global.__players[arg2
                 && confirm[1].__type == ""gamepad button"" && confirm[1].__value == gp_face1)
                 confirm[1].__value = gp_face2;
         }
-        var verbs = [""nova_bag_previous"", ""nova_bag_next""];
-        var values = pad ? [gp_shoulderl, gp_shoulderr] : [vk_pageup, vk_pagedown];
-        for (var i = 0; i < 2; i++) {
+        // Menu Confirm and Back are fixed; profiles saved before them gain the defaults.
+        var verbs = [""nova_bag_previous"", ""nova_bag_next"", ""nova_confirm"", ""nova_back""];
+        var values = pad ? [gp_shoulderl, gp_shoulderr, gp_face2, gp_face1] : [vk_pageup, vk_pagedown, vk_control, vk_alt];
+        for (var i = 0; i < 4; i++) {
             if (!variable_struct_exists(profile, verbs[i]))
                 variable_struct_set(profile, verbs[i], [{__type: pad ? ""gamepad button"" : ""key"", __value: values[i]}, {}]);
         }

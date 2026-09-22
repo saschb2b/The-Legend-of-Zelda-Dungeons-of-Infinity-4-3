@@ -11,6 +11,8 @@ These versions identify the 4:3 patch, independently of the original game's vers
 - Move Updates and Credits to Options > About. Show D-pad glyphs for left/right hints.
 - Keep nested Options pages inside the Options panel. The header shows the path, such as Options > Controls > Gamepad, the tabs stay visible, and B reads Back. Restoring defaults asks in a dialog over the affected page.
 - Show gamepad bindings as button glyphs instead of long text that overflowed the Gamepad page. Remapping highlights the action it is waiting for.
+- Remap one action at a time instead of walking through every action. A button already in use swaps between the two actions. Changed actions are marked, the help line shows the default, and Reset restores a single action. Restore all defaults asks first and is inactive when nothing changed. Actions are grouped as Movement, Combat, World and Menus.
+- Keep menu Confirm (A), Back (B) and Pause (Select) fixed. Remapping Sword or Interact no longer moves the menu buttons, so a remap cannot lock players out. Select or Esc cancels a remap, and an unanswered remap stops after ten seconds.
 - Remove the pause menu's HUD toggle. The Status button still shows and hides the panels.
 
 ## [1.7.3](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.7.3) - 2026-09-22

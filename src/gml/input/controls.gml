@@ -1,5 +1,6 @@
-global.NovaConfirmVerb = function() { return input_profile_get() == "gamepad" ? "action" : "sword"; };
-global.NovaCloseVerb = function() { return input_profile_get() == "gamepad" ? "sword" : "action"; };
+// Menu Confirm and Back use fixed verbs, so remapping Interact or Sword cannot strand the player in a menu.
+global.NovaConfirmVerb = function() { return "nova_confirm"; };
+global.NovaCloseVerb = function() { return "nova_back"; };
 global.NovaBinding = function(verb, profile = undefined) {
     var binding = input_binding_get(verb, 0, 0, profile);
     if (binding.__type == undefined) binding = input_binding_get(verb, 0, 1, profile);

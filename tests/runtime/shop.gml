@@ -66,7 +66,8 @@ function ShopTests() {
         input_profile_set(device == 0 ? "keyboard" : "gamepad");
         var dialogue = ShopOpen(shop, false);
         ShopCloseCase(shop, dialogue, "shop opening animation " + input_profile_get(), global.NovaCloseVerb());
-        var verbs = [global.NovaCloseVerb(), "escape", ["action", "sword"]];
+        // Pressing both buttons also presses their fixed menu verbs.
+        var verbs = [global.NovaCloseVerb(), "escape", ["action", "sword", "nova_confirm", "nova_back"]];
         for (var key = 0; key < array_length(verbs); key++) {
             for (var choice = 0; choice < 3; choice++) {
                 var dialogue = ShopOpen(shop);

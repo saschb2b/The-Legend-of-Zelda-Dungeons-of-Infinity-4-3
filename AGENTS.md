@@ -59,6 +59,7 @@ Read the relevant implementation too. If documentation disagrees with code, inve
 Preserve these decisions unless the requested change explicitly revises them:
 
 - Nintendo button layout: **A interacts and confirms. B swings the sword and closes menus.** Shop entry uses A. B must close without submitting or buying.
+- Menu Confirm, Back and Pause use the fixed verbs `nova_confirm`, `nova_back` and `menu_access`. Remapping gameplay actions must never move them. The remapper changes one action at a time, swaps on conflict and marks bindings that differ from `__input_config_verbs()`.
 - Resolve prompts from the current action binding, including remapped controls and keyboard input. Keep physical controller translation separate from logical game actions.
 - Use the checked-in **Kenney Nintendo Switch 2/Double** glyphs. Retain their filenames, checksums and license. Do not redraw or invent replacements.
 - Place action hints at the bottom right, label before glyph. A precedes B Close. Keep L/R beside page headings and reserve space for the longest label.

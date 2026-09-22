@@ -120,6 +120,7 @@ function ProfileMenuTests() {
     with (oMenu) { NovaRememberPlayer(); NovaGo("home", 0); }
 }
 
+ProfileCaptureGamepad = "";
 function ProfileCaptureStart() {
     ProfileCaptureUsers = global.Users;
     ProfileCaptureUserIndex = global.UserIndex;
@@ -172,14 +173,21 @@ function ProfileCaptureStep() {
         Capture = "profiles-keyboard";
     } else if (Capture == "profiles-keyboard") {
         input_profile_set("gamepad");
+        ProfileCaptureGamepad = input_profile_export("gamepad");
+        // Item moved to Y swaps Map onto X, so the capture shows two changed actions.
+        global.NovaRemapAssign("item", input_binding_gamepad_button(gp_face4), 0);
         oMenu.NovaOptions.device = 0;
+        oMenu.NovaOptions.bind_focus = 2;
+        oMenu.NovaOptions.notice = "";
         Capture = "options-gamepad";
     } else if (Capture == "options-gamepad") {
         // Show the scan highlight without starting a real binding scan.
+        oMenu.NovaOptions.bind_focus = 1;
+        oMenu.NovaOptions.capture = true;
         global.NovaRemapping = true;
-        global.BindingRemap_VerbIndex = 2;
         Capture = "options-remapping";
     } else if (Capture == "options-remapping") {
+        oMenu.NovaOptions.capture = false;
         global.NovaRemapping = false;
         oMenu.NovaOptions.page = "confirm";
         oMenu.NovaOptions.confirm = "device";
@@ -190,6 +198,7 @@ function ProfileCaptureStep() {
         oMenu.NovaPage = "credits";
         Capture = "options-credits";
     } else {
+        input_profile_import(ProfileCaptureGamepad, "gamepad");
         oMenu.NovaOptions = global.NovaOptionsState("title");
         global.Users = ProfileCaptureUsers;
         global.UserIndex = ProfileCaptureUserIndex;
