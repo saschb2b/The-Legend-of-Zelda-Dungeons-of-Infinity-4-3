@@ -139,6 +139,8 @@ function HUDScaleTests() {
         var name = "HUD at " + string(width) + "x" + string(height);
         Record(name + " uses an integer scale and position", scale >= 1 && scale == floor(scale) && layout.x == floor(layout.x) && layout.y == floor(layout.y));
         Record(name + " keeps equal side margins", abs(layout.x + 16 * scale - (width - layout.right)) <= 1);
+        Record(name + " spans the footer between its margins", layout.footer_left == layout.x + 16 * scale && layout.footer_width == (layout.width - 32) * scale && layout.footer_left + layout.footer_width == layout.right);
+        Record(name + " reports the world scale beside the HUD scale", layout.world_x == width / 256 && layout.world_y == height / 224 && scale <= min(layout.world_x, layout.world_y));
         Record(name + " separates counters from twenty hearts", layout.width - 95 >= 160);
         Record(name + " fits the screen", layout.x + layout.width * scale <= width && layout.y + layout.height * scale <= height);
         Record(name + " keeps the footer below the playfield center", layout.footer_y > height * 0.75 && layout.footer_y + 6 * scale < height);

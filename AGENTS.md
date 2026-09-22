@@ -59,6 +59,7 @@ Preserve these decisions unless the requested change explicitly revises them:
 - Resolve prompts from the current action binding, including remapped controls and keyboard input. Keep physical controller translation separate from logical game actions.
 - Use the checked-in **Kenney Nintendo Switch 2/Double** glyphs. Retain their filenames, checksums and license. Do not redraw or invent replacements.
 - Place action hints at the bottom right, label before glyph. A precedes B Close. Keep L/R beside page headings and reserve space for the longest label.
+- Size gameplay, inventory, map and arcade prompts from `NovaHUDLayout`. Anchor footer rows to its `right`, `footer_y` and `footer_width`. Keep page glyphs beside their headings on whole screen pixels. Title and adventure menus use their own scale.
 - Use **Status** for the collapsible HUD panels and **Close** for dismissal. Actions, Equip and Use have distinct meanings documented in the README.
 - Keep the centered title logo, then transition to the adventure menu. Continue resumes the selected player's save. Keep setup within one active frame.
 - Match the game's existing fonts, sprites and window frames. Use original artwork for backports and record its provenance. Distinguish recovered behavior from patch adaptations.
@@ -103,6 +104,7 @@ Confirm the device is idle before testing or replacing files. Do not terminate a
 - Preserve `savedata/` and `save-backups/`. Verify save hashes around deployment. Install only the verified production build, never an instrumented test or village-preview build.
 - After a crash, preserve `log.txt` and the relevant saves locally before relaunching. Read the first error and call chain before attributing it to the latest visible change.
 - Reproduce with isolated fixtures or a private copy of the affected save. Keep the regression report and crash log under ignored `.build/`.
+- Before a test fixture generates another floor, activate all instances so `Dungeon_Clear` can remove dormant enemies. Follow normal floor travel's cleanup sequence.
 - Use `--capture`, `--capture-context`, `--capture-arcade`, `--capture-profiles` or `--capture-updates` for the relevant screen. Inspect captures for clipping, spacing and incomplete frames.
 - Remote screenshots can omit parts of a frame. Recheck on the physical screen before treating that artifact as a rendering defect.
 

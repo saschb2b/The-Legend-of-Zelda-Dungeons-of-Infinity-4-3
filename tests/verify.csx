@@ -40,6 +40,11 @@ var crtPosition = compositor.IndexOf("NovaCRT_Draw(NovaFrame");
 Check(crtPosition >= 0 && crtPosition < compositor.IndexOf("NovaHUD_Draw(_nova_layout)"), "CRT must leave the HUD unfiltered");
 Check(compositor.IndexOf("draw_surface_stretched(NovaFrame") < compositor.IndexOf("NovaHUD_Draw(_nova_layout)"), "HUD must be composed after world scaling");
 Check(compositor.Contains("gpu_set_texfilter(false)") && compositor.Contains("gpu_set_texfilter(_nova_filter)"), "HUD must use nearest-neighbor scaling and restore filtering");
+Check(!Regex.IsMatch(compositor, @"_nova_[wh] / (256|224)"), "Compositor prompts must use the HUD layout, not the world scale");
+foreach (var caller in new[] { "global.NovaInventoryPrompts(oInventory, _nova_layout)", "global.NovaArcadePrompts(_nova_layout)" })
+    Check(compositor.Contains(caller), "Prompt layer must receive the HUD layout: " + caller);
+foreach (var name in new[] { "gml_GlobalScript___Input", "gml_GlobalScript___Arcade" })
+    Check(!Code(name).Contains("display_get_gui_width() / 256"), "Prompt helpers must size from the HUD layout: " + name);
 Check(!Data.GameObjects.Any(obj => obj.Name.Content == "oNovaTests"), "Test object leaked into production");
 Check(!Data.Code.Any(code => code.Name.Content.Contains("NovaTest")), "Test code leaked into production");
 Check(!Data.GameObjects.Any(obj => obj.Name.Content == "oNovaVillageTest"), "Village preview leaked into production");

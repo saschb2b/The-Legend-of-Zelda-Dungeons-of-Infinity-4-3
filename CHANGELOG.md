@@ -4,6 +4,39 @@ These versions identify the 4:3 patch, independently of the original game's vers
 
 ## Unreleased
 
+## [1.7.2](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.7.2) - 2026-09-21
+
+Menu hints now match the compact gameplay HUD.
+
+### Fixed
+
+- Size inventory actions, item information, map and arcade hints at the same integer scale as gameplay hints, 3x on the Nova. Keep a consistent footer baseline and right margin.
+- Keep smaller L/R glyphs beside the inventory heading, aligned to whole screen pixels. Item artwork and descriptions retain their reading size.
+- Fix a test-suite crash caused by dormant dungeon enemies surviving the test-only jump to the village. Add a regression case for that cleanup.
+
+### Inventory before and after
+
+<table>
+<tr>
+<th width="50%">v1.7.1</th>
+<th width="50%">v1.7.2</th>
+</tr>
+<tr>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.1/screenshots/inventory.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.1/screenshots/inventory.png" alt="Bag inventory with larger shoulder glyphs and action hints" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.2/screenshots/inventory.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.2/screenshots/inventory.png" alt="Bag inventory with compact shoulder glyphs and action hints at the gameplay HUD scale" width="640"></a></td>
+</tr>
+</table>
+
+Unedited Nova captures from test saves. Existing saves remain compatible.
+
+Validation: 38 unit tests and 1,535 device assertions passed. The [testing guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.7.2/TESTING.md#nova-runtime-suite) records a separate, pre-existing native shutdown fault after test completion.
+
+Choose **Options > Updates** from the adventure menu, or run the **Nova patch installer ZIP** under Assets.
+
+For a fresh installation, follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.7.2/README.md#install-on-the-nova).
+
+[Changes from v1.7.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.7.1...v1.7.2).
+
 ## [1.7.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.7.1) - 2026-09-21
 
 More room for the dungeon, smoother interaction hints, and a CRT-Lottes effect tuned for the Nova.

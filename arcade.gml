@@ -53,7 +53,7 @@ global.NovaClawPrizeIndex = function(item_class) {
     }
     return 0;
 };
-global.NovaArcadePrompts = function() {
+global.NovaArcadePrompts = function(layout) {
     if (instance_exists(oDialogueBox)) return;
     var prompts = [];
     var machine = global.Arcade_ActiveInst;
@@ -72,10 +72,9 @@ global.NovaArcadePrompts = function() {
         }
     }
     if (array_length(prompts) == 0) return;
-    var sx = display_get_gui_width() / 256;
-    var sy = display_get_gui_height() / 224;
+    var scale = layout.scale;
     draw_set_font(global.HUDFont2);
     draw_set_alpha(1);
-    prompts = global.NovaHintRow(prompts, 238 * sx, 209 * sy, sx, sy, 12 * min(sx,sy), 8*sx, 224*sx);
+    prompts = global.NovaHintRow(prompts, layout.right, layout.footer_y, scale, scale, 12 * scale, 8 * scale, layout.footer_width);
     for (var i = 0; i < array_length(prompts); i++) global.NovaHintDraw(prompts[i]);
 };

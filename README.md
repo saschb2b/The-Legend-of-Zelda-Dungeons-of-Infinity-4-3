@@ -139,7 +139,9 @@ Testing covers the Retroid Nova on ROCKNIX. The launcher selects Freedreno and S
 
 Gameplay presents the complete 256×224 playfield at 4:3 with horizontal pixel aspect correction. The title uses a centered 300×225 view, and profile menus use a 400×300 view. Status panels use 75% scale and 90% opacity.
 
-The HUD renders after the playfield at its own integer scale, with square pixels and a smaller footprint. On the Nova's 1280×960 screen, it uses 3× scaling. Equipment and counters sit at the left edge, with hearts at the right. The CRT option affects the world while the HUD and gameplay hints stay crisp. Keyboard prompts use text keycaps.
+The HUD renders after the playfield at its own integer scale, with square pixels and a smaller footprint. On the Nova's 1280×960 screen, it uses 3× scaling. Equipment and counters sit at the left edge, with hearts at the right. The CRT option affects the world while the HUD and gameplay hints stay crisp.
+
+Inventory, map and arcade hints share the HUD scale, footer baseline and right margin. Smaller L/R glyphs stay beside the inventory heading. Item artwork and descriptions retain their larger scale for browsing.
 
 Enable **CRT** for shaped scanlines, a phosphor grille and soft bloom. The CRT-Lottes port keeps the full playfield visible and preserves dark detail. Arcade machines use their original effect.
 

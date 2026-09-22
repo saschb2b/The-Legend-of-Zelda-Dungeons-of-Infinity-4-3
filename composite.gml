@@ -54,16 +54,16 @@ if (instance_exists(oHUD) && ((!_nova_ui && (!global.Paused || _nova_travel)) ||
     gpu_set_texfilter(_nova_filter);
 }
 // Render glyphs after CRT scaling so their letters remain readable.
-if (instance_exists(oInventory) && (!instance_exists(oDialogueBox) || global.NovaInventoryInfo())) global.NovaInventoryPrompts(oInventory);
+if (instance_exists(oInventory) && (!instance_exists(oDialogueBox) || global.NovaInventoryInfo())) global.NovaInventoryPrompts(oInventory, _nova_layout);
 if (instance_exists(oMap) && !oMap.Close) {
-    var sx = _nova_w / 256;
-    var sy = _nova_h / 224;
-    var size = 12 * min(sx, sy);
+    var sx = _nova_layout.scale;
+    var sy = sx;
+    var size = 12 * sx;
     draw_set_font(global.HUDFont2);
     draw_set_alpha(oMap.Alpha);
     var binding = global.NovaBinding(global.NovaCloseVerb());
     var width = global.NovaPromptWidth(binding, "CLOSE", sx, size);
-    global.NovaPromptDraw(binding, "CLOSE", 238 * sx - width, 209 * sy, sx, sy, size);
+    global.NovaPromptDraw(binding, "CLOSE", _nova_layout.right - width, _nova_layout.footer_y, sx, sy, size);
     draw_set_alpha(1);
 }
 if (instance_exists(oHUD) && !_nova_modal && !global.ArcadeVP_Show && !global.Users[global.UserIndex].Prefs[2]) {
@@ -79,4 +79,4 @@ if (instance_exists(oHUD) && !_nova_modal && !global.ArcadeVP_Show && !global.Us
     draw_set_alpha(1);
 }
 
-global.NovaArcadePrompts();
+global.NovaArcadePrompts(_nova_layout);

@@ -67,21 +67,25 @@ function ControlTests() {
     ui.Alpha = 1;
     global.InventoryInst = ui;
     Record("inventory leaves room for the full HUD", global.NovaInventoryHUD() && ui.Y - oCamera.Y >= 64 && ui.X - oCamera.X >= 24 && ui.X + ui.W <= oCamera.X + 232 && ui.Y + ui.H + 23 <= oCamera.Y + 224);
-    var footer_empty = global.NovaInventoryFooter(ui, 5, 960 / 224);
+    var layout = global.NovaHUDLayout(1280, 960);
+    var footer_empty = global.NovaInventoryFooter(ui, layout);
     Record("empty inventory retains only the Close hint", !footer_empty[0].visible && footer_empty[2].visible && !footer_empty[1].visible);
     var page_before = ui.NovaPage;
     var overflow_before = ui.NovaOverflowPages;
-    var pager_before = global.NovaInventoryPager(ui, 5, 960 / 224);
+    var pager_before = global.NovaInventoryPager(ui, layout);
     ui.NovaOverflowPages = 2;
     var font_before = draw_get_font();
     draw_set_font(global.HUDFont2);
     for (var page = 0; page <= 7; page++) {
         ui.NovaPage = page;
-        var pager = global.NovaInventoryPager(ui, 5, 960 / 224);
-        var half_title = string_width(global.NovaInventoryHeading(ui)) * 5 / 2;
-        var center = (ui.X - oCamera.X + ui.W / 2) * 5;
+        var pager = global.NovaInventoryPager(ui, layout);
+        var half_title = string_width(global.NovaInventoryHeading(ui)) * layout.world_x / 2;
+        var center = (ui.X - oCamera.X + ui.W / 2) * layout.world_x;
+        var clearance = 8 * layout.world_x;
         Record("page " + string(page) + " keeps both shoulder hints fixed", pager[0].x == pager_before[0].x && pager[1].x == pager_before[1].x && pager[0].y == pager_before[0].y && pager[1].y == pager_before[1].y);
-        Record("page " + string(page) + " title fits between shoulder hints", pager[0].x + pager[0].width + 40 <= center - half_title && center + half_title + 40 <= pager[1].x);
+        Record("page " + string(page) + " title fits between shoulder hints", pager[0].x + pager[0].width + clearance <= center - half_title && center + half_title + clearance <= pager[1].x);
+        Record("page " + string(page) + " shoulder glyphs use the HUD scale", pager[0].size == 12 * layout.scale && pager[1].size == 12 * layout.scale && pager[0].scale == layout.scale);
+        Record("page " + string(page) + " shoulder glyphs use whole screen pixels", pager[0].x == floor(pager[0].x) && pager[1].x == floor(pager[1].x) && pager[0].y == floor(pager[0].y));
     }
     draw_set_font(font_before);
     ui.NovaPage = page_before;
@@ -97,7 +101,7 @@ function ControlTests() {
     with (ui) { NovaRefresh(); NovaItemMenu(); }
     Record("confirm opens actions for the highlighted item", ui.MenuEnable);
     Record("active gear has no redundant equip action", !ds_grid_get(ui.MenuItemGrid, 1, 0) && !ds_grid_get(ui.MenuItemGrid, 1, 1));
-    var footer_gear = global.NovaInventoryFooter(ui, 5, 960 / 224);
+    var footer_gear = global.NovaInventoryFooter(ui, layout);
     Record("item actions keep Close in its empty-inventory position", footer_gear[2].x == footer_empty[2].x && footer_gear[2].y == footer_empty[2].y && !footer_gear[0].visible);
     var action_labels = ["EQUIP", "USE", "DROP", "INFO"];
     for (var action = 0; action < 4; action++) {
@@ -106,7 +110,7 @@ function ControlTests() {
     }
     PressEvent(ui, global.NovaConfirmVerb(), oInventory, ev_step, ev_step_normal);
     Record("item information keeps the HUD visible", global.NovaInventoryInfo() && global.NovaInventoryHUD());
-    var footer_info = global.NovaInventoryFooter(ui, 5, 960 / 224);
+    var footer_info = global.NovaInventoryFooter(ui, layout);
     Record("item information preserves the footer positions", footer_info[2].x == footer_empty[2].x && footer_info[1].icon_x == footer_gear[1].icon_x && !footer_info[0].visible);
     PressEvent(global.DB_Inst, global.NovaCloseVerb(), oDialogueBox, ev_step, ev_step_end);
     Record("close dismisses information without closing inventory", !instance_exists(global.DB_Inst) && instance_exists(ui) && !ui.Close && __input_global().__cleared);
@@ -135,19 +139,26 @@ function ControlTests() {
     for (var slot = 15; slot <= 31; slot++) global.Inventory[slot] = {ItemClass: -1, ItemIndex: -1, Amount: 0, Enabled: true};
     with (ui) NovaRefresh();
     Record("empty overflow returns to a valid bag", ui.NovaPage == 1 && global.Inventory_SlotIndex_Selected >= 10 && global.Inventory_SlotIndex_Selected < 15);
-    var footer_item = global.NovaInventoryFooter(ui, 5, 960 / 224);
+    var footer_item = global.NovaInventoryFooter(ui, layout);
     Record("equippable items keep Close fixed while exposing Equip", footer_item[0].visible && footer_item[2].x == footer_empty[2].x && footer_item[1].icon_x == footer_gear[1].icon_x);
     Record("Equip precedes the primary action and Close", footer_item[0].right < footer_item[1].x && footer_item[1].right < footer_item[2].x);
-    Record("Nova controller prompts keep their full size", footer_item[0].size == 12 * (960 / 224) && footer_item[1].scale_x == 5);
+    Record("Nova controller prompts match the HUD scale", footer_item[0].size == 12 * layout.scale && footer_item[1].scale_x == layout.scale);
+    draw_set_font(global.HUDFont2);
+    var status = global.NovaBinding("hud");
+    var status_left = layout.right - global.NovaPromptWidth(status, "STATUS", layout.scale, 12 * layout.scale, 2);
+    var gameplay = global.NovaContextHint(layout, status_left, "INSPECT");
+    Record("inventory hints share the gameplay footer row", footer_item[2].right == layout.right && footer_item[2].y == gameplay.y && footer_item[2].scale_x == gameplay.scale_x && footer_item[2].size == gameplay.size);
     input_binding_set("action", input_binding_gamepad_button(gp_face4), 0, 0, "gamepad");
     input_binding_set("sword", input_binding_gamepad_button(gp_face3), 0, 0, "gamepad");
-    var footer_remapped = global.NovaInventoryFooter(ui, 5, 960 / 224);
+    var footer_remapped = global.NovaInventoryFooter(ui, layout);
     Record("remapped glyphs preserve action order and positions", global.NovaGlyph(footer_remapped[2].binding) == 2 && global.NovaGlyph(footer_remapped[1].binding) == 3 && footer_remapped[2].x == footer_item[2].x && footer_remapped[1].x == footer_item[1].x);
     input_profile_import(gamepad_before, "gamepad");
     input_profile_set("keyboard");
-    for (var scale = 1; scale <= 5; scale += 4) {
-        var footer_keyboard = global.NovaInventoryFooter(ui, scale, scale * 6 / 7);
-        Record("keyboard footer fits at scale " + string(scale), footer_keyboard[0].x >= 14 * scale && footer_keyboard[2].right <= 238 * scale + 0.01 && footer_keyboard[0].right < footer_keyboard[1].x && footer_keyboard[1].right < footer_keyboard[2].x);
+    var footer_sizes = [[256, 224], [640, 480], [1280, 960], [1920, 1440]];
+    for (var index = 0; index < array_length(footer_sizes); index++) {
+        var fit_layout = global.NovaHUDLayout(footer_sizes[index][0], footer_sizes[index][1]);
+        var footer_keyboard = global.NovaInventoryFooter(ui, fit_layout);
+        Record("keyboard footer fits at " + string(footer_sizes[index][0]) + "x" + string(footer_sizes[index][1]), footer_keyboard[0].x >= fit_layout.footer_left - 0.01 && footer_keyboard[2].right <= fit_layout.right + 0.01 && footer_keyboard[0].right < footer_keyboard[1].x && footer_keyboard[1].right < footer_keyboard[2].x);
     }
     var footer_verbs = ["item", "action", "sword"];
     for (var i = 0; i < 3; i++) {
@@ -155,13 +166,13 @@ function ControlTests() {
         input_binding_set(verb, input_binding_empty(), 0, 0, "keyboard");
         input_binding_set(verb, input_binding_empty(), 0, 1, "keyboard");
     }
-    var footer_unbound = global.NovaInventoryFooter(ui, 5, 960 / 224);
-    Record("unbound key labels fit without colliding", footer_unbound[0].x >= 70 && footer_unbound[2].right <= 1190.01);
+    var footer_unbound = global.NovaInventoryFooter(ui, layout);
+    Record("unbound key labels fit without colliding", footer_unbound[0].x >= layout.footer_left - 0.01 && footer_unbound[2].right <= layout.right + 0.01);
     draw_set_font(global.HUDFont2);
     for (var i = 0; i < 3; i++) {
         var prompt = footer_unbound[i];
         Record("hint label precedes glyph " + string(i), prompt.icon_x >= prompt.x + string_width(prompt.label) * prompt.scale_x);
-        Record("footer clears inventory and curse text " + string(i), prompt.y - prompt.size / 2 > (ui.Y - oCamera.Y + ui.H + 23) * (960 / 224));
+        Record("footer clears inventory and curse text " + string(i), prompt.y - prompt.size / 2 > (ui.Y - oCamera.Y + ui.H + 23) * layout.world_y);
         if (i < 2) Record("unbound prompt spacing " + string(i), prompt.right < footer_unbound[i + 1].x);
     }
     input_profile_import(keyboard_before, "keyboard");

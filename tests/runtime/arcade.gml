@@ -222,7 +222,14 @@ function ArcadeTravelStart() {
     global.SaveLevel = false;
     global.Continue = false;
     with (oIntro) instance_destroy();
+    var dormant = instance_create_layer(oLink.x + 48, oLink.y, "Objs_Lower", oEnemy_Soldier_Advanced,
+        {FloorLevel: 0, RoomIndex: oLink.RoomIndex, SectionID: 0});
+    instance_deactivate_object(dormant);
+    // Dungeon_Clear visits active instances; normal floor travel activates them first.
+    instance_activate_all();
     Dungeon_InitLevel(6);
+    instance_activate_object(dormant);
+    Record("village fixture removes inactive enemies from the preceding floor", !instance_exists(dormant));
     instance_activate_object(oClawMachine);
     instance_activate_object(oArcade_Mothula);
     ArcadeRooms = [instance_find(oClawMachine,0).RoomIndex,instance_find(oArcade_Mothula,0).RoomIndex];

@@ -48,6 +48,7 @@ global.NovaKeyLabel = function(binding) {
 };
 global.NovaKeyWidth = function(binding) {
     var font = draw_get_font();
+    // The compact HUD font has no Z glyph; keycaps need the complete font.
     draw_set_font(global.HUDFont);
     var width = ceil(string_width(global.NovaKeyLabel(binding)) / 2) + 6;
     draw_set_font(font);
@@ -150,25 +151,27 @@ global.NovaInventoryHeading = function(inventory) {
     if (inventory.NovaPage >= 6 && inventory.NovaOverflowPages > 1) heading += " " + string(inventory.NovaPage - 5);
     return heading;
 };
-global.NovaInventoryPager = function(inventory, sx, sy) {
+global.NovaInventoryPager = function(inventory, layout) {
     var font = draw_get_font();
     draw_set_font(global.HUDFont2);
     // Reserve the full title set, including both possible legacy overflow pages.
     var heading_width = string_width(inventory.NovaTitles[6] + " 2");
     for (var i = 0; i < array_length(inventory.NovaTitles); i++) heading_width = max(heading_width, string_width(inventory.NovaTitles[i]));
     var bindings = [global.NovaBinding("nova_bag_previous"), global.NovaBinding("nova_bag_next")];
-    var size = 12 * min(sx, sy);
-    var widths = [global.NovaPromptWidth(bindings[0], "", sx, size), global.NovaPromptWidth(bindings[1], "", sx, size)];
-    var center = (inventory.X - oCamera.X + inventory.W / 2) * sx;
-    var offset = (heading_width / 2 + 8) * sx;
-    var py = (inventory.Y - oCamera.Y + 14) * sy;
+    // Page headings use world coordinates, but glyphs use square screen pixels.
+    var scale = layout.scale;
+    var size = 12 * scale;
+    var widths = [global.NovaPromptWidth(bindings[0], "", scale, size), global.NovaPromptWidth(bindings[1], "", scale, size)];
+    var center = round((inventory.X - oCamera.X + inventory.W / 2) * layout.world_x);
+    var offset = ceil((heading_width / 2 + 8) * layout.world_x);
+    var py = round((inventory.Y - oCamera.Y + 14) * layout.world_y);
     draw_set_font(font);
     return [
-        {binding: bindings[0], x: center - offset - widths[0], y: py, width: widths[0], size: size},
-        {binding: bindings[1], x: center + offset, y: py, width: widths[1], size: size}
+        {binding: bindings[0], x: center - offset - widths[0], y: py, width: widths[0], size: size, scale: scale},
+        {binding: bindings[1], x: center + offset, y: py, width: widths[1], size: size, scale: scale}
     ];
 };
-global.NovaInventoryFooter = function(inventory, sx, sy) {
+global.NovaInventoryFooter = function(inventory, layout) {
     var info = global.NovaInventoryInfo();
     var selected = global.Inventory[global.Inventory_SlotIndex_Selected];
     var primary = info ? "MORE" : global.NovaInventoryAction(inventory);
@@ -179,24 +182,23 @@ global.NovaInventoryFooter = function(inventory, sx, sy) {
     ];
     var font = draw_get_font();
     draw_set_font(global.HUDFont2);
-    prompts = global.NovaHintRow(prompts, 238 * sx, 209 * sy, sx, sy, 12 * min(sx, sy), 8 * sx, 224 * sx);
+    var scale = layout.scale;
+    prompts = global.NovaHintRow(prompts, layout.right, layout.footer_y, scale, scale, 12 * scale, 8 * scale, layout.footer_width);
     draw_set_font(font);
     return prompts;
 };
-global.NovaInventoryPrompts = function(inventory) {
+global.NovaInventoryPrompts = function(inventory, layout) {
     with (inventory) {
-    var sx = display_get_gui_width() / 256;
-    var sy = display_get_gui_height() / 224;
     draw_set_font(global.HUDFont2);
     draw_set_alpha(Alpha);
     if (!global.NovaInventoryInfo()) {
-        var pager = global.NovaInventoryPager(id, sx, sy);
+        var pager = global.NovaInventoryPager(id, layout);
         for (var i = 0; i < array_length(pager); i++) {
             var prompt = pager[i];
-            global.NovaPromptDraw(prompt.binding, "", prompt.x, prompt.y, sx, sy, prompt.size);
+            global.NovaPromptDraw(prompt.binding, "", prompt.x, prompt.y, prompt.scale, prompt.scale, prompt.size);
         }
     }
-    var prompts = global.NovaInventoryFooter(id, sx, sy);
+    var prompts = global.NovaInventoryFooter(id, layout);
     for (var i = 0; i < array_length(prompts); i++) global.NovaHintDraw(prompts[i]);
     draw_set_alpha(1);
     }
@@ -210,7 +212,9 @@ global.NovaHUDLayout = function(width, height) {
     var left = floor((width - columns * scale) / 2);
     var top = floor((height - rows * scale) / 2);
     return {scale: scale, width: columns, height: rows, x: left, y: top,
-        right: left + (columns - 16) * scale, footer_y: top + (rows - 15) * scale};
+        world_x: width / 256, world_y: height / 224,
+        right: left + (columns - 16) * scale, footer_y: top + (rows - 15) * scale,
+        footer_left: left + 16 * scale, footer_width: (columns - 32) * scale};
 };
 global.NovaContextBlocked = function() {
     return !instance_exists(oLink) || !instance_exists(oCamera) || global.Paused || global.AltTab || global.ArcadeVP_Show
@@ -225,7 +229,7 @@ global.NovaContextHint = function(layout, status_left, label = undefined) {
     if (label == undefined) label = global.NovaContextAction();
     var scale = layout.scale;
     var prompt = {binding: global.NovaBinding("action"), label: label, visible: label != ""};
-    var hints = global.NovaHintRow([prompt], status_left - 8 * scale, layout.footer_y, scale, scale, 12 * scale, 0, (layout.width - 32) * scale);
+    var hints = global.NovaHintRow([prompt], status_left - 8 * scale, layout.footer_y, scale, scale, 12 * scale, 0, layout.footer_width);
     return hints[0];
 };
 
