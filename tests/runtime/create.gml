@@ -36,7 +36,7 @@ function MenuTests() {
     global.Users[0].Name = "HARNESS";
     DungeonSeq_Init(0);
     oMenu.NovaTransition = 36;
-    var cases = [["setup", "home"], ["players", "home"], ["options", "home"], ["challenges", "setup"], ["replace", "setup"], ["player", "players"], ["rename", "player"], ["delete", "player"], ["records", "player"], ["controls", "options"], ["credits", "options"], ["gamepad", "controls"], ["keyboard", "controls"]];
+    var cases = [["setup", "home"], ["players", "home"], ["options", "home"], ["challenges", "setup"], ["replace", "setup"], ["player", "players"], ["rename", "player"], ["delete", "player"], ["records", "player"], ["credits", "options"]];
     for (var i = 0; i < array_length(cases); i++) {
         for (var key = 0; key < 2; key++) {
             oMenu.NovaPage = cases[i][0];
@@ -52,16 +52,21 @@ function MenuTests() {
     oMenu.NovaFocus = 0;
     PressEvent(oMenu, "menu_input", oMenu, ev_step, ev_step_normal);
     Record("Default delete choice preserves the player", global.Users[0].Name == "HARNESS");
-    oMenu.NovaPage = "gamepad";
+    oMenu.NovaPage = "options";
+    oMenu.NovaOptions.page = "device";
     oMenu.Bindings_Remap = true;
+    global.NovaRemapping = true;
     PressEvent(oMenu, global.NovaCloseVerb(), oMenu, ev_step, ev_step_normal);
-    Record("Close does not interrupt a binding scan", oMenu.NovaPage == "gamepad");
+    Record("Close does not interrupt a binding scan", oMenu.NovaPage == "options" && oMenu.NovaOptions.page == "device");
     oMenu.Bindings_Remap = false;
+    global.NovaRemapping = false;
+    oMenu.NovaOptions.page = "list";
     var keyboard_before = input_profile_export("keyboard");
     var remap = instance_create_layer(0, 0, "System", oInputRemap, {InputIndex: 1});
+    Record("remapping blocks the Options screen", global.NovaRemapping && oMenu.Bindings_Remap);
     input_binding_scan_set_Success(input_binding_key(ord("Q")));
     input_binding_scan_set_Failure(-20);
-    Record("aborted remapping restores every previous binding", input_profile_export("keyboard") == keyboard_before && !instance_exists(remap));
+    Record("aborted remapping restores every previous binding", input_profile_export("keyboard") == keyboard_before && !instance_exists(remap) && !global.NovaRemapping && !oMenu.Bindings_Remap);
     remap = instance_create_layer(0, 0, "System", oInputRemap, {InputIndex: 1});
     var keys = [ord("Z"), ord("X"), ord("C"), ord("M"), ord("S"), ord("I"), vk_escape, vk_f1, vk_up, vk_down, vk_left, vk_right, vk_pageup, vk_pagedown];
     for (var k = 0; k < array_length(keys); k++) input_binding_scan_set_Success(input_binding_key(keys[k]));
@@ -72,17 +77,35 @@ function MenuTests() {
 function PauseTests() {
     var pause = instance_create_layer(0, 0, "System", oMenu_Game);
     pause.Open = false;
-    for (var index = 1; index <= 2; index++) {
-        pause.Index = index;
-        pause.SelectorPos = 1;
-        PressEvent(pause, global.NovaCloseVerb(), oMenu_Game, ev_step, ev_step_normal);
-        Record("pause submenu " + string(index) + " cancels", pause.Index == 0 && !pause.Close && !pause.Quitting);
-    }
-    pause.Index = 1;
-    PressEvent(pause, "escape", oMenu_Game, ev_step, ev_step_normal);
-    Record("Escape backs out of options without closing pause", pause.Index == 0 && !pause.Close);
+    pause.Index = 2;
+    pause.SelectorPos = 1;
     PressEvent(pause, global.NovaCloseVerb(), oMenu_Game, ev_step, ev_step_normal);
-    Record("action resumes from pause root", pause.Close && !pause.Quitting);
+    Record("pause confirmation cancels", pause.Index == 0 && !pause.Close && !pause.Quitting);
+    pause.SelectorPos = 2;
+    PressEvent(pause, "menu_input", oMenu_Game, ev_step, ev_step_normal);
+    Record("pause Options opens the shared screen", pause.NovaOptionsOpen && pause.NovaOptions.context == "pause" && pause.Index == 0);
+    Record("pause Options omits title-only About", array_length(pause.NovaOptions.tabs) == 4 && array_get_index(pause.NovaOptions.tabs, "About") == -1);
+    PressEvent(pause, "escape", oMenu_Game, ev_step, ev_step_normal);
+    Record("Escape backs out of Options without closing pause", !pause.NovaOptionsOpen && !pause.Close && pause.SelectorPos == 2);
+    PressEvent(pause, "menu_input", oMenu_Game, ev_step, ev_step_normal);
+    PressEvent(pause, global.NovaCloseVerb(), oMenu_Game, ev_step, ev_step_normal);
+    Record("Close returns to the pause Options row", !pause.NovaOptionsOpen && !pause.Close && pause.SelectorPos == 2);
+    PressEvent(pause, "menu_input", oMenu_Game, ev_step, ev_step_normal);
+    var keyboard_before = input_profile_export("keyboard");
+    pause.NovaOptions.page = "device";
+    pause.NovaOptions.device = 1;
+    pause.NovaOptions.device_focus = 0;
+    PressEvent(pause, "menu_input", oMenu_Game, ev_step, ev_step_normal);
+    Record("pause starts remapping without the adventure menu", global.NovaRemapping && instance_exists(oInputRemap) && !instance_exists(oMenu));
+    PressEvent(pause, global.NovaCloseVerb(), oMenu_Game, ev_step, ev_step_normal);
+    PressEvent(pause, "menu_access", oMenu_Game, ev_step, ev_step_normal);
+    Record("buttons during a pause remap do not leave Options", pause.NovaOptionsOpen && pause.NovaOptions.page == "device" && !pause.Close);
+    input_binding_scan_set_Success(input_binding_key(ord("Q")));
+    input_binding_scan_set_Failure(-20);
+    Record("aborted pause remap restores the keyboard", !global.NovaRemapping && !instance_exists(oInputRemap) && input_profile_export("keyboard") == keyboard_before);
+    pause.NovaOptions.page = "list";
+    PressEvent(pause, "menu_access", oMenu_Game, ev_step, ev_step_normal);
+    Record("Select leaves pause from Options", !pause.NovaOptionsOpen && pause.Close && !pause.Quitting);
     with (pause) instance_destroy();
 }
 function EnemyFixture(object) {

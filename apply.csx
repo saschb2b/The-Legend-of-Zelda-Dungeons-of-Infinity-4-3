@@ -71,6 +71,15 @@ Edit("gml_Object_oTitle_Step_0", "AllowStart || false", "AllowStart || global.Ca
 edits["gml_Object_oMenu_Create_0"] = FlattenEnums(Read("gml_Object_oMenu_Create_0"));
 edits["gml_Object_oMenu_Create_0"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "updates.gml"));
 edits["gml_Object_oMenu_Create_0"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "profiles.gml"));
+group.QueueAppend("gml_Object_oMenu_Game_Create_0", "NovaOptionsOpen = false; NovaOptions = undefined;");
+Edit("gml_Object_oMenu_Game_Step_0", "Index = 1;", "NovaOptionsOpen = true; NovaOptions = global.NovaOptionsState(\"pause\");");
+Edit("gml_Object_oMenu_Game_Draw_0", "draw_sprite_stretched(sprite_index, 0, FrameX, FrameY, FrameW, FrameH);",
+    "if (NovaOptionsOpen) { draw_set_alpha(1); exit; }\ndraw_sprite_stretched(sprite_index, 0, FrameX, FrameY, FrameW, FrameH);");
+// Remapping also runs from the pause menu, where the adventure menu does not exist.
+Edit("gml_Object_oInputRemap_Create_0", "oMenu.Bindings_Remap = true;\noMenu.Menu_Active = false;",
+    "global.NovaRemapping = true;\nwith (oMenu) { Bindings_Remap = true; Menu_Active = false; }");
+Edit("gml_GlobalScript___Input", "oMenu.Bindings_Remap = false;\n    oMenu.Menu_Active = true;",
+    "global.NovaRemapping = false;\n    with (oMenu) { Bindings_Remap = false; Menu_Active = true; }");
 Edit("gml_Object_oMenu_Game_Step_0", "if (input_check_pressed(\"menu_access\"))",
     File.ReadAllText(Path.Combine(patchDir, "pause_cancel.gml")) + "\nif (input_check_pressed(\"menu_access\"))");
 Edit("gml_Object_oGame_Step_1", "if (input_check_pressed(\"hud\"))",
@@ -242,6 +251,7 @@ Edit("gml_GlobalScript___Input", "global.BindingVerbs[1] = [0, 1, 2, 3, 4, 5, 6,
 Edit("gml_GlobalScript___Input", "function GetInputVerbStr(arg0)\n{",
     "function GetInputVerbStr(arg0)\n{\n    if (arg0 == 12) return \"nova_bag_previous\";\n    if (arg0 == 13) return \"nova_bag_next\";");
 edits["gml_GlobalScript___Input"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "controls.gml"));
+edits["gml_GlobalScript___Input"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "options.gml"));
 ApplyContent();
 ApplyArcade();
 ApplyContextHints();

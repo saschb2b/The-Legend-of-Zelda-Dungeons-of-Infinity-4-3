@@ -152,10 +152,26 @@ function ProfileCaptureStep() {
         oMenu.NovaPage = "players";
         Capture = "profiles-players";
     } else if (Capture == "profiles-players") {
-        oMenu.NovaPage = "keyboard";
+        oMenu.NovaOptions = global.NovaOptionsState("title");
+        oMenu.NovaOptions.tab = 2;
+        oMenu.NovaPage = "options";
+        Capture = "options-audio";
+    } else if (Capture == "options-audio") {
+        oMenu.NovaOptions.tab = 1;
+        Capture = "options-display";
+    } else if (Capture == "options-display") {
+        oMenu.NovaOptions.tab = 2;
+        oMenu.NovaOptions.page = "confirm";
+        oMenu.NovaOptions.confirm = "tab";
+        Capture = "options-defaults";
+    } else if (Capture == "options-defaults") {
+        oMenu.NovaOptions.tab = 3;
+        oMenu.NovaOptions.page = "device";
+        oMenu.NovaOptions.device = 1;
         input_profile_set("keyboard");
         Capture = "profiles-keyboard";
     } else {
+        oMenu.NovaOptions = global.NovaOptionsState("title");
         global.Users = ProfileCaptureUsers;
         global.UserIndex = ProfileCaptureUserIndex;
         oMenu.NovaPage = "home";

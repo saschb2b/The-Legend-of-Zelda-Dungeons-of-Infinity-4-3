@@ -28,6 +28,7 @@ try {
             ContentMenuTests();
             ProfileMenuTests();
             UpdateMenuTests();
+            OptionsMenuTests();
             if (file_exists("nova-capture-enabled.txt") || file_exists("nova-profile-capture-enabled.txt")) {
                 ProfileCaptureStart();
                 Stage = 10;

@@ -80,3 +80,5 @@ if (instance_exists(oHUD) && !_nova_modal && !global.ArcadeVP_Show && !global.Us
 }
 
 global.NovaArcadePrompts(_nova_layout);
+// Options draw over the finished frame, so CRT changes show behind them immediately.
+if (instance_exists(oMenu_Game) && oMenu_Game.NovaOptionsOpen) global.NovaOptionsOverlay(oMenu_Game.NovaOptions, oMenu_Game.Alpha, _nova_w, _nova_h);

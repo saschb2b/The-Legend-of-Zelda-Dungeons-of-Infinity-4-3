@@ -4,6 +4,13 @@ These versions identify the 4:3 patch, independently of the original game's vers
 
 ## Unreleased
 
+### Changed
+
+- Replace the separate title and pause options with one Options screen. L/R switch between Game, Display, Audio and Controls. Each setting explains itself, applies immediately, and has a Defaults option per tab that asks first.
+- Add music and sound-effect volume in ten steps, and expose the blood and title-skip preferences. Controls can now be remapped from the pause menu.
+- Move Updates and Credits to Options > About. Show D-pad glyphs for left/right hints.
+- Remove the pause menu's HUD toggle. The Status button still shows and hides the panels.
+
 ## [1.7.3](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.7.3) - 2026-09-22
 
 In-game updates install again.

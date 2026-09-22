@@ -33,7 +33,7 @@ The installer downloads the official PortMaster package and applies the patch au
 
 **Updating:** close the game, replace the installer files with the newer download, and run the installer again. Your saves stay in `zeldadoi-43/savedata/`. The installer preserves them and keeps migration backups in `zeldadoi-43/save-backups/`.
 
-For updates over Wi-Fi, choose **Options > Updates** from the adventure menu. It shows the installed and available patch versions and the changes since your version. Use L/R to page through the notes. Choose **Install update** to download the update and restart the game. Press **B** to close or cancel a download.
+For updates over Wi-Fi, choose **Options > About > Updates** from the adventure menu. It shows the installed and available patch versions and the changes since your version. Use L/R to page through the notes. Choose **Install update** to download the update and restart the game. Press **B** to close or cancel a download.
 
 The updater checks stable releases only when you open Updates or choose Check again. It verifies downloads before installation and preserves your saves. If installation fails, the previous version remains available. Keep the device powered on during installation.
 
@@ -41,7 +41,7 @@ If installation fails, check `zeldadoi-43-installer/install.log`. For another at
 
 ## Controls
 
-These are the default controller bindings. Change them under **Options > Controls**. Each button hint follows your current mapping, including keyboard bindings.
+These are the default controller bindings. Change them under **Options > Controls**, from the adventure menu or the pause menu. Each button hint follows your current mapping, including keyboard bindings.
 
 | Button | During play | In the inventory |
 | --- | --- | --- |
@@ -84,6 +84,10 @@ The centered title screen leads into an adventure menu with your last selected p
 
 **Change player** keeps all five save slots available, with each saved adventure's character, floor and hearts grouped in one row. Select a player to return to their adventure, or use **Manage** for records, renaming and deletion. Starting over an existing save asks for confirmation. Options, controls, updates and credits are available before entering the dungeon.
 
+![Options with Game, Display, Audio, Controls and About tabs, volume bars and a description of the selected setting](screenshots/options.png)
+
+**Options** opens the same screen from the adventure menu and the pause menu. L/R switch between Game, Display, Audio and Controls, and left/right changes the highlighted setting. Changes apply immediately, and a line below the list explains each setting. **Defaults** restores the current tab after confirmation. Music and sound effects have ten volume steps; zero mutes them. Controls, CRT and item messages are saved for each player. Volume, blood and title skipping apply to the whole device. Updates and credits are under **About** in the adventure menu.
+
 ## Playing and updating
 
 The village on floor 6 has two more minigames. The claw costs ten rupees: move left/right and grab with A. In the pub, L/R changes the slot bet and A plays. B closes either game.
@@ -92,7 +96,7 @@ Hold Sword after a swing to poke while moving. With a level-three sword or highe
 
 Open **Challenges** before a run to adjust health, darkness, inventory space, shop prices, and other restrictions. The last page includes No map, No food, and Wall Master. Existing runs keep their original challenge restrictions.
 
-Press Start or confirm to skip the opening title animation. To require the full animation, set `CanSkipTitle=0` under `[Preferences]` in `zeldadoi-43/savedata/options.ini`.
+Press Start or confirm to skip the opening title animation. To require the full animation, turn off **Skip title intro** under **Options > Game**.
 
 This is an unofficial patch of the PortMaster **1.1.6 VM** build with selected 1.2.x backports. It does not include every change from 1.2.1. Read the [backport audit](BACKPORTS.md) for coverage and the [changelog](CHANGELOG.md) for changes between patch releases.
 

@@ -30,6 +30,7 @@ Read the relevant implementation too. If documentation disagrees with code, inve
 | World composition, HUD and CRT | `composite.gml`, `hud.gml`, `crt.gml`, `shaders/` |
 | Bindings, glyphs and contextual hints | `controller.py`, `controls.gml`, `context.csx` |
 | Title-to-game flow and update menu | `profiles.gml`, `adventure.gml`, `updates.gml`, `challenge_menu.gml` |
+| Options for the adventure and pause menus | `options.gml`, `pause_cancel.gml` |
 | Inventory behavior and presentation | `inventory*.gml` |
 | Combat and challenges | `sword.gml`, `gems.gml`, `challenges.gml`, `wallmaster_*.gml` |
 | Village minigames | `arcade.csx`, `arcade.gml`, `arcade/` |
@@ -60,6 +61,7 @@ Preserve these decisions unless the requested change explicitly revises them:
 - Use the checked-in **Kenney Nintendo Switch 2/Double** glyphs. Retain their filenames, checksums and license. Do not redraw or invent replacements.
 - Place action hints at the bottom right, label before glyph. A precedes B Close. Keep L/R beside page headings and reserve space for the longest label.
 - Size gameplay, inventory, map and arcade prompts from `NovaHUDLayout`. Anchor footer rows to its `right`, `footer_y` and `footer_width`. Keep page glyphs beside their headings on whole screen pixels. Title and adventure menus use their own scale.
+- Keep one Options screen, `options.gml`, for the adventure and pause menus. Settings apply immediately and explain themselves below the list. Defaults restores one tab after confirmation. Pause draws the screen after the CRT pass.
 - Use **Status** for the collapsible HUD panels and **Close** for dismissal. Actions, Equip and Use have distinct meanings documented in the README.
 - Keep the centered title logo, then transition to the adventure menu. Continue resumes the selected player's save. Keep setup within one active frame.
 - Match the game's existing fonts, sprites and window frames. Use original artwork for backports and record its provenance. Distinguish recovered behavior from patch adaptations.

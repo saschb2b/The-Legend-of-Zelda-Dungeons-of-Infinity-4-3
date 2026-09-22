@@ -1,7 +1,7 @@
 Capture = "";
 CaptureTick = 0;
 CaptureIndex = 0;
-CaptureNames = ["inventory-gear", "inventory-items", "inventory-bags", "inventory-treasure", "inventory-food", "inventory-pendants", "inventory-overflow", "inventory-actions", "inventory-info", "inventory-keyboard", "inventory-crt", "inventory-overflowextra", "status-default", "status-crt", "status-remapped", "status-keyboard", "inventory-cursed", "map-default"];
+CaptureNames = ["inventory-gear", "inventory-items", "inventory-bags", "inventory-treasure", "inventory-food", "inventory-pendants", "inventory-overflow", "inventory-actions", "inventory-info", "inventory-keyboard", "inventory-crt", "inventory-overflowextra", "status-default", "status-crt", "status-remapped", "status-keyboard", "inventory-cursed", "map-default", "options-pause"];
 function CaptureStart() {
     global.ItemData[1].Type = 3;
     global.ItemData[5].Type = 3;
@@ -59,6 +59,18 @@ function CaptureStep() {
         Complete = true;
         Flush();
         game_end();
+        return;
+    }
+    if (CaptureIndex == 18) {
+        with (oMap) instance_destroy();
+        // CRT stays on behind the pause Options to show the live preview.
+        global.Users[global.UserIndex].Prefs[3] = true;
+        var pause = instance_create_layer(0, 0, "System", oMenu_Game);
+        pause.Open = false;
+        pause.Alpha = 1;
+        pause.NovaOptionsOpen = true;
+        pause.NovaOptions = global.NovaOptionsState("pause");
+        pause.NovaOptions.tab = 1;
         return;
     }
     if (CaptureIndex == 17) {

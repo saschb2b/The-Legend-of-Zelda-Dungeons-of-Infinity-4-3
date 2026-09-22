@@ -11,6 +11,7 @@ NovaLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.,
 NovaNameCell = 0;
 NovaSetupParent = "home";
 NovaSetupPlayer = 0;
+NovaOptions = global.NovaOptionsState("title");
 Menu_Active = true;
 MenuWin_Main_Shift = false;
 
@@ -109,8 +110,7 @@ function NovaClose() {
         case "challenges": case "replace": NovaGo("setup"); break;
         case "player": NovaGo("players"); break;
         case "rename": case "delete": case "records": NovaGo("player"); break;
-        case "controls": case "credits": NovaGo("options"); break;
-        case "gamepad": case "keyboard": NovaGo("controls"); break;
+        case "credits": NovaGo("options"); break;
     }
     audio_play_sound(Sound_Throw, 1, false);
     input_clear_momentary(true);
@@ -135,8 +135,7 @@ function NovaRowCount() {
         case "setup": return 4;
         case "players": return array_length(NovaPlayerRows());
         case "player": return 4;
-        case "options": return 3;
-        case "controls": case "gamepad": case "keyboard": case "replace": case "delete": return 2;
+        case "replace": case "delete": return 2;
         case "challenges": return array_length(NovaChallengePages[NovaChallengePage]) + 1;
     }
     return 1;
@@ -149,7 +148,7 @@ function NovaConfirm() {
                 case "Continue": NovaContinue(); break;
                 case "New adventure": NovaNewDraft(); break;
                 case "Change player": NovaGo("players", 0); break;
-                case "Options": NovaGo("options"); break;
+                case "Options": NovaOptions.page = "list"; NovaGo("options", 0); break;
                 case "Quit game": game_end(); break;
             }
             break;
@@ -181,21 +180,6 @@ function NovaConfirm() {
             if (NovaFocus == 0) NovaClose();
             else { User_Delete(); NovaRestorePlayer(); NovaGo("players", 0); }
             break;
-        case "options":
-            if (NovaFocus == 0) NovaGo("controls", 0);
-            else if (NovaFocus == 1) NovaUpdateEnter();
-            else { NovaCreditPage = 0; NovaGo("credits", 0); }
-            break;
-        case "controls": NovaGo(NovaFocus == 0 ? "gamepad" : "keyboard", 0); break;
-        case "gamepad": case "keyboard":
-            var device = NovaPage == "gamepad" ? 0 : 1;
-            if (NovaFocus == 0) instance_create_layer(-100, -100, "Menu", oInputRemap, {InputIndex: device});
-            else {
-                input_profile_reset_bindings(device == 0 ? "gamepad" : "keyboard");
-                User_SaveControls();
-                Bindings_GetIcons(device);
-            }
-            break;
         case "rename":
             if (NovaNameCell < string_length(NovaLetters)) {
                 if (string_length(NovaName) < 8) NovaName += string_char_at(NovaLetters, NovaNameCell + 1);
@@ -216,6 +200,13 @@ function NovaAdventureStep(close) {
     if (NovaTransition == 36 && variable_global_exists("NovaTitleFrame") && surface_exists(global.NovaTitleFrame)) surface_free(global.NovaTitleFrame);
     if (NovaUpdateOpen) { NovaUpdateStep(); return; }
     if (instance_exists(ErrorMsgInst) || global.AltTab || Bindings_Remap) return;
+    if (NovaPage == "options") {
+        var result = global.NovaOptionsStep(NovaOptions, close);
+        if (result == "close") { User_Save(); NovaGo("home"); }
+        else if (result == "updates") NovaUpdateEnter();
+        else if (result == "credits") { NovaCreditPage = 0; NovaGo("credits", 0); }
+        return;
+    }
     if (close) { NovaClose(); return; }
     if (NovaPage == "players" && input_check_pressed("item")) {
         var rows = NovaPlayerRows();
@@ -233,12 +224,8 @@ function NovaAdventureStep(close) {
         var count = NovaRowCount();
         if (input_check_pressed("down")) { NovaFocus = (NovaFocus + 1) mod count; audio_play_sound(Sound_Text, 1, false); }
         if (input_check_pressed("up")) { NovaFocus = (NovaFocus + count - 1) mod count; audio_play_sound(Sound_Text, 1, false); }
-        if (NovaPage == "gamepad" || NovaPage == "keyboard") {
-            if (input_check_pressed("left") || input_check_pressed("right")) NovaFocus = 1 - NovaFocus;
-        } else {
-            if (input_check_pressed("left")) NovaCycle(-1);
-            if (input_check_pressed("right")) NovaCycle(1);
-        }
+        if (input_check_pressed("left")) NovaCycle(-1);
+        if (input_check_pressed("right")) NovaCycle(1);
     }
     var page_delta = input_check_pressed("nova_bag_next") - input_check_pressed("nova_bag_previous");
     if (page_delta != 0) {
@@ -312,6 +299,7 @@ function NovaAdventureDraw() {
     NovaLandscape();
     if (NovaUpdateOpen) { NovaUpdateDraw(); return; }
     if (instance_exists(ErrorMsgInst)) return;
+    if (NovaPage == "options") { global.NovaOptionsDraw(NovaOptions, Selector_Frame); return; }
     if (NovaPage == "home") {
         var t = clamp((NovaTransition - 12) / 24, 0, 1);
         t = t * t * (3 - 2 * t);
@@ -340,7 +328,7 @@ function NovaAdventureDraw() {
             draw_surface_ext(global.NovaTitleFrame, 0, -38, 400 / surface_get_width(global.NovaTitleFrame), 300 / surface_get_height(global.NovaTitleFrame), 0, c_white, 1 - NovaTransition / 12);
         return;
     }
-    var titles = {setup: "New adventure", players: "Players", player: "Player", options: "Options", controls: "Controls", gamepad: "Gamepad", keyboard: "Keyboard", challenges: "Challenges", replace: "New adventure", delete: "Delete player", rename: "Your name", records: "Records", credits: "Credits"};
+    var titles = {setup: "New adventure", players: "Players", player: "Player", challenges: "Challenges", replace: "New adventure", delete: "Delete player", rename: "Your name", records: "Records", credits: "Credits"};
     NovaMenuFrame(variable_struct_exists(titles, NovaPage) ? variable_struct_get(titles, NovaPage) : "Saved adventure");
     switch (NovaPage) {
         case "setup":
@@ -354,7 +342,7 @@ function NovaAdventureDraw() {
             for (var i = 0; i < 12; i++) custom = custom || NovaDraft.challenges[i] != 0;
             NovaRow("Challenges", 2, 204, custom ? "Custom" : "Standard");
             NovaRow("Begin adventure", 3, 235);
-            var adjust = NovaFocus < 2 ? {binding: global.NovaBinding("left"), binding2: global.NovaBinding("right"), label: "Change"} : undefined;
+            var adjust = NovaFocus < 2 ? {binding: global.NovaDirectionBinding("left"), binding2: global.NovaDirectionBinding("right"), label: "Change"} : undefined;
             NovaFooter(NovaFocus == 3 ? "Begin" : (NovaFocus < 2 ? "Next" : "Select"), adjust);
             break;
         case "challenges":
@@ -391,27 +379,6 @@ function NovaAdventureDraw() {
             var rows = ["Play", "Records", "Rename", "Delete player"];
             for (var i = 0; i < 4; i++) NovaRow(rows[i], i, 108 + i * 36);
             NovaFooter();
-            break;
-        case "options": case "controls":
-            var rows = NovaPage == "options" ? ["Controls", "Updates", "Credits"] : ["Gamepad", "Keyboard"];
-            for (var i = 0; i < array_length(rows); i++) NovaRow(rows[i], i, 90 + i * 48);
-            NovaFooter();
-            break;
-        case "gamepad": case "keyboard":
-            var device = NovaPage == "gamepad" ? 0 : 1;
-            NovaRow("Remap", 0, 64, "", 60);
-            NovaRow("Default", 1, 64, "", 232);
-            var labels = ["Sword", "Interact", "Item", "Map", "Strafe", "Inventory", "Menu", "Status", "Up", "Down", "Left", "Right", "Previous bag", "Next bag"];
-            for (var i = 0; i < global.BindingIconCount[device]; i++) {
-                var px = 44 + (i div 7) * 160;
-                var py = 104 + (i mod 7) * 20;
-                var scanning = Bindings_Remap && i == global.BindingRemap_VerbIndex;
-                NovaText(labels[global.BindingVerbs[device][i]], px, py, scanning, 0.75);
-                var label = scanning ? "Press..." : global.NovaKeyLabel(global.NovaBinding(GetInputVerbStr(global.BindingVerbs[device][i]), device == 0 ? "gamepad" : "keyboard"));
-                NovaText(label, px + 143, py, scanning, 0.6, fa_right);
-            }
-            if (Bindings_Remap) NovaText("Follow the highlighted action", 200, 280, false, 0.75, fa_center);
-            else NovaFooter();
             break;
         case "replace": case "delete":
             NovaText(NovaPage == "replace" ? "Replace your saved adventure?" : "Delete " + global.Users[global.UserIndex].Name + "?", 200, 90, false, 1, fa_center);

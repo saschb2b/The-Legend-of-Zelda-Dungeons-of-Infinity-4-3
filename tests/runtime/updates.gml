@@ -17,7 +17,9 @@ function UpdateMenuTests() {
         Menu_Active = true;
         Menu_ActiveIndex = 0;
         NovaPage = "options";
-        NovaFocus = 1;
+        NovaOptions = global.NovaOptionsState("title");
+        NovaOptions.tab = 4;
+        NovaOptions.focus = 0;
         Selector_Index_Main = global.MaxUsers;
     }
     Record("Updates is available in Options", oMenu.NovaPage == "options");
@@ -78,7 +80,7 @@ function UpdateMenuTests() {
     PressEvent(oMenu, global.NovaCloseVerb(), oMenu, ev_step, ev_step_normal);
     Record("Close wins over a ready update", !global.NovaTestUpdateRestart && UpdateRequestRead().action == "cancel");
     Record("Controller B closes Updates", !oMenu.NovaUpdateOpen);
-    Record("Closing Updates restores its Options row", oMenu.NovaPage == "options" && oMenu.NovaFocus == 1);
+    Record("Closing Updates restores its Options row", oMenu.NovaPage == "options" && oMenu.NovaOptions.tab == 4 && oMenu.NovaOptions.focus == 0);
     input_profile_set(profile);
     file_delete("nova-update-request.json");
     file_delete("nova-update-status.json");

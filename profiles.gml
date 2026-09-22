@@ -1,9 +1,5 @@
 function NovaMenuLayout() {
-    return {
-        x: 24, y: 10, width: 352, height: 216,
-        header_y: -20, header_width: 352, header_height: 20,
-        left: 42, right: 358, footer_y: 242, footer_left: 28, footer_right: 372
-    };
+    return global.NovaMenuLayout();
 }
 function NovaMenuFrame(title) {
     var layout = NovaMenuLayout();

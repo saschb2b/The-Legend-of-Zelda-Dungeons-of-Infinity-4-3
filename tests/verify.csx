@@ -24,7 +24,11 @@ Check(hand.Textures.Count == 2 && hand.Width == 24 && hand.Height == 23, "Wallma
 Check(Code("gml_Object_oTitle_Step_0").Contains("global.CanSkipTitle"), "Title skip option missing");
 var menuDraw = Code("gml_Object_oMenu_Draw_0");
 var menuCreate = Code("gml_Object_oMenu_Create_0");
-Check(menuDraw.Contains("NovaAdventureDraw()") && menuCreate.Contains("NovaDraft") && menuCreate.Contains("Previous bag"), "Adventure, challenge and control paths must coexist");
+Check(menuDraw.Contains("NovaAdventureDraw()") && menuCreate.Contains("NovaDraft") && menuCreate.Contains("global.NovaOptionsStep(NovaOptions") && Code("gml_GlobalScript___Input").Contains("Previous bag"), "Adventure, challenge and control paths must coexist");
+Check(Code("gml_Object_oMenu_Game_Step_0").Contains("global.NovaOptionsStep(NovaOptions") && Code("gml_Object_oMenu_Game_Draw_0").Contains("if (NovaOptionsOpen)"), "Pause must open the shared Options screen");
+Check(Code("gml_Object_oRender_Draw_64").Contains("global.NovaOptionsOverlay("), "Pause Options must draw after the CRT pass");
+foreach (var name in new[] { "gml_Object_oInputRemap_Create_0", "gml_GlobalScript___Input" })
+    Check(!Code(name).Contains("oMenu.Bindings_Remap") && Code(name).Contains("global.NovaRemapping"), "Remapping must not require the adventure menu: " + name);
 Check(Code("gml_Object_oMenu_Step_0").Contains("keyboard_check_pressed(vk_escape)"), "Menu cancel missing");
 Check(menuCreate.Contains("NovaUpdateOpen = false") && menuCreate.Contains("NovaUpdateDraw()"), "Updater menu initialization and drawing must coexist");
 Check(Code("gml_Object_oMenuWin_Draw_0").Contains("instance_exists(oMenu)"), "Startup must suppress inactive parent windows");
