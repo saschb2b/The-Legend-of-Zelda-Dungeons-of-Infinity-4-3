@@ -52,7 +52,7 @@ using (var worker = new TextureWorker()) {
         else sprite.Textures[frame].Texture = page;
     }
 }
-var content = JsonDocument.Parse(File.ReadAllText(Path.Combine(patchDir, "content_1_2_1.json"))).RootElement;
+var content = JsonDocument.Parse(File.ReadAllText(Path.Combine(patchDir, "src/data/content_1_2_1.json"))).RootElement;
 var gemIndices = new List<int>();
 var gemNames = new string[10];
 var gemRanks = new int[10];
@@ -78,7 +78,7 @@ for (var row = 0; row < 10; row++) {
         gemCode += "global.GemPrize[" + hi + "][" + lo + "] = " + recipes[col].GetRawText() + ";\n";
     }
 }
-gemCode += "}\n" + File.ReadAllText(Path.Combine(patchDir, "gems.gml"));
+gemCode += "}\n" + File.ReadAllText(Path.Combine(patchDir, "src/gml/gameplay/gems.gml"));
 group.QueueReplace("gml_GlobalScript___Gems", gemCode);
 Edit("gml_Object_oGemPondWater_Create_0", "GemCount = array_create(9);", "GemCount = array_create(10);");
 Edit("gml_GlobalScript___Users", "    global.Challenges = StructCopy(global.Users[global.UserIndex].SaveData.Challenges);",
@@ -90,8 +90,8 @@ var challengeData = content.GetProperty("challenges");
 var challengeCode = "";
 foreach (var field in new[] { "Hearts", "Defense", "Rupees", "ShopPrices", "Curses" })
     challengeCode += "global.NovaChallenge" + field + " = " + challengeData.GetProperty("ChallengeMaxArray_" + field).GetRawText() + ";\n";
-group.QueueAppend("gml_GlobalScript___Menu", challengeCode + File.ReadAllText(Path.Combine(patchDir, "challenges.gml")));
-Edit("gml_Object_oMenu_Create_0", "depth = -100;", "depth = -100;\n" + File.ReadAllText(Path.Combine(patchDir, "challenge_menu.gml")));
+group.QueueAppend("gml_GlobalScript___Menu", challengeCode + File.ReadAllText(Path.Combine(patchDir, "src/gml/gameplay/challenges.gml")));
+Edit("gml_Object_oMenu_Create_0", "depth = -100;", "depth = -100;\n" + File.ReadAllText(Path.Combine(patchDir, "src/gml/menus/challenge_menu.gml")));
 Edit("gml_GlobalScript___Users", "    global.Users[global.UserIndex].SaveData.Challenges = StructCopy(global.Challenges);",
     "    global.Users[global.UserIndex].SaveData.Challenges = StructCopy(global.Challenges);\n    global.Users[global.UserIndex].SaveData.NovaChallengeOptions = StructCopy(global.NovaChallengeOptions);");
 Edit("gml_GlobalScript___Users", "    global.Challenges = StructCopy(global.Users[global.UserIndex].SaveData.Challenges);",
@@ -127,9 +127,9 @@ Edit("gml_GlobalScript___Treasures", "Prob(0.055 + (global.Level.Index * 0.005))
 Edit("gml_Object_oDeadGuy_Step_0", "(0.2 + (global.Level.Index * 0.005))", "((0.2 + (global.Level.Index * 0.005)) * global.NovaChallengeCurses[global.NovaOption(8)])");
 var hand = new UndertaleGameObject { Name = Data.Strings.MakeString("oNovaWallmaster"), Sprite = Data.Sprites.ByName("sNovaWallmaster"), Visible = true };
 Data.GameObjects.Add(hand);
-group.QueueReplace("gml_Object_oNovaWallmaster_Create_0", File.ReadAllText(Path.Combine(patchDir, "wallmaster_create.gml")));
-group.QueueReplace("gml_Object_oNovaWallmaster_Step_0", File.ReadAllText(Path.Combine(patchDir, "wallmaster_step.gml")));
-group.QueueReplace("gml_Object_oNovaWallmaster_Draw_0", File.ReadAllText(Path.Combine(patchDir, "wallmaster_draw.gml")));
+group.QueueReplace("gml_Object_oNovaWallmaster_Create_0", File.ReadAllText(Path.Combine(patchDir, "src/gml/gameplay/wallmaster_create.gml")));
+group.QueueReplace("gml_Object_oNovaWallmaster_Step_0", File.ReadAllText(Path.Combine(patchDir, "src/gml/gameplay/wallmaster_step.gml")));
+group.QueueReplace("gml_Object_oNovaWallmaster_Draw_0", File.ReadAllText(Path.Combine(patchDir, "src/gml/gameplay/wallmaster_draw.gml")));
 group.QueueAppend("gml_Object_oLink_Step_2", @"
 if (global.NovaOption(11) && global.Level.Index > 0 && global.Level.Index < 13 && global.Level.Index != 6 && global.Level.Index != 10 && !instance_exists(oNovaWallmaster))
     instance_create_layer(x - 80, y, ""ObjsHighest"", oNovaWallmaster);");

@@ -2,7 +2,7 @@
 
 The base remains the PortMaster 1.1.6 VM build. Patch release numbers are independent of the original game's versions. Version 1.5.0 adds Topaz, revised recipes and artwork, variable challenges, and a Wallmaster mode to the inventory, combat, and fixes below. It does not provide full 1.2.1 parity.
 
-The references are the developer's bundled change log, manual, Gem Combo Poster, dungeon templates, and Windows 1.2.1 build. Its native executable retains named functions and data initializers. Reading those initializers supplied the exact gem recipes, drop weights, rod capacities, and challenge choices recorded in `content_1_2_1.json`. That file identifies the source executable by SHA-256. The gem recipes also match the poster. Gameplay integrations described below adapt those values to the older VM game.
+The references are the developer's bundled change log, manual, Gem Combo Poster, dungeon templates, and Windows 1.2.1 build. Its native executable retains named functions and data initializers. Reading those initializers supplied the exact gem recipes, drop weights, rod capacities, and challenge choices recorded in `src/data/content_1_2_1.json`. That file identifies the source executable by SHA-256. The gem recipes also match the poster. Gameplay integrations described below adapt those values to the older VM game.
 
 | Change | Included and checked |
 | --- | --- |
@@ -54,7 +54,7 @@ Challenge choices use the recovered values. Enemy crowds multiply the older engi
 
 Wallmaster uses the recovered artwork, damage, chase speed, attack speed/duration, hover height, and wait values. Its pursuit and collision handling are a VM implementation. It follows Link across dungeon rooms, pauses during menus and transitions, and leaves village levels. It uses normal Link damage and invulnerability rules. A full dungeon run may reveal differences from the native encounter.
 
-`dungeon_fixes.json` is the source for the template corrections. The comparison matched rooms by grid geometry and translated connected-room indices into the 1.1.6 ordering. It excluded cosmetic room/door reordering. The build generates guarded assignments before the game creates rotated and mirrored templates. Each assignment checks its original value.
+`src/data/dungeon_fixes.json` is the source for the template corrections. The comparison matched rooms by grid geometry and translated connected-room indices into the 1.1.6 ordering. It excluded cosmetic room/door reordering. The build generates guarded assignments before the game creates rotated and mirrored templates. Each assignment checks its original value.
 
 ## Village minigames
 
@@ -76,7 +76,7 @@ The claw costs ten rupees, has five prizes, and uses the original 65% success ch
 
 The normal prize pool has 97 entries. Food takes 75, with four each for coupons, gems, kinstones, large magic refills and fairy orbs. Heart containers and wishstones each take one. The recovered pool rules exclude forbidden food and unavailable rare prizes.
 
-`arcade.gml` and `arcade/` adapt these rules and the animations to the older VM. The controller footer follows this patch's bindings. B settles a paid slot result once. For the claw, B refunds a play before Grab; after Grab it settles the chosen outcome without waiting for the animation. These closure rules are patch adaptations. The VM implementation is not a complete native-code transplant.
+`src/gml/arcade/arcade.gml` and `arcade/` adapt these rules and the animations to the older VM. The controller footer follows this patch's bindings. B settles a paid slot result once. For the claw, B refunds a play before Grab; after Grab it settles the chosen outcome without waiting for the animation. These closure rules are patch adaptations. The VM implementation is not a complete native-code transplant.
 
 `assets/arcade-resources.zip` contains resource byte patches and metadata for 18 sprites and 15 sounds. Its manifest records the SHA-256 hashes of the inspected executable, game data and two audio groups. Each resource patch checks its base and reconstructed bytes. Sprites retain original origins, collision bounds and nine-slice settings, including repeated payout symbols and the extending claw cable. The game artwork and audio are extracted originals.
 

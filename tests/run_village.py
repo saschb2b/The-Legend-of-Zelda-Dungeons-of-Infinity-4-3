@@ -12,6 +12,8 @@ from run_device import copy, remote
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+INSTALLER = ROOT / 'installer'
+sys.path.insert(0, str(INSTALLER))
 import build
 from install import GAME_DIR, LAUNCHER
 
@@ -32,7 +34,7 @@ def main():
     launcher = f'{args.ports_dir}/DOI Village Test.sh'
     source = f'{args.ports_dir}/{GAME_DIR}'
     request = lambda command, data=None: remote(args.host, args.control_path, command, data)
-    constants = f'SOURCE={source!r}\nSTAGE={stage!r}\nLAUNCHER={launcher!r}\nLAUNCHER_TEXT={(ROOT / LAUNCHER).read_text()!r}\n'
+    constants = f'SOURCE={source!r}\nSTAGE={stage!r}\nLAUNCHER={launcher!r}\nLAUNCHER_TEXT={(INSTALLER / LAUNCHER).read_text()!r}\n'
     snapshot = '''import hashlib,json,pathlib,shutil,urllib.request
 source=pathlib.Path(SOURCE)
 stage=pathlib.Path(STAGE)
@@ -60,7 +62,7 @@ launcher.chmod(0o755)
     record = {'stage': stage, 'launcher': launcher, 'game_sha256': hashlib.sha256(game.read_bytes()).hexdigest()}
     (ROOT / '.build/village-preview.json').write_text(json.dumps(record, indent=2) + '\n')
     for helper in ('controller.py', 'updater.py', 'install.py'):
-        copy(args.host, args.control_path, ROOT / helper, stage + '/' + helper)
+        copy(args.host, args.control_path, INSTALLER / helper, stage + '/' + helper)
     port_path = ROOT / '.build/village-preview.port'
     with ZipFile(ROOT / '.build/original.port') as original, ZipFile(port_path, 'w') as port:
         for entry in original.infolist():

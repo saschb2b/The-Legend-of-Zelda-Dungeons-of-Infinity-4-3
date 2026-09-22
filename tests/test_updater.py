@@ -196,7 +196,7 @@ class UpdateTransactionTests(unittest.TestCase):
 
 class DownloadAndInstallTests(unittest.TestCase):
     def setUp(self):
-        from test_install import binary_patch
+        from tests.test_install import binary_patch
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
@@ -230,7 +230,7 @@ class DownloadAndInstallTests(unittest.TestCase):
         root = Path(__file__).resolve().parents[1]
         with ZipFile(installer, 'w') as archive:
             for name in ('install.py', 'controller.py', 'updater.py', 'README.md', 'gameinfo.xml', updater.LAUNCHER):
-                archive.writestr('zeldadoi-43-installer/' + name, (root / name).read_bytes())
+                archive.writestr('zeldadoi-43-installer/' + name, (root / name if name == 'README.md' else root / 'installer' / name).read_bytes())
             archive.writestr('zeldadoi-43-installer/manifest.json', json.dumps(manifest))
             archive.writestr('zeldadoi-43-installer/patches/game.droid.bsdiff', delta)
         self.installer = installer.getvalue()

@@ -14,6 +14,8 @@ from zipfile import ZipFile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+INSTALLER = ROOT / 'installer'
+sys.path.insert(0, str(INSTALLER))
 from install import GAME_DIR, LAUNCHER
 
 
@@ -80,13 +82,13 @@ text=text.replace(anchor,'GAMEDIR='+repr(str(stage)))
 launcher.write_text(text)
 launcher.chmod(0o755)
 '''
-        constants = f'CAPTURE_ARCADE={args.capture_arcade!r}\nCAPTURE_CONTEXT={args.capture_context!r}\nCAPTURE={args.capture!r}\nCAPTURE_UPDATES={args.capture_updates!r}\nCAPTURE_PROFILES={args.capture_profiles!r}\nSOURCE={source!r}\nSTAGE={stage!r}\nLAUNCHER={launcher!r}\nLAUNCHER_TEXT={(ROOT / LAUNCHER).read_text()!r}\n'
+        constants = f'CAPTURE_ARCADE={args.capture_arcade!r}\nCAPTURE_CONTEXT={args.capture_context!r}\nCAPTURE={args.capture!r}\nCAPTURE_UPDATES={args.capture_updates!r}\nCAPTURE_PROFILES={args.capture_profiles!r}\nSOURCE={source!r}\nSTAGE={stage!r}\nLAUNCHER={launcher!r}\nLAUNCHER_TEXT={(INSTALLER / LAUNCHER).read_text()!r}\n'
         snapshot, staging = setup.split('shutil.copytree', 1)
         before = json.loads(request('python3 -', (constants + snapshot).encode()))
         created = True
         request('python3 -', (constants + 'import json,pathlib,shutil\nsource=pathlib.Path(SOURCE)\nstage=pathlib.Path(STAGE)\nlauncher=pathlib.Path(LAUNCHER)\nshutil.copytree' + staging).encode())
         for helper in ('controller.py', 'updater.py', 'install.py'):
-            copy(args.host, args.control_path, ROOT / helper, stage + '/' + helper)
+            copy(args.host, args.control_path, INSTALLER / helper, stage + '/' + helper)
         with tempfile.TemporaryDirectory() as directory:
             port_path = Path(directory) / 'runtime.port'
             with ZipFile(ROOT / '.build/original.port') as original, ZipFile(port_path, 'w') as port:

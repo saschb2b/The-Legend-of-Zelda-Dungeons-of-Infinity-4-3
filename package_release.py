@@ -15,15 +15,20 @@ PAYLOAD_FILES = ('install.py', 'controller.py', 'updater.py', 'manifest.json', '
 INSTALLER_LAUNCHER = 'Install Zelda Dungeons of Infinity 4-3.sh'
 
 
+def source(root, name):
+    # The player README ships with the installer; everything else lives in installer/.
+    return root / name if name == 'README.md' else root / 'installer' / name
+
+
 def write_archive(root, output):
     output.parent.mkdir(parents=True, exist_ok=True)
     with ZipFile(output, 'x', compression=ZIP_DEFLATED, compresslevel=9) as release:
-        def add(source, destination):
+        def add(name, destination):
             entry = ZipInfo(destination, date_time=(2026, 9, 19, 0, 0, 0))
             entry.create_system = 3
             entry.compress_type = ZIP_DEFLATED
-            entry.external_attr = (stat.S_IFREG | (0o755 if source.endswith('.sh') else 0o644)) << 16
-            release.writestr(entry, (root / source).read_bytes(), compresslevel=9)
+            entry.external_attr = (stat.S_IFREG | (0o755 if name.endswith('.sh') else 0o644)) << 16
+            release.writestr(entry, source(root, name).read_bytes(), compresslevel=9)
 
         add(INSTALLER_LAUNCHER, INSTALLER_LAUNCHER)
         for name in PAYLOAD_FILES:
@@ -64,9 +69,9 @@ def main():
         'patched_game_size': len(patched),
         'patch_sha256': hashlib.sha256(patch).hexdigest(),
     }
-    (ROOT / 'patches').mkdir(exist_ok=True)
-    (ROOT / 'patches/game.droid.bsdiff').write_bytes(patch)
-    (ROOT / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
+    (ROOT / 'installer/patches').mkdir(exist_ok=True)
+    (ROOT / 'installer/patches/game.droid.bsdiff').write_bytes(patch)
+    (ROOT / 'installer/manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
     write_archive(ROOT, args.output)
     print(f'{args.output}: {args.output.stat().st_size:,} bytes, patch only')
 

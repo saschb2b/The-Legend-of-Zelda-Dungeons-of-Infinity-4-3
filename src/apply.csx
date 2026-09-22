@@ -14,12 +14,13 @@ using UndertaleModLib.Util;
 // mistaken for 2024.8 alignment padding by the tool's version detection.
 Data.SetGMS2Version(2024, 6);
 Data.FORM.FUNC.CodeLocals ??= new UndertaleModLib.UndertaleSimpleList<UndertaleCodeLocals>();
+// build.py runs the compiler from the repository root; patch paths are relative to it.
 var patchDir = Directory.GetCurrentDirectory();
 var novaCRT = new UndertaleShader {
     Name = Data.Strings.MakeString("shd_NovaCRT"),
     Type = UndertaleShader.ShaderType.GLSL_ES,
-    GLSL_ES_Vertex = Data.Strings.MakeString(File.ReadAllText(Path.Combine(patchDir, "shaders/crt-lottes.vsh"))),
-    GLSL_ES_Fragment = Data.Strings.MakeString(File.ReadAllText(Path.Combine(patchDir, "shaders/crt-lottes.fsh"))),
+    GLSL_ES_Vertex = Data.Strings.MakeString(File.ReadAllText(Path.Combine(patchDir, "src/shaders/crt-lottes.vsh"))),
+    GLSL_ES_Fragment = Data.Strings.MakeString(File.ReadAllText(Path.Combine(patchDir, "src/shaders/crt-lottes.fsh"))),
     GLSL_Vertex = Data.Strings.MakeString(""), GLSL_Fragment = Data.Strings.MakeString(""),
     HLSL9_Vertex = Data.Strings.MakeString(""), HLSL9_Fragment = Data.Strings.MakeString("")
 };
@@ -69,8 +70,8 @@ Edit("gml_Object_oInit_Create_0", "ini_close();",
     "global.CanSkipTitle = ini_read_real(\"Preferences\", \"CanSkipTitle\", 1) == 1;\nini_close();");
 Edit("gml_Object_oTitle_Step_0", "AllowStart || false", "AllowStart || global.CanSkipTitle");
 edits["gml_Object_oMenu_Create_0"] = FlattenEnums(Read("gml_Object_oMenu_Create_0"));
-edits["gml_Object_oMenu_Create_0"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "updates.gml"));
-edits["gml_Object_oMenu_Create_0"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "profiles.gml"));
+edits["gml_Object_oMenu_Create_0"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "src/gml/menus/updates.gml"));
+edits["gml_Object_oMenu_Create_0"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "src/gml/menus/profiles.gml"));
 group.QueueAppend("gml_Object_oMenu_Game_Create_0", "NovaOptionsOpen = false; NovaOptions = undefined;");
 Edit("gml_Object_oMenu_Game_Step_0", "Index = 1;", "NovaOptionsOpen = true; NovaOptions = global.NovaOptionsState(\"pause\");");
 Edit("gml_Object_oMenu_Game_Draw_0", "draw_sprite_stretched(sprite_index, 0, FrameX, FrameY, FrameW, FrameH);",
@@ -81,7 +82,7 @@ Edit("gml_Object_oInputRemap_Create_0", "oMenu.Bindings_Remap = true;\noMenu.Men
 Edit("gml_GlobalScript___Input", "oMenu.Bindings_Remap = false;\n    oMenu.Menu_Active = true;",
     "global.NovaRemapping = false;\n    with (oMenu) { Bindings_Remap = false; Menu_Active = true; }");
 Edit("gml_Object_oMenu_Game_Step_0", "if (input_check_pressed(\"menu_access\"))",
-    File.ReadAllText(Path.Combine(patchDir, "pause_cancel.gml")) + "\nif (input_check_pressed(\"menu_access\"))");
+    File.ReadAllText(Path.Combine(patchDir, "src/gml/menus/pause_cancel.gml")) + "\nif (input_check_pressed(\"menu_access\"))");
 Edit("gml_Object_oGame_Step_1", "if (input_check_pressed(\"hud\"))",
     "if (input_check_pressed(\"hud\") && !global.Paused && !instance_exists(oInventory) && !instance_exists(oMap) && !instance_exists(oMenu_Game) && !instance_exists(oDialogueBox))");
 Edit("gml_Object_oMap_Create_0", "FrameX = oCamera.X + 26;\nFrameY = oCamera.Y + 10;",
@@ -128,13 +129,13 @@ var render = FlattenEnums(Read(renderName));
 var marker = "if (global.Users[global.UserIndex].Prefs[3])";
 var position = render.IndexOf(marker);
 if (position < 0) throw new Exception("Final compositor not found");
-group.QueueReplace(renderName, render.Substring(0, position) + File.ReadAllText(Path.Combine(patchDir, "composite.gml")));
+group.QueueReplace(renderName, render.Substring(0, position) + File.ReadAllText(Path.Combine(patchDir, "src/gml/render/composite.gml")));
 group.QueueAppend("gml_Object_oRender_Create_0", "NovaFrame = -1; NovaHUD = -1; NovaTransitionHUD = false; surface_resize(application_surface, 1600, 900); display_set_gui_maximise();");
 group.QueueAppend("gml_Object_oRender_Create_0", "NovaContext = global.NovaContextMotion();");
-group.QueueAppend("gml_Object_oRender_Create_0", File.ReadAllText(Path.Combine(patchDir, "crt.gml")));
+group.QueueAppend("gml_Object_oRender_Create_0", File.ReadAllText(Path.Combine(patchDir, "src/gml/render/crt.gml")));
 group.QueueAppend("gml_Object_oRender_Step_2", "global.NovaContextUpdate(delta_time / 1000000);");
 group.QueueAppend("gml_Object_oRender_CleanUp_0", "if (surface_exists(NovaFrame)) surface_free(NovaFrame); if (surface_exists(NovaHUD)) surface_free(NovaHUD); display_set_gui_maximise(-1, -1);");
-group.QueueAppend("gml_Object_oRender_Create_0", "function NovaHUD_Draw(layout) { with (oHUD) {\n" + File.ReadAllText(Path.Combine(patchDir, "hud.gml")) + "\n} }");
+group.QueueAppend("gml_Object_oRender_Create_0", "function NovaHUD_Draw(layout) { with (oHUD) {\n" + File.ReadAllText(Path.Combine(patchDir, "src/gml/render/hud.gml")) + "\n} }");
 var hudName = "gml_Object_oHUD_Draw_0";
 var hud = FlattenEnums(Read(hudName));
 var metricsStart = hud.IndexOf("draw_sprite_ext(sHUD_Life,");
@@ -187,7 +188,7 @@ group.QueueReplace("gml_Object_oNovaScreen_CleanUp_0", "display_set_gui_maximise
 foreach (var screen in new[] { "oTitle", "oMenu" }) {
     group.QueueAppend($"gml_Object_{screen}_Create_0", "instance_create_layer(0, 0, \"System\", oNovaScreen);");
 }
-group.QueueAppend("gml_Object_oLink_Create_0", File.ReadAllText(Path.Combine(patchDir, "sword.gml")));
+group.QueueAppend("gml_Object_oLink_Create_0", File.ReadAllText(Path.Combine(patchDir, "src/gml/gameplay/sword.gml")));
 group.QueueAppend("gml_Object_oLink_Create_0", "NovaCrystalHold = false; NovaCrystalTicks = 0;");
 Edit("gml_Object_oLink_Step_0",
     "S = (ItemHolding == -4) ? ((Action[6] && !InDoorPassage) ? RunSpeed : WalkSpeed) : CarryingSpeed;",
@@ -212,7 +213,7 @@ function Facing_Check()
     else if (vx > 0) Facing = 4;
 }
 ");
-using (var backports = JsonDocument.Parse(File.ReadAllText(Path.Combine(patchDir, "backports.json")))) {
+using (var backports = JsonDocument.Parse(File.ReadAllText(Path.Combine(patchDir, "src/data/backports.json")))) {
     foreach (var fix in backports.RootElement.EnumerateArray()) {
         Edit(fix.GetProperty("code").GetString(), fix.GetProperty("anchor").GetString(), fix.GetProperty("replacement").GetString());
     }
@@ -250,12 +251,12 @@ Edit("gml_GlobalScript___Input", "global.BindingVerbs[1] = [0, 1, 2, 3, 4, 5, 6,
     "global.BindingVerbs[1] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];");
 Edit("gml_GlobalScript___Input", "function GetInputVerbStr(arg0)\n{",
     "function GetInputVerbStr(arg0)\n{\n    if (arg0 == 12) return \"nova_bag_previous\";\n    if (arg0 == 13) return \"nova_bag_next\";");
-edits["gml_GlobalScript___Input"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "controls.gml"));
-edits["gml_GlobalScript___Input"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "options.gml"));
+edits["gml_GlobalScript___Input"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "src/gml/input/controls.gml"));
+edits["gml_GlobalScript___Input"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "src/gml/menus/options.gml"));
 ApplyContent();
 ApplyArcade();
 ApplyContextHints();
-using (var corrections = JsonDocument.Parse(File.ReadAllText(Path.Combine(patchDir, "dungeon_fixes.json")))) {
+using (var corrections = JsonDocument.Parse(File.ReadAllText(Path.Combine(patchDir, "src/data/dungeon_fixes.json")))) {
     var statements = "";
     foreach (var fix in corrections.RootElement.EnumerateArray()) {
         var path = "Templates_Dungeon_Temp";
@@ -275,7 +276,7 @@ using (var corrections = JsonDocument.Parse(File.ReadAllText(Path.Combine(patchD
 }
 var inventoryName = "gml_GlobalScript___Inventory";
 var inventory = edits.ContainsKey(inventoryName) ? edits[inventoryName] : FlattenEnums(Read(inventoryName));
-var additions = File.ReadAllText(Path.Combine(patchDir, "inventory.gml"));
+var additions = File.ReadAllText(Path.Combine(patchDir, "src/gml/inventory/inventory.gml"));
 var functions = Regex.Matches(additions, @"(?m)^function (\w+)\(");
 for (var i = 0; i < functions.Count; i++) {
     var name = functions[i].Groups[1].Value;
@@ -307,13 +308,13 @@ foreach (var spec in new[] { ("oNovaFoodBag", "sNovaFoodBag"), ("oNovaPendantBag
     Data.GameObjects.Add(bag);
     group.QueueReplace("gml_Object_" + spec.Item1 + "_Create_0", "event_inherited(); ShadowOffsetY = -1; if (Class == 51) { image_index = 1; mask_index = sItem_Lamp; }");
 }
-group.QueueAppend("gml_Object_oInventory_Create_0", File.ReadAllText(Path.Combine(patchDir, "inventory_ui.gml")));
-group.QueueReplace("gml_Object_oInventory_Step_0", File.ReadAllText(Path.Combine(patchDir, "inventory_step.gml")));
-group.QueueReplace("gml_Object_oInventory_Draw_0", File.ReadAllText(Path.Combine(patchDir, "inventory_draw.gml")));
+group.QueueAppend("gml_Object_oInventory_Create_0", File.ReadAllText(Path.Combine(patchDir, "src/gml/inventory/inventory_ui.gml")));
+group.QueueReplace("gml_Object_oInventory_Step_0", File.ReadAllText(Path.Combine(patchDir, "src/gml/inventory/inventory_step.gml")));
+group.QueueReplace("gml_Object_oInventory_Draw_0", File.ReadAllText(Path.Combine(patchDir, "src/gml/inventory/inventory_draw.gml")));
 group.QueueReplace("gml_Object_oInventory_Step_2", "if (Close) { Alpha -= AlphaSpeed; if (Alpha <= 0) instance_destroy(); }");
 string GlobalInventoryCalls(string source) => Regex.Replace(source, @"(?<![.\w])Nova(GearSlot|BagRange|EmptyRange|EmptySlot|InventoryInit|InventoryMigrate|CandleInit)\(", "global.Nova$1(");
 // The startup controller owns the scene; upstream windows remain only as bootstrap data.
-edits["gml_Object_oMenu_Create_0"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "adventure.gml"));
+edits["gml_Object_oMenu_Create_0"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "src/gml/menus/adventure.gml"));
 Edit("gml_Object_oMenu_Create_0", "audio_sound_gain(MenuMusic, 0.5, 0);", "audio_sound_gain(MenuMusic, 0, 0); audio_sound_gain(MenuMusic, 0.5, 350);");
 var creditSource = Read("gml_Object_oCredits_Create_0");
 var creditStart = creditSource.IndexOf("TextArray = [];");

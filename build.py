@@ -5,14 +5,16 @@ import json
 import shutil
 import struct
 import subprocess
+import sys
 import tempfile
 import urllib.request
 from pathlib import Path
 from zipfile import ZipFile
 
-import install
-
 ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(ROOT / 'installer'))
+import install  # noqa: E402
+
 BUILD = ROOT / '.build'
 TOOL_URL = 'https://github.com/UnderminersTeam/UndertaleModTool/releases/download/0.9.2.0/UTMT_CLI_v0.9.2.0-Ubuntu.zip'
 TOOL_SHA256 = 'd182f00c0e5ced8d9252aa1f796374cfee077a3889a658e70b68685f9cd559c7'
@@ -51,7 +53,8 @@ def run_umt(tool, source, script, output=None, sentinel=None):
         command += ['-o', str(output), '-f']
     log = BUILD / (Path(script).stem + '.log')
     with log.open('w') as stream:
-        result = subprocess.run(command, cwd=ROOT, stdout=stream, stderr=subprocess.STDOUT, timeout=240)
+        # The CLI can wait on an inherited stdin; it never needs input.
+        result = subprocess.run(command, cwd=ROOT, stdin=subprocess.DEVNULL, stdout=stream, stderr=subprocess.STDOUT, timeout=240)
     content = log.read_text()
     # The CLI can return zero after a script exception. Require an explicit completion marker.
     if result.returncode or (sentinel and sentinel not in content) or (output and not output.is_file()):
@@ -97,19 +100,29 @@ def extract_original(archive, manifest):
 
 
 def check_release(original, rebuilt, manifest):
-    delta = (ROOT / 'patches/game.droid.bsdiff').read_bytes()
+    delta = (ROOT / 'installer/patches/game.droid.bsdiff').read_bytes()
     install.verify(delta, manifest['patch_sha256'], 'Patch')
     reconstructed = install.apply_patch(original, delta, manifest['patched_game_size'])
     install.verify(reconstructed, manifest['patched_game_sha256'], 'Patched game')
     if reconstructed != rebuilt:
         raise ValueError('Release delta does not match a clean source build. Repackage the release.')
     with tempfile.TemporaryDirectory() as directory:
-        ports = Path(directory)
+        ports = Path(directory) / 'ports'
         savedata = ports / install.GAME_DIR / 'savedata'
         savedata.mkdir(parents=True)
         (savedata / 'Users').write_bytes(b'CI save preservation sentinel')
-        install.install(ports, BUILD / 'port.zip', refresh=False)
-        install.install(ports, BUILD / 'port.zip', refresh=False)
+        # Install from the packaged layout, which adds the player README beside installer/.
+        import package_release
+        package_release.write_archive(ROOT, Path(directory) / 'release.zip')
+        with ZipFile(Path(directory) / 'release.zip') as release:
+            release.extractall(Path(directory) / 'release')
+        source_root = install.ROOT
+        install.ROOT = Path(directory) / 'release/zeldadoi-43-installer'
+        try:
+            install.install(ports, BUILD / 'port.zip', refresh=False)
+            install.install(ports, BUILD / 'port.zip', refresh=False)
+        finally:
+            install.ROOT = source_root
         with ZipFile(ports / install.GAME_DIR / 'zeldadoi.port') as port:
             if port.read('assets/game.droid') != rebuilt:
                 raise ValueError('Installed game differs from the clean build.')
@@ -125,14 +138,14 @@ def main():
     parser.add_argument('--runtime-tests', action='store_true', help='Also compile a separate instrumented game for the Nova harness.')
     args = parser.parse_args()
     BUILD.mkdir(exist_ok=True)
-    manifest = json.loads((ROOT / 'manifest.json').read_text())
+    manifest = json.loads((ROOT / 'installer/manifest.json').read_text())
     upstream = args.upstream_zip or download(manifest['upstream_url'], BUILD / 'port.zip', manifest['upstream_sha256'])
     original = extract_original(upstream, manifest)
     if upstream.resolve() != (BUILD / 'port.zip').resolve():
         shutil.copyfile(upstream, BUILD / 'port.zip')
     tool = args.utmt.resolve() if args.utmt else toolchain()
     output = BUILD / 'patched.droid'
-    run_umt(tool, BUILD / 'game.droid', 'apply.csx', output, '4:3 overlay patch compiled.')
+    run_umt(tool, BUILD / 'game.droid', 'src/apply.csx', output, '4:3 overlay patch compiled.')
     verify_runner_format(output.read_bytes())
     run_umt(tool, output, 'tests/verify.csx', sentinel='NOVA BUILD VERIFIED')
     if args.check_release:

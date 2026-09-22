@@ -6,7 +6,7 @@ Play Dungeons of Infinity fullscreen on ROCKNIX, with a classic Zelda HUD and a 
 
 [**Download the installer**](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/latest) · [Installation](#install-on-the-nova) · [Controls](#controls) · [What's changed](CHANGELOG.md)
 
-![Dungeons of Infinity on the Nova, with the classic HUD and Status button hint](screenshots/playfield.png)
+![Dungeons of Infinity on the Nova, with the classic HUD and Status button hint](docs/screenshots/playfield.png)
 
 - The complete playfield fills the display. Title screens and menus fit too.
 - Health and supplies stay visible while status panels open over the game.
@@ -70,21 +70,21 @@ Input hints sit together at the bottom right, with each action label followed by
 
 | Inventory below the HUD | Contextual item actions |
 | --- | --- |
-| ![Compact bag inventory below health and counters, with Switch 2 button hints below the frame](screenshots/inventory.png) | ![Item action list with a confirm hint that names the highlighted Info action](screenshots/inventory-actions.png) |
+| ![Compact bag inventory below health and counters, with Switch 2 button hints below the frame](docs/screenshots/inventory.png) | ![Item action list with a confirm hint that names the highlighted Info action](docs/screenshots/inventory-actions.png) |
 
 Inventory and menu screenshots use test saves to show progress and full inventories. All screenshots come from the game running on a Nova.
 
 | Status at a stick-click | Continue your adventure |
 | --- | --- |
-| ![Equipment, map, and dungeon progress over the playfield](screenshots/overlay.png) | ![Adventure menu with the saved name and floor beneath Continue](screenshots/profile.png) |
+| ![Equipment, map, and dungeon progress over the playfield](docs/screenshots/overlay.png) | ![Adventure menu with the saved name and floor beneath Continue](docs/screenshots/profile.png) |
 
 The centered title screen leads into an adventure menu with your last selected player. Their name and floor sit beneath **Continue**, which resumes the saved run in one press. **New adventure** lets you choose a character, bonus and challenges in one frame. **Begin adventure** is selected by default. A fresh player starts as Link, with no required name entry.
 
-![New adventure setup with character selection, bonus, challenges and Begin adventure](screenshots/adventure-setup.png)
+![New adventure setup with character selection, bonus, challenges and Begin adventure](docs/screenshots/adventure-setup.png)
 
 **Change player** keeps all five save slots available, with each saved adventure's character, floor and hearts grouped in one row. Select a player to return to their adventure, or use **Manage** for records, renaming and deletion. Starting over an existing save asks for confirmation. Options, controls, updates and credits are available before entering the dungeon.
 
-![Options with Game, Display, Audio, Controls and About tabs, volume bars and a description of the selected setting](screenshots/options.png)
+![Options with Game, Display, Audio, Controls and About tabs, volume bars and a description of the selected setting](docs/screenshots/options.png)
 
 **Options** opens the same screen from the adventure menu and the pause menu. L/R switch between Game, Display, Audio and Controls, and left/right changes the highlighted setting. Changes apply immediately, and a line below the list explains each setting. **Defaults** restores the current tab after confirmation. Music and sound effects have ten volume steps; zero mutes them. Controls, CRT and item messages are saved for each player. Volume, blood and title skipping apply to the whole device. Updates and credits are under **About** in the adventure menu.
 
@@ -98,7 +98,7 @@ Open **Challenges** before a run to adjust health, darkness, inventory space, sh
 
 Press Start or confirm to skip the opening title animation. To require the full animation, turn off **Skip title intro** under **Options > Game**.
 
-This is an unofficial patch of the PortMaster **1.1.6 VM** build with selected 1.2.x backports. It does not include every change from 1.2.1. Read the [backport audit](BACKPORTS.md) for coverage and the [changelog](CHANGELOG.md) for changes between patch releases.
+This is an unofficial patch of the PortMaster **1.1.6 VM** build with selected 1.2.x backports. It does not include every change from 1.2.1. Read the [backport audit](docs/BACKPORTS.md) for coverage and the [changelog](CHANGELOG.md) for changes between patch releases.
 
 <details>
 <summary>Save migration and returning to an older patch</summary>
@@ -118,7 +118,7 @@ Reinstallation preserves both backups. Keep them if you plan to return to an ear
 
 The repository distributes patch code and binary deltas. Installer downloads contain no standalone game or runtime. Checksums verify the upstream package and patched output.
 
-[TESTING.md](TESTING.md) covers builds, GitHub CI, the isolated Nova regression suite, and the release procedure. Patch versions are independent of the original game's versions. Related fixes stay under Unreleased until the batch is ready.
+[TESTING.md](docs/TESTING.md) covers builds, GitHub CI, the isolated Nova regression suite, and the release procedure. Patch versions are independent of the original game's versions. Related fixes stay under Unreleased until the batch is ready.
 
 <details>
 <summary>Build the patch on Linux</summary>
@@ -157,6 +157,6 @@ Justin Bohemier created Dungeons of Infinity. The [PortMaster package](https://g
 
 Controller glyphs use Kenney's Input Prompts 1.5A, from `Nintendo Switch 2/Double`, under [CC0](assets/buttons/LICENSE.txt). [The asset manifest](assets/buttons/manifest.json) records source filenames and checksums. The patch copies this artwork without redrawing it.
 
-The gameplay CRT shader adapts Timothy Lottes' public-domain CRT-Lottes shader from RetroArch. [Shader source and tuning notes](shaders/README.md) document the port and its attribution.
+The gameplay CRT shader adapts Timothy Lottes' public-domain CRT-Lottes shader from RetroArch. [Shader source and tuning notes](src/shaders/README.md) document the port and its attribution.
 
 The release builder uses [bsdiff4](https://pypi.org/project/bsdiff4/) to create the binary patch.

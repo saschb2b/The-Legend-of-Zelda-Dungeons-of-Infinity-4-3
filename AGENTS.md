@@ -13,32 +13,34 @@ Work from this repository's root. Check `git status` before editing and preserve
 | Task | Source of truth |
 | --- | --- |
 | Player experience, controls and installation | [README.md](README.md) |
-| Builds, device tests, captures and releases | [TESTING.md](TESTING.md) |
-| Backport coverage, recovered behavior and deliberate adaptations | [BACKPORTS.md](BACKPORTS.md) |
+| Builds, device tests, captures and releases | [docs/TESTING.md](docs/TESTING.md) |
+| Backport coverage, recovered behavior and deliberate adaptations | [docs/BACKPORTS.md](docs/BACKPORTS.md) |
 | Shipped changes and release notes | [CHANGELOG.md](CHANGELOG.md) |
-| CRT provenance and tuning | [shaders/README.md](shaders/README.md) |
+| CRT provenance and tuning | [src/shaders/README.md](src/shaders/README.md) |
 
 Read the relevant implementation too. If documentation disagrees with code, investigate the difference before repeating either claim.
 
-## Code map
+## Repository layout
 
-| Area | Files |
+| Path | Contents |
 | --- | --- |
-| Build, compile and structural verification | `build.py`, `apply.csx`, `tests/verify.csx` |
-| Guarded edits to upstream events and dungeon templates | `backports.json`, `dungeon_fixes.json` |
-| Recovered content and resource imports | `content_1_2_1.json`, `content.csx`, `assets/` |
-| World composition, HUD and CRT | `composite.gml`, `hud.gml`, `crt.gml`, `shaders/` |
-| Bindings, glyphs and contextual hints | `controller.py`, `controls.gml`, `context.csx` |
-| Title-to-game flow and update menu | `profiles.gml`, `adventure.gml`, `updates.gml`, `challenge_menu.gml` |
-| Options for the adventure and pause menus | `options.gml`, `pause_cancel.gml` |
-| Inventory behavior and presentation | `inventory*.gml` |
-| Combat and challenges | `sword.gml`, `gems.gml`, `challenges.gml`, `wallmaster_*.gml` |
-| Village minigames | `arcade.csx`, `arcade.gml`, `arcade/` |
-| Installation, OTA and Ports launchers | `install.py`, `updater.py`, root `*.sh` files |
-| Release delta and metadata | `package_release.py`, `patches/game.droid.bsdiff`, `manifest.json` |
-| Host tests and device regression suite | `test_install.py`, `tests/test_*.py`, `tests/runtime/`, `tests/run_device.py` |
+| `build.py`, `package_release.py` | Build, verification and release packaging entry points |
+| `src/apply.csx` | Compiler entry script; loads `content.csx`, `context.csx` and `arcade.csx` beside it |
+| `src/data/` | Guarded upstream edits and recovered data: `backports.json`, `dungeon_fixes.json`, `content_1_2_1.json` |
+| `src/gml/render/` | World composition, HUD and CRT: `composite.gml`, `hud.gml`, `crt.gml` |
+| `src/gml/input/` | Bindings, glyphs and contextual hints: `controls.gml` |
+| `src/gml/menus/` | Title-to-game flow, Options, updates and challenges: `adventure.gml`, `profiles.gml`, `options.gml`, `pause_cancel.gml`, `updates.gml`, `challenge_menu.gml` |
+| `src/gml/inventory/` | Inventory behavior and presentation |
+| `src/gml/gameplay/` | Combat and challenges: `sword.gml`, `gems.gml`, `challenges.gml`, `wallmaster_*.gml` |
+| `src/gml/arcade/` | Village minigames, imported by `src/arcade.csx` |
+| `src/shaders/` | CRT-Lottes port and its provenance |
+| `assets/` | Imported art: controller glyphs, arcade resources, recovered content art |
+| `installer/` | Everything the patch installer ships beside the player README: `install.py`, `updater.py`, `controller.py`, launchers, `gameinfo.xml`, `manifest.json`, `patches/game.droid.bsdiff` |
+| `tests/` | Host tests (`test_*.py`), build verification (`verify.csx`), device runners and the runtime suite in `tests/runtime/` |
+| `docs/` | Testing and release guide, backport audit, README screenshots |
+| `tools/` | Manual helpers, such as `repack.py` for a local patched port |
 
-`apply.csx` imports patch fragments into named GameMaker events. Treat `.gml` files as injected code: understand their event, instance scope and execution order before editing.
+`src/apply.csx` imports patch fragments into named GameMaker events. Treat `.gml` files as injected code: understand their event, instance scope and execution order before editing. Paths in the `.csx` scripts are relative to the repository root, where `build.py` runs the compiler.
 
 ## Patch implementation rules
 
@@ -61,7 +63,7 @@ Preserve these decisions unless the requested change explicitly revises them:
 - Use the checked-in **Kenney Nintendo Switch 2/Double** glyphs. Retain their filenames, checksums and license. Do not redraw or invent replacements.
 - Place action hints at the bottom right, label before glyph. A precedes B Close. Keep L/R beside page headings and reserve space for the longest label.
 - Size gameplay, inventory, map and arcade prompts from `NovaHUDLayout`. Anchor footer rows to its `right`, `footer_y` and `footer_width`. Keep page glyphs beside their headings on whole screen pixels. Title and adventure menus use their own scale.
-- Keep one Options screen, `options.gml`, for the adventure and pause menus. Settings apply immediately and explain themselves below the list. Defaults restores one tab after confirmation. Pause draws the screen after the CRT pass.
+- Keep one Options screen, `src/gml/menus/options.gml`, for the adventure and pause menus. Settings apply immediately and explain themselves below the list. Defaults restores one tab after confirmation. Pause draws the screen after the CRT pass.
 - Use **Status** for the collapsible HUD panels and **Close** for dismissal. Actions, Equip and Use have distinct meanings documented in the README.
 - Keep the centered title logo, then transition to the adventure menu. Continue resumes the selected player's save. Keep setup within one active frame.
 - Match the game's existing fonts, sprites and window frames. Use original artwork for backports and record its provenance. Distinguish recovered behavior from patch adaptations.
@@ -79,7 +81,7 @@ Run checks appropriate to the files and behavior changed:
 | --- | --- |
 | Documentation only | Check referenced paths, commands, claims and `git diff --check` |
 | Python, installer, updater or controller adapter | `python3 -m unittest discover -v` |
-| Shell launchers | `bash -n ./*.sh`, plus affected installation or device behavior |
+| Shell launchers | `bash -n installer/*.sh`, plus affected installation or device behavior |
 | GML, shader, resource import or patch data | Unit suite, `python3 build.py --runtime-tests`, then affected device cases |
 | Release package | Full device suite and `python3 build.py --check-release --runtime-tests` after packaging |
 
@@ -110,15 +112,15 @@ Confirm the device is idle before testing or replacing files. Do not terminate a
 - Use `--capture`, `--capture-context`, `--capture-arcade`, `--capture-profiles` or `--capture-updates` for the relevant screen. Inspect captures for clipping, spacing and incomplete frames.
 - Remote screenshots can omit parts of a frame. Recheck on the physical screen before treating that artifact as a rendering defect.
 
-Use the cleanup and playable-village instructions in [TESTING.md](TESTING.md) for interrupted runs or manual minigame testing. Keep user playtesting separate from production saves.
+Use the cleanup and playable-village instructions in [docs/TESTING.md](docs/TESTING.md) for interrupted runs or manual minigame testing. Keep user playtesting separate from production saves.
 
 ## Releases and documentation
 
 Group development changes under **Unreleased**. Use patch versions for fixes and refinements, and minor versions for substantial gameplay additions. Avoid a release for every individual adjustment.
 
-When the user requests or has already authorized publication, follow [the release procedure](TESTING.md#release-procedure). Finish the build, device checks and package verification before tagging.
+When the user requests or has already authorized publication, follow [the release procedure](docs/TESTING.md#release-procedure). Finish the build, device checks and package verification before tagging.
 
-- Generate `manifest.json` and the binary delta with `package_release.py`. Do not hand-edit their hashes. Use an unused output filename.
+- Generate `installer/manifest.json` and the binary delta with `package_release.py`. Do not hand-edit their hashes. Use an unused output filename.
 - Publish only the patch installer ZIP and its SHA-256 checksum. Preserve the package allowlist and upstream hash checks. Never attach full games, runtimes or instrumented builds.
 - Keep published tags and downloads immutable unless the user explicitly requests replacement. Normally, ship corrections as the next patch version.
 - Commit source, tests, delta, manifest and release notes together. Require GitHub checks to pass before tagging. Tag CI also verifies the release delta.

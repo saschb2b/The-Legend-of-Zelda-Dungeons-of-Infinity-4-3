@@ -117,17 +117,17 @@ void ApplyArcade() {
             ParentId = Data.GameObjects.ByName(name == "oClawMachine" ? "oPopMachine" : "oArcade")
         });
     }
-    group.QueueAppend("gml_GlobalScript___Arcade", File.ReadAllText(Path.Combine(patchDir, "arcade.gml")));
+    group.QueueAppend("gml_GlobalScript___Arcade", File.ReadAllText(Path.Combine(patchDir, "src/gml/arcade/arcade.gml")));
     foreach (var entry in new[] { ("oArcade_Mothula", "slot"), ("oClawMachine", "claw") }) {
         foreach (var ev in new[] { "Create_0", "Step_0", "Draw_0", "CleanUp_0" }) {
-            var path = Path.Combine(patchDir, "arcade", entry.Item2 + "_" + ev.ToLowerInvariant() + ".gml");
+            var path = Path.Combine(patchDir, "src/gml/arcade", entry.Item2 + "_" + ev.ToLowerInvariant() + ".gml");
             group.QueueReplace("gml_Object_" + entry.Item1 + "_" + ev, File.ReadAllText(path));
         }
     }
     // Parent end-step state changes belong to the older arcade games.
     group.QueueReplace("gml_Object_oArcade_Mothula_Step_2", "");
     group.QueueReplace("gml_Object_oArcade_Mothula_Alarm_1", "");
-    group.QueueReplace("gml_Object_oArcade_Mothula_Draw_73", File.ReadAllText(Path.Combine(patchDir, "arcade/slot_draw_73.gml")));
+    group.QueueReplace("gml_Object_oArcade_Mothula_Draw_73", File.ReadAllText(Path.Combine(patchDir, "src/gml/arcade/slot_draw_73.gml")));
     Edit("gml_GlobalScript___RoomTemplates", "global.Templates_Room = json_parse(buffer_read(ParsedTemplates_Buffer, buffer_string));",
         "global.Templates_Room = json_parse(buffer_read(ParsedTemplates_Buffer, buffer_string));\n    global.NovaArcadeTemplates();");
     Edit("gml_GlobalScript___Dungeon_Draw_SpecialObjs_Forced", "case \"Poker\":", "case \"ClawMachine\":\n                        ArcadeType = oClawMachine;\n                        PosX = ObjX; PosY = ObjY;\n                        break;\n                    case \"Mothula\":\n                        ArcadeType = oArcade_Mothula;\n                        break;\n                    case \"Poker\":");

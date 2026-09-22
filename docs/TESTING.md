@@ -15,7 +15,7 @@ From the repository root:
 ```sh
 python3 -m unittest discover -v
 python3 build.py --runtime-tests
-bash -n ./*.sh
+bash -n installer/*.sh
 ```
 
 The unit suite uses temporary synthetic archives and needs no game files or third-party packages. CI runs it on Python 3.11 and 3.14. The build job uses Python 3.12 on Ubuntu 24.04. Actions use full commit pins, read-only repository permissions, and timeouts. Dependabot checks action pins monthly.
@@ -126,7 +126,7 @@ Use [SemVer-style](https://semver.org/spec/v2.0.0.html) version numbers for the 
 | Minor (`x.Y.0`) | A planned batch of new gameplay features, modes, or substantial backports |
 | Major (`X.0.0`) | Changes that break the documented installation or save compatibility contract |
 
-Batch related work under **Unreleased** in [CHANGELOG.md](CHANGELOG.md). A completed task, commit, or test run does not require a release. Publish routine fixes together after the batch passes verification. Publish a separate hotfix when an existing release has a serious crash, save, or installation problem.
+Batch related work under **Unreleased** in [CHANGELOG.md](../CHANGELOG.md). A completed task, commit, or test run does not require a release. Publish routine fixes together after the batch passes verification. Publish a separate hotfix when an existing release has a serious crash, save, or installation problem.
 
 Keep work-in-progress builds local. For shared testing, use a GitHub draft or an `-rc.N` prerelease for the intended version. Promote a tested batch to stable once it is ready. Documentation, release-note corrections, tests, and CI maintenance alone do not need an installer release or a version bump.
 
@@ -158,4 +158,4 @@ Use the title `vX.Y.Z: Short description` and copy that version's changelog sect
 5. Commit the source, tests, binary delta, manifest, and changelog together. Push and require the GitHub checks to pass before tagging a release.
 6. Publish the matching changelog section, installer ZIP, and SHA-256 checksum. Never attach `.droid`, `.port`, `.build/`, test reports containing device data, or upstream downloads.
 
-`package_release.py` writes a fixed allowlist of installer files with stable ZIP timestamps. It verifies binary-patch reconstruction and refuses an existing output filename. `manifest.json` records the original game, patched game, delta, and upstream archive hashes.
+`package_release.py` writes a fixed allowlist of installer files with stable ZIP timestamps. It verifies binary-patch reconstruction and refuses an existing output filename. `installer/manifest.json` records the original game, patched game, delta, and upstream archive hashes.

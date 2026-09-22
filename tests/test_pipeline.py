@@ -9,7 +9,7 @@ from zipfile import ZipFile
 
 import build
 import install
-from test_install import binary_patch
+from tests.test_install import binary_patch
 from hashlib import sha256
 
 
@@ -174,10 +174,10 @@ class ReleaseTests(unittest.TestCase):
         import package_release
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            (root / 'patches').mkdir()
+            (root / 'installer/patches').mkdir(parents=True)
             names = (*package_release.PAYLOAD_FILES, package_release.INSTALLER_LAUNCHER)
             for name in names:
-                (root / name).write_text(name)
+                package_release.source(root, name).write_text(name)
             (root / 'game.droid').write_bytes(b'game must not ship')
             (root / 'runtime-tests.droid').write_bytes(b'test build must not ship')
             first, second = root / 'a.zip', root / 'b.zip'
