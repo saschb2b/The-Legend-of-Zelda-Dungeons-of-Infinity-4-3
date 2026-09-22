@@ -21,11 +21,102 @@ function ContentMenuTests() {
     Record("Shoulder paging wraps to Survival", oMenu.NovaChallengePage == 0 && oMenu.NovaFocus == 0);
     PressEvent(oMenu, "nova_bag_previous", oMenu, ev_step, ev_step_normal);
     Record("Previous shoulder wraps to Restrictions", oMenu.NovaChallengePage == 2);
-    oMenu.NovaFocus = array_length(oMenu.NovaChallengePages[2]);
+    var before_defaults = json_stringify(oMenu.NovaDraft.challenges);
+    PressEvent(oMenu, "item", oMenu, ev_step, ev_step_normal);
+    Record("Defaults asks before clearing challenges", oMenu.NovaChallengeDialog && oMenu.NovaChallengeDialogFocus == 0);
+    PressEvent(oMenu, global.NovaCloseVerb(), oMenu, ev_step, ev_step_normal);
+    Record("Back from the dialog keeps challenges and the page", !oMenu.NovaChallengeDialog && oMenu.NovaPage == "challenges" && json_stringify(oMenu.NovaDraft.challenges) == before_defaults);
+    PressEvent(oMenu, "item", oMenu, ev_step, ev_step_normal);
+    PressEvent(oMenu, "down", oMenu, ev_step, ev_step_normal);
     PressEvent(oMenu, "menu_input", oMenu, ev_step, ev_step_normal);
-    Record("Reset clears all draft challenges", json_stringify(oMenu.NovaDraft.challenges) == json_stringify(array_create(12, 0)));
+    Record("Restore defaults clears all draft challenges", !oMenu.NovaChallengeDialog && json_stringify(oMenu.NovaDraft.challenges) == json_stringify(array_create(12, 0)));
     PressEvent(oMenu, global.NovaCloseVerb(), oMenu, ev_step, ev_step_normal);
     Record("Closing challenges restores its setup row", oMenu.NovaPage == "setup" && oMenu.NovaFocus == 2);
+    SetupScreenTests();
+}
+function SetupScreenTests() {
+    var users = global.Users;
+    var user_index = global.UserIndex;
+    global.Users = [ProfileFixture("LINK", 4, 4, 3.5, 5), new User_Create(), new User_Create(), new User_Create(), new User_Create()];
+    global.UserIndex = 0;
+    with (oMenu) NovaSetupForget(0);
+    with (oMenu) NovaNewDraft();
+    Record("without a remembered setup the saved run's character is kept", oMenu.NovaDraft.character == 4 && oMenu.NovaPresetIndex(oMenu.NovaDraft.challenges) == 0);
+    oMenu.NovaFocus = 2;
+    PressEvent(oMenu, "right", oMenu, ev_step, ev_step_normal);
+    Record("right selects Second Quest", oMenu.NovaPresetIndex(oMenu.NovaDraft.challenges) == 1 && oMenu.NovaChallengeLevel(oMenu.NovaDraft.challenges) > 0);
+    PressEvent(oMenu, "right", oMenu, ev_step, ev_step_normal);
+    var master = oMenu.NovaChallengeLevel(oMenu.NovaDraft.challenges);
+    Record("Master Quest is harder than Second Quest", oMenu.NovaPresetIndex(oMenu.NovaDraft.challenges) == 2 && master > oMenu.NovaChallengeLevel(oMenu.NovaPresets[1].values));
+    PressEvent(oMenu, "right", oMenu, ev_step, ev_step_normal);
+    Record("presets wrap to Hero's Path", oMenu.NovaPresetIndex(oMenu.NovaDraft.challenges) == 0);
+    oMenu.NovaDraft.challenges[10] = 1;
+    Record("a changed mix reads as Custom", oMenu.NovaPresetIndex(oMenu.NovaDraft.challenges) == -1);
+    PressEvent(oMenu, "right", oMenu, ev_step, ev_step_normal);
+    PressEvent(oMenu, "left", oMenu, ev_step, ev_step_normal);
+    Record("a custom mix stays reachable after browsing presets", oMenu.NovaPresetIndex(oMenu.NovaDraft.challenges) == -1 && oMenu.NovaDraft.challenges[10] == 1);
+    oMenu.NovaFocus = 0;
+    var before_random = oMenu.NovaDraft.character;
+    PressEvent(oMenu, "item", oMenu, ev_step, ev_step_normal);
+    Record("Random picks a different character", oMenu.NovaDraft.character != before_random && oMenu.NovaPage == "setup");
+    oMenu.NovaDraft.character = 6;
+    oMenu.NovaDraft.bonus = 4;
+    global.NovaTestStart = false;
+    PressEvent(oMenu, "menu_input", oMenu, ev_step, ev_step_normal);
+    Record("confirm on the character row goes to Begin's replacement check", oMenu.NovaPage == "replace");
+    PressEvent(oMenu, "down", oMenu, ev_step, ev_step_normal);
+    PressEvent(oMenu, "menu_input", oMenu, ev_step, ev_step_normal);
+    Record("beginning starts the run", global.NovaTestStart);
+    with (oMenu) NovaNewDraft();
+    Record("the last setup is remembered for this player", oMenu.NovaDraft.character == 6 && oMenu.NovaDraft.bonus == 4 && oMenu.NovaDraft.challenges[10] == 1);
+    global.UserIndex = 1;
+    with (oMenu) NovaNewDraft();
+    Record("another player keeps its own setup", oMenu.NovaDraft.character == 0 && oMenu.NovaDraft.bonus == 0 && oMenu.NovaPresetIndex(oMenu.NovaDraft.challenges) == 0);
+    global.UserIndex = 0;
+    with (oMenu) NovaSetupForget(0);
+    Record("deleting a player forgets its setup", oMenu.NovaSetupLoad(0).bonus == 0);
+    ini_open("nova-menu.ini");
+    ini_write_string("Setup", "Player0", "3,x,{");
+    ini_close();
+    Record("a damaged remembered setup falls back safely", oMenu.NovaSetupLoad(0).bonus == 0 && oMenu.NovaSetupLoad(0).character == 4);
+    global.Users[0].SaveData.NovaChallengeOptions = oMenu.NovaPresets[2].values;
+    Record("save cards carry the challenge level", oMenu.NovaProfileSummary(0).level == master);
+    draw_set_font(global.MenuFont_Innactive);
+    var layout = oMenu.NovaSetupLayout();
+    var options = global.NovaOptionsLayout();
+    var longest = 0;
+    for (var i = 0; i < array_length(oMenu.NovaBonusNames); i++) longest = max(longest, string_width(oMenu.NovaBonusNames[i]) * 0.85);
+    Record("the longest bonus fits beside its icon", layout.column + 22 + longest < 350);
+    Record("the preview and Begin stay above the help line", layout.preview_y + layout.preview_h + 34 < layout.rule_y && layout.begin_y + layout.begin_h < layout.rule_y);
+    var help_ok = true;
+    var line = string_height("A") + 4;
+    for (var i = 0; i < 12; i++) help_ok = help_ok && string_height_ext(oMenu.NovaChallengeHelp[i], line, options.help_width / 0.6) / line <= 2.01;
+    for (var i = 0; i < 3; i++) help_ok = help_ok && string_height_ext(oMenu.NovaPresets[i].help, line, options.help_width / 0.6) / line <= 2.01;
+    for (var i = 0; i < 8; i++) help_ok = help_ok && string_height_ext(oMenu.NovaBonusHelp[i], line, options.help_width / 0.6) / line <= 2.01;
+    Record("setup and challenge help fits in two lines", help_ok);
+    var crumbs = global.NovaMenuTitleParts(["New adventure", "Challenges"]);
+    draw_set_font(global.MenuFont_Innactive);
+    var summary_width = string_width("Custom  Level 30") * 0.7;
+    Record("the challenge summary clears the breadcrumb", crumbs[1].x + crumbs[1].width + 8 < 358 - summary_width);
+    Record("setup selectors clear the value arrows", layout.selector + 18 < layout.column - 11);
+    for (var device = 0; device < 2; device++) {
+        input_profile_set(device == 0 ? "gamepad" : "keyboard");
+        var menu = global.NovaMenuLayout();
+        for (var focus = 0; focus < 4; focus++) {
+            oMenu.NovaFocus = focus;
+            var hints = oMenu.NovaSetupFooter();
+            var last = hints[array_length(hints) - 1];
+            Record("setup footer fits row " + string(focus) + " " + string(device), hints[0].x >= menu.footer_left - 0.01 && last.right <= menu.footer_right + 0.01 && last.label == "Close");
+        }
+    }
+    input_profile_set("gamepad");
+    with (oMenu) NovaSetupForget(0);
+    global.Users = users;
+    global.UserIndex = user_index;
+    global.LinkCharacterIndex = 0;
+    global.StartingGear = 0;
+    global.NovaResetChallenges();
+    with (oMenu) NovaGo("home", 0);
 }
 function ContentTests() {
     if (!variable_global_exists("NovaOption")) { Record("1.2.1 content is available", false); return; }

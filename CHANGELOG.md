@@ -12,6 +12,10 @@ These versions identify the 4:3 patch, independently of the original game's vers
 - Keep nested Options pages inside the Options panel. The header shows the path, such as Options > Controls > Gamepad, the tabs stay visible, and B reads Back. Restoring defaults asks in a dialog over the affected page.
 - Show gamepad bindings as button glyphs instead of long text that overflowed the Gamepad page. Remapping highlights the action it is waiting for.
 - Remap one action at a time instead of walking through every action. A button already in use swaps between the two actions. Changed actions are marked, the help line shows the default, and Reset restores a single action. Restore all defaults asks first and is inactive when nothing changed. Actions are grouped as Movement, Combat, World and Menus.
+- Rebuild New adventure around a character preview with a floor shadow and subtle idle motion, the bonus item's artwork, and a help line for the highlighted choice. Begin adventure is the largest element and one A press away from every row except Challenges. Random picks another character.
+- Add challenge presets named Hero's Path, Second Quest and Master Quest, a level meter that adds up every challenge, and icons for the active ones. A custom mix stays available while browsing presets.
+- Give the Challenges page tabs, a breadcrumb, a description and icon for each challenge, marked changes and a Defaults dialog.
+- Remember each player's last character, bonus and challenges. Saves started with challenges show their level beside the floor.
 - Keep menu Confirm (A), Back (B) and Pause (Select) fixed. Remapping Sword or Interact no longer moves the menu buttons, so a remap cannot lock players out. Select or Esc cancels a remap, and an unanswered remap stops after ten seconds.
 - Remove the pause menu's HUD toggle. The Status button still shows and hides the panels.
 

@@ -78,9 +78,9 @@ Inventory and menu screenshots use test saves to show progress and full inventor
 | --- | --- |
 | ![Equipment, map, and dungeon progress over the playfield](docs/screenshots/overlay.png) | ![Adventure menu with the saved name and floor beneath Continue](docs/screenshots/profile.png) |
 
-The centered title screen leads into an adventure menu with your last selected player. Their name and floor sit beneath **Continue**, which resumes the saved run in one press. **New adventure** lets you choose a character, bonus and challenges in one frame. **Begin adventure** is selected by default. A fresh player starts as Link, with no required name entry.
+The centered title screen leads into an adventure menu with your last selected player. Their name and floor sit beneath **Continue**, which resumes the saved run in one press. **New adventure** shows your character beside the bonus and challenges, with a line below explaining the highlighted choice. Press **A** on any row except Challenges to begin, and **Begin adventure** is selected by default. **Random** picks another character. Each player's last setup is remembered. A fresh player starts as Link, with no required name entry.
 
-![New adventure setup with character selection, bonus, challenges and Begin adventure](docs/screenshots/adventure-setup.png)
+![New adventure with a character preview, Wooden Shield bonus, the Second Quest challenge preset with its level meter and icons, and Begin adventure](docs/screenshots/adventure-setup.png)
 
 **Change player** keeps all five save slots available, with each saved adventure's character, floor and hearts grouped in one row. Select a player to return to their adventure, or use **Manage** for records, renaming and deletion. Starting over an existing save asks for confirmation. Options, controls, updates and credits are available before entering the dungeon.
 
@@ -94,7 +94,7 @@ The village on floor 6 has two more minigames. The claw costs ten rupees: move l
 
 Hold Sword after a swing to poke while moving. With a level-three sword or higher, hold until the blade flashes, then release to spin. Level-two swords can break pots.
 
-Open **Challenges** before a run to adjust health, darkness, inventory space, shop prices, and other restrictions. The last page includes No map, No food, and Wall Master. Existing runs keep their original challenge restrictions.
+Choose a challenge preset with left/right: **Hero's Path** is the standard game, **Second Quest** is tougher, and **Master Quest** is for veterans. The level meter adds up every challenge, and icons show which ones are active. Press **A** on Challenges to customize health, darkness, inventory space, shop prices and other restrictions; each explains itself, changed values are marked, and **Defaults** restores Hero's Path after asking. The last page includes No map, No food, and Wall Master. Existing runs keep their original challenge restrictions, and saves started with challenges show their level beside the floor.
 
 Press Start or confirm to skip the opening title animation. To require the full animation, turn off **Skip title intro** under **Options > Game**.
 

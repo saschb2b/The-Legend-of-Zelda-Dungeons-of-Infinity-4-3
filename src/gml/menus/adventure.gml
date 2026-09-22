@@ -1,7 +1,7 @@
 NovaPage = "home";
 NovaFocus = 0;
 NovaFocusMemory = {};
-NovaDraft = {character: 0, bonus: 0, challenges: array_create(12, 0)};
+NovaDraft = {character: 0, bonus: 0, challenges: array_create(12, 0), custom: undefined};
 NovaTransition = variable_global_exists("NovaTitleFrame") && surface_exists(global.NovaTitleFrame) ? 0 : 36;
 NovaCharacterNames = [];
 for (var i = 0; i < 9; i++) array_push(NovaCharacterNames, string_replace(sprite_get_name(global.LinkCharacterSpr[i]), "sLinkCharacter_", ""));
@@ -68,7 +68,8 @@ function NovaNewDraft(player = -1) {
     NovaSetupParent = NovaPage;
     NovaSetupPlayer = global.UserIndex;
     if (player >= 0) global.UserIndex = player;
-    NovaDraft = {character: 0, bonus: 0, challenges: array_create(12, 0)};
+    NovaDraft = NovaSetupLoad(global.UserIndex);
+    NovaChallengeDialog = false;
     NovaGo("setup", 3);
 }
 function NovaBegin() {
@@ -79,6 +80,7 @@ function NovaBegin() {
         User_Save();
     }
     NovaRememberPlayer();
+    NovaSetupSave();
     global.LinkCharacterIndex = NovaDraft.character;
     global.StartingGear = NovaDraft.bonus;
     global.NovaResetChallenges();
@@ -119,13 +121,12 @@ function NovaCycle(delta) {
     if (NovaPage == "setup") {
         if (NovaFocus == 0) NovaDraft.character = (NovaDraft.character + delta + 9) mod 9;
         if (NovaFocus == 1) NovaDraft.bonus = (NovaDraft.bonus + delta + 8) mod 8;
+        if (NovaFocus == 2) NovaPresetCycle(delta);
     } else if (NovaPage == "challenges") {
         var page = NovaChallengePages[NovaChallengePage];
-        if (NovaFocus < array_length(page)) {
-            var index = page[NovaFocus];
-            var count = array_length(NovaChallengeValues[index]);
-            NovaDraft.challenges[index] = (NovaDraft.challenges[index] + delta + count) mod count;
-        } else NovaDraft.challenges = array_create(12, 0);
+        var index = page[clamp(NovaFocus, 0, array_length(page) - 1)];
+        var count = array_length(NovaChallengeValues[index]);
+        NovaDraft.challenges[index] = (NovaDraft.challenges[index] + delta + count) mod count;
     }
     audio_play_sound(Sound_Text, 1, false);
 }
@@ -136,7 +137,7 @@ function NovaRowCount() {
         case "players": return array_length(NovaPlayerRows());
         case "player": return 4;
         case "replace": case "delete": return 2;
-        case "challenges": return array_length(NovaChallengePages[NovaChallengePage]) + 1;
+        case "challenges": return array_length(NovaChallengePages[NovaChallengePage]);
     }
     return 1;
 }
@@ -153,8 +154,8 @@ function NovaConfirm() {
             }
             break;
         case "setup":
-            if (NovaFocus < 2) NovaCycle(1);
-            else if (NovaFocus == 2) { NovaChallengePage = 0; NovaGo("challenges", 0); }
+            // Begin is one press away from every row except Challenges, which opens its page.
+            if (NovaFocus == 2) { NovaChallengePage = 0; NovaGo("challenges", 0); }
             else if (NovaProfileSummary(global.UserIndex).saved) NovaGo("replace", 0);
             else NovaBegin();
             break;
@@ -178,7 +179,7 @@ function NovaConfirm() {
             break;
         case "delete":
             if (NovaFocus == 0) NovaClose();
-            else { User_Delete(); NovaRestorePlayer(); NovaGo("players", 0); }
+            else { NovaSetupForget(global.UserIndex); User_Delete(); NovaRestorePlayer(); NovaGo("players", 0); }
             break;
         case "rename":
             if (NovaNameCell < string_length(NovaLetters)) {
@@ -207,7 +208,20 @@ function NovaAdventureStep(close) {
         else if (result == "credits") { NovaCreditPage = 0; NovaGo("credits", 0); }
         return;
     }
+    if (NovaPage == "challenges" && NovaChallengeDialogStep(close)) return;
     if (close) { NovaClose(); return; }
+    if (NovaPage == "challenges" && input_check_pressed("item")) {
+        NovaChallengeDialog = true;
+        NovaChallengeDialogFocus = 0;
+        audio_play_sound(Sound_TextDone, 1, false);
+        input_clear_momentary(true);
+        return;
+    }
+    if (NovaPage == "setup" && NovaFocus == 0 && input_check_pressed("item")) {
+        NovaSetupRandom();
+        input_clear_momentary(true);
+        return;
+    }
     if (NovaPage == "players" && input_check_pressed("item")) {
         var rows = NovaPlayerRows();
         var index = rows[NovaFocus];
@@ -248,12 +262,14 @@ function NovaRow(label, row, py, value = "", px = 60) {
     if (NovaFocus == row) draw_sprite(sMenu_Selector_Active, Selector_Frame, px - 22, py - 38);
 }
 // Pages reached from Options say Back, matching the Options screen's nested pages.
+// Extra hints come before Select; pass one hint or an array of them.
 function NovaFooterLayout(label = "Select", extra = undefined, close = "Close") {
     var font = draw_get_font();
     draw_set_font(global.MenuFont_Innactive);
     var layout = NovaMenuLayout();
     var prompts = [];
-    if (extra != undefined) array_push(prompts, extra);
+    if (is_array(extra)) for (var i = 0; i < array_length(extra); i++) array_push(prompts, extra[i]);
+    else if (extra != undefined) array_push(prompts, extra);
     if (label != "") array_push(prompts, {binding: NovaMenuConfirmBinding(), label: label, reserve: label == "Install update" || label == "Check again" ? "Install update" : "Continue"});
     array_push(prompts, {binding: global.NovaBinding(global.NovaCloseVerb()), label: close});
     prompts = global.NovaHintRow(prompts, layout.footer_right, layout.footer_y, 0.75, 0.75, 16, 12, layout.footer_right - layout.footer_left);
@@ -321,6 +337,7 @@ function NovaAdventureDraw() {
             // Sprite fonts contain ASCII only; the separator shares the text baseline.
             draw_rectangle(separator, 169 - 38 + 5, separator + 1, 169 - 38 + 6, false);
             NovaText("Floor " + string(summary.floor), separator + 8, 169, false, 0.75);
+            if (summary.level > 0) NovaChallengeBadge(separator + 8 + string_width("Floor " + string(summary.floor)) * 0.75 + 8, 169 - 38, summary.level);
             draw_set_alpha(t);
         }
         NovaFooter(NovaFocus == 0 && summary.saved ? "Continue" : "Select");
@@ -329,31 +346,11 @@ function NovaAdventureDraw() {
             draw_surface_ext(global.NovaTitleFrame, 0, -38, 400 / surface_get_width(global.NovaTitleFrame), 300 / surface_get_height(global.NovaTitleFrame), 0, c_white, 1 - NovaTransition / 12);
         return;
     }
-    var titles = {setup: "New adventure", players: "Players", player: "Player", challenges: "Challenges", replace: "New adventure", delete: "Delete player", rename: "Your name", records: "Records", credits: ["Options", "About", "Credits"]};
+    var titles = {setup: "New adventure", players: "Players", player: "Player", challenges: ["New adventure", "Challenges"], replace: "New adventure", delete: "Delete player", rename: "Your name", records: "Records", credits: ["Options", "About", "Credits"]};
     NovaMenuFrame(variable_struct_exists(titles, NovaPage) ? variable_struct_get(titles, NovaPage) : "Saved adventure");
     switch (NovaPage) {
-        case "setup":
-            NovaText(NovaCharacterNames[NovaDraft.character], 200, 64, NovaFocus == 0, 1, fa_center);
-            draw_sprite_ext(global.CharacterSprites, NovaDraft.character, 176, 50, 3, 3, 0, c_white, 1);
-            NovaRow("Bonus", 1, 173);
-            NovaText(Menu[10][NovaDraft.bonus], 178, 173, false, 0.85);
-            var gift = NovaDraft.bonus * 4;
-            draw_sprite(global.GearSprites[gift], global.GearSprites[gift + 1], 340 + global.GearSprites[gift + 2], 149 + global.GearSprites[gift + 3]);
-            var custom = false;
-            for (var i = 0; i < 12; i++) custom = custom || NovaDraft.challenges[i] != 0;
-            NovaRow("Challenges", 2, 204, custom ? "Custom" : "Standard");
-            NovaRow("Begin adventure", 3, 235);
-            var adjust = NovaFocus < 2 ? {binding: global.NovaDirectionBinding("left"), binding2: global.NovaDirectionBinding("right"), label: "Change"} : undefined;
-            NovaFooter(NovaFocus == 3 ? "Begin" : (NovaFocus < 2 ? "Next" : "Select"), adjust);
-            break;
-        case "challenges":
-            var headings = ["Survival", "Dungeon", "Restrictions"];
-            NovaPageHeading(headings[NovaChallengePage]);
-            var page = NovaChallengePages[NovaChallengePage];
-            for (var i = 0; i < array_length(page); i++) NovaRow(NovaChallengeLabels[page[i]], i, 92 + i * 24, NovaChallengeValues[page[i]][NovaDraft.challenges[page[i]]]);
-            NovaRow("Reset all", array_length(page), 235);
-            NovaFooter("Change");
-            break;
+        case "setup": NovaSetupDraw(); break;
+        case "challenges": NovaChallengesDraw(); break;
         case "players":
             var rows = NovaPlayerRows();
             for (var i = 0; i < array_length(rows); i++) {
@@ -363,6 +360,7 @@ function NovaAdventureDraw() {
                 if (NovaFocus == i) draw_sprite(sMenu_Selector_Active, Selector_Frame, 38, py - 38);
                 if (summary.name != "") {
                     NovaText(summary.saved ? "Floor " + string(summary.floor) : "No saved run", 190, py + 3, false, 0.75);
+                    if (summary.level > 0) NovaChallengeBadge(190, py - 38 + 18, summary.level);
                     if (summary.saved) {
                         draw_sprite(global.CharacterSprites, summary.character, 60, py - 38);
                         NovaHearts(summary, 264, py + 2);

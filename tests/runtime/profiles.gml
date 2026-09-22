@@ -144,10 +144,18 @@ function ProfileCaptureStep() {
     } else if (Capture == "profiles-maximum") {
         global.UserIndex = 0;
         with (oMenu) NovaNewDraft();
+        oMenu.NovaDraft.bonus = 4;
+        oMenu.NovaDraft.challenges = array_create(12, 0);
+        array_copy(oMenu.NovaDraft.challenges, 0, oMenu.NovaPresets[1].values, 0, 12);
+        oMenu.NovaFocus = 2;
         Capture = "profiles-setup";
     } else if (Capture == "profiles-setup") {
+        oMenu.NovaFocus = 3;
+        Capture = "profiles-begin";
+    } else if (Capture == "profiles-begin") {
         oMenu.NovaPage = "challenges";
-        oMenu.NovaFocus = 0;
+        oMenu.NovaChallengePage = 0;
+        oMenu.NovaFocus = 1;
         Capture = "profiles-challenges";
     } else if (Capture == "profiles-challenges") {
         oMenu.NovaPage = "players";

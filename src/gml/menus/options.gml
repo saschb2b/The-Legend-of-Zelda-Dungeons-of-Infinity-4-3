@@ -660,6 +660,10 @@ global.NovaOptionsDrawConfirm = function(state, selector) {
         subject = string_lower(state.tabs[state.tab]) + " settings";
         detail = "Other tabs keep their settings.";
     }
+    global.NovaDialogDraw("Restore default " + subject + "?", detail, state.confirm_focus, selector);
+};
+// A Cancel-first confirmation drawn over the dimmed page it affects.
+global.NovaDialogDraw = function(question, detail, focus, selector) {
     var menu = global.NovaMenuLayout();
     var dialog = global.NovaOptionsDialog();
     draw_set_color(c_black);
@@ -668,13 +672,13 @@ global.NovaOptionsDrawConfirm = function(state, selector) {
     draw_set_alpha(1);
     draw_set_color(c_white);
     draw_sprite_stretched(sMenuWin, 0, dialog.x, dialog.y, dialog.width, dialog.height);
-    global.NovaOptText("Restore default " + subject + "?", 200, dialog.y + 14, false, 0.9, fa_center);
+    global.NovaOptText(question, 200, dialog.y + 14, false, 0.9, fa_center);
     global.NovaOptText(detail, 200, dialog.y + 36, false, 0.7, fa_center);
     var rows = ["Cancel", "Restore defaults"];
     for (var i = 0; i < 2; i++) {
         var py = dialog.y + 62 + i * 24;
-        global.NovaOptText(rows[i], dialog.x + 60, py, state.confirm_focus == i, 0.9);
-        if (state.confirm_focus == i) draw_sprite(sMenu_Selector_Active, selector, dialog.x + 38, py);
+        global.NovaOptText(rows[i], dialog.x + 60, py, focus == i, 0.9);
+        if (focus == i) draw_sprite(sMenu_Selector_Active, selector, dialog.x + 38, py);
     }
 };
 global.NovaOptionsDialog = function() {
