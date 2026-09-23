@@ -43,6 +43,7 @@ def main():
     parser.add_argument('--capture-updates', action='store_true', help='Capture only the updater screens during regression tests.')
     parser.add_argument('--capture-profiles', action='store_true', help='Capture empty and saved profiles with controller and keyboard prompts.')
     parser.add_argument('--report-dir', type=Path, default=ROOT / '.build/device-results')
+    parser.add_argument('--patch-version', help='Bundle this version with the test game, as the installer does, for screenshots.')
     args = parser.parse_args()
     game_bytes = args.game.read_bytes()
     game_digest = hashlib.sha256(game_bytes).hexdigest()
@@ -97,6 +98,8 @@ launcher.chmod(0o755)
             with ZipFile(ROOT / '.build/original.port') as original, ZipFile(port_path, 'w') as port:
                 for entry in original.infolist():
                     port.writestr(entry, game_bytes if entry.filename == 'assets/game.droid' else original.read(entry))
+                if args.patch_version:
+                    port.writestr('assets/patch-version.txt', args.patch_version + '\n')
             copy(args.host, args.control_path, port_path, stage + '/zeldadoi.port')
         launch_code = f'''import urllib.request,time
 urllib.request.urlopen('http://127.0.0.1:1234/reloadgames',timeout=5).read()
