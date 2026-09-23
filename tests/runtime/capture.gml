@@ -1,7 +1,7 @@
 Capture = "";
 CaptureTick = 0;
 CaptureIndex = 0;
-CaptureNames = ["inventory-gear", "inventory-items", "inventory-bags", "inventory-treasure", "inventory-food", "inventory-pendants", "inventory-overflow", "inventory-actions", "inventory-info", "inventory-keyboard", "inventory-crt", "inventory-overflowextra", "status-default", "status-crt", "status-remapped", "status-keyboard", "inventory-cursed", "map-default", "pause-menu", "pause-quit", "options-pause"];
+CaptureNames = ["inventory-gear", "inventory-items", "inventory-bags", "inventory-treasure", "inventory-food", "inventory-pendants", "inventory-overflow", "inventory-actions", "inventory-info", "inventory-keyboard", "inventory-crt", "inventory-overflowextra", "status-default", "status-crt", "status-remapped", "status-keyboard", "inventory-cursed", "map-default", "pause-menu", "pause-quit", "options-pause", "status-panels"];
 function CaptureStart() {
     global.ItemData[1].Type = 3;
     global.ItemData[5].Type = 3;
@@ -91,6 +91,15 @@ function CaptureStep() {
         oMenu_Game.NovaOptionsOpen = true;
         oMenu_Game.NovaOptions = global.NovaOptionsState("pause");
         oMenu_Game.NovaOptions.tab = 1;
+        return;
+    }
+    if (CaptureIndex == 21) {
+        // Open Status: wide screens dock the panels beside the playfield, 4:3 overlays them.
+        with (oMenu_Game) instance_destroy();
+        global.Paused = false;
+        global.Users[global.UserIndex].Prefs[2] = true;
+        global.Users[global.UserIndex].Prefs[3] = false;
+        input_profile_set("gamepad");
         return;
     }
     if (CaptureIndex == 17) {

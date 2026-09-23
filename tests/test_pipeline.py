@@ -65,7 +65,7 @@ class InstallIntegrationTests(unittest.TestCase):
         self.assertEqual((self.game / 'savedata/Users').read_bytes(), b'precious save')
         self.assertEqual((self.game / 'zeldadoi.port').read_bytes(), b'existing game')
         self.assertEqual((self.ports / install.LAUNCHER).read_text(), 'existing launcher')
-        self.assertFalse(list(self.ports.glob('.doi43-install-*')))
+        self.assertFalse(list(self.ports.glob('.doi-install-*')))
 
     def test_install_and_reinstall_preserve_saves_and_assets(self):
         for _ in range(2):
@@ -187,7 +187,7 @@ class ReleaseTests(unittest.TestCase):
             with ZipFile(first) as archive:
                 self.assertEqual(set(archive.namelist()), {
                     package_release.INSTALLER_LAUNCHER,
-                    *('zeldadoi-43-installer/' + name for name in package_release.PAYLOAD_FILES),
+                    *(package_release.PAYLOAD_DIR + '/' + name for name in package_release.PAYLOAD_FILES),
                 })
                 self.assertTrue(archive.getinfo(package_release.INSTALLER_LAUNCHER).external_attr >> 16 & 0o111)
             with self.assertRaises(FileExistsError):

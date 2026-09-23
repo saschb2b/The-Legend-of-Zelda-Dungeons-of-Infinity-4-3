@@ -140,7 +140,11 @@ function HUDScaleTests() {
         Record(name + " uses an integer scale and position", scale >= 1 && scale == floor(scale) && layout.x == floor(layout.x) && layout.y == floor(layout.y));
         Record(name + " keeps equal side margins", abs(layout.x + 16 * scale - (width - layout.right)) <= 1);
         Record(name + " spans the footer between its margins", layout.footer_left == layout.x + 16 * scale && layout.footer_width == (layout.width - 32) * scale && layout.footer_left + layout.footer_width == layout.right);
-        Record(name + " reports the world scale beside the HUD scale", layout.world_x == width / 256 && layout.world_y == height / 224 && scale <= min(layout.world_x, layout.world_y));
+        Record(name + " reports the world scale beside the HUD scale", layout.world_x == layout.world_width / 256 && layout.world_y == layout.world_height / 224 && scale <= max(1, min(layout.world_x, layout.world_y)));
+        Record(name + " keeps a centered 4:3 playfield", abs(layout.world_width - layout.world_height * 4 / 3) <= 1
+            && layout.world_left == floor((width - layout.world_width) / 2) && layout.world_top == floor((height - layout.world_height) / 2)
+            && (layout.world_width == width || layout.world_height == height));
+        Record(name + " keeps the HUD on the playfield", layout.x >= layout.world_left && layout.x + layout.width * scale <= layout.world_left + layout.world_width);
         Record(name + " separates counters from twenty hearts", layout.width - 95 >= 160);
         Record(name + " fits the screen", layout.x + layout.width * scale <= width && layout.y + layout.height * scale <= height);
         Record(name + " keeps the footer below the playfield center", layout.footer_y > height * 0.75 && layout.footer_y + 6 * scale < height);
@@ -176,6 +180,7 @@ function HUDScaleTests() {
         surface_free(native);
         surface_free(scaled);
     }
+    ScreenShapeTests();
     oHUD.MagicW = magic;
     oHUD.RupeesStr = rupees;
     oHUD.HealthLowPulseColor = pulse;
@@ -183,4 +188,31 @@ function HUDScaleTests() {
     global.Inventory_ItemData[17].Amount = saved_health;
     global.Inventory_ItemData[18].Amount = capacity;
     gpu_set_texfilter(filtering);
+}
+
+function ScreenShapeTests() {
+    var square = global.NovaSquarePixels;
+    var integer = global.NovaIntegerScale;
+    global.NovaSquarePixels = false;
+    global.NovaIntegerScale = false;
+    var wide = global.NovaHUDLayout(1920, 1080);
+    Record("16:9 pillarboxes a 1440x1080 playfield", wide.world_left == 240 && wide.world_top == 0 && wide.world_width == 1440 && wide.world_height == 1080);
+    Record("16:9 docks the side panels at 3x", wide.docked && wide.panel_scale == 3 && 72 * wide.panel_scale + 8 <= wide.world_left);
+    Record("720p docks the side panels at 2x", global.NovaHUDLayout(1280, 720).docked && global.NovaHUDLayout(1280, 720).panel_scale == 2);
+    Record("4:3 keeps panels over the playfield", !global.NovaHUDLayout(1280, 960).docked && global.NovaHUDLayout(1280, 960).world_width == 1280);
+    Record("3:2 borders stay too narrow for panels", !global.NovaHUDLayout(1620, 1080).docked);
+    var tall = global.NovaHUDLayout(720, 720);
+    Record("square screens letterbox the playfield", tall.world_width == 720 && tall.world_height == 540 && tall.world_top == 90 && !tall.docked);
+    global.NovaSquarePixels = true;
+    var pixels = global.NovaHUDLayout(1920, 1080);
+    Record("square pixels narrow the playfield to 8:7", pixels.world_height == 1080 && pixels.world_width == round(1080 * 8 / 7) && pixels.docked && pixels.panel_scale == 4);
+    global.NovaIntegerScale = true;
+    var exact = global.NovaHUDLayout(1920, 1080);
+    Record("integer square pixels draw each game pixel as a 4x4 block", exact.world_width == 1024 && exact.world_height == 896 && exact.world_left == 448 && exact.world_top == 92);
+    global.NovaSquarePixels = false;
+    var rows = global.NovaHUDLayout(1920, 1080);
+    Record("integer scaling keeps whole pixel rows in 4:3", rows.world_height == 896 && abs(rows.world_width - 896 * 4 / 3) <= 1);
+    Record("integer scaling falls back below one whole multiple", global.NovaHUDLayout(256, 200).world_height == 192);
+    global.NovaSquarePixels = square;
+    global.NovaIntegerScale = integer;
 }

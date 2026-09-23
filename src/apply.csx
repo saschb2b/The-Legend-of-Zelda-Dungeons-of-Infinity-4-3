@@ -154,7 +154,8 @@ draw_set_color(c_white);
 var panelHUD = hud.Substring(0, metricsStart) + equipmentStats + hud.Substring(metricsEnd);
 panelHUD = ReplaceOnce(panelHUD, "if (ShowLamp)", "if (ShowLamp && (global.Inventory_ItemData[24].Owns[0] || global.Inventory_ItemData[51].Owns[0]))");
 group.QueueReplace(hudName, panelHUD);
-group.QueueAppend("gml_Object_oGame_Create_0", "global.Users[global.UserIndex].Prefs[2] = false;");
+// Status starts open where the side panels fit beside the playfield.
+group.QueueAppend("gml_Object_oGame_Create_0", "global.Users[global.UserIndex].Prefs[2] = global.NovaHUDLayout(window_get_width(), window_get_height()).docked;");
 Edit("gml_GlobalScript___Users", "return [true, true, true, false, true, false, false, false];", "return [true, true, false, false, true, false, false, false];");
 var title = Data.Rooms.ByName("Room_Title");
 title.Views[0].ViewX = 50;
@@ -165,13 +166,13 @@ menu.Height = 300;
 menu.Views[0].ViewY = -38;
 menu.Views[0].ViewHeight = 300;
 menu.Views[0].PortHeight = 1200;
-group.QueueReplace("gml_Object_oTitle_Draw_0", ReplaceOnce(Read("gml_Object_oTitle_Draw_0"), "draw_text(8, 212,", "draw_text(58, 212,") + @"
+group.QueueReplace("gml_Object_oTitle_Draw_0", ReplaceOnce(Read("gml_Object_oTitle_Draw_0"), "draw_text(8, 212,", "draw_text(camera_get_view_x(view_camera[0]) + 8, 212,") + @"
 if (AllowStart) {
     draw_set_font(global.MenuFont_Innactive);
     var binding = input_binding_get(""menu_input"", 0, 1);
     if (binding.__type == undefined) binding = global.NovaBinding(""menu_input"");
     var width = global.NovaPromptWidth(binding, ""Begin"", 0.75, 12);
-    global.NovaPromptDraw(binding, ""Begin"", 329 - width, 210, 0.75, 0.75, 12);
+    global.NovaPromptDraw(binding, ""Begin"", camera_get_view_x(view_camera[0]) + camera_get_view_width(view_camera[0]) - 21 - width, 210, 0.75, 0.75, 12);
 }");
 var credits = Read("gml_Object_oCredits_Create_0");
 credits = ReplaceOnce(credits, "x = (camera_get_view_width(view_camera[0]) - BoxW) / 2;", "x = camera_get_view_x(view_camera[0]) + (camera_get_view_width(view_camera[0]) - BoxW) / 2;");
@@ -179,13 +180,24 @@ credits = ReplaceOnce(credits, "TextSurfaceX = (x * 4) + 20;", "TextSurfaceX = (
 group.QueueReplace("gml_Object_oCredits_Create_0", credits);
 group.QueueReplace("gml_Object_oNovaScreen_Create_0", @"
 depth = 1000000;
-NovaWidth = room == Room_Title ? 1200 : 1600;
-NovaHeight = room == Room_Title ? 900 : 1200;
+// Start screens widen with the display, from 4:3 up to the original 16:9 title scene.
+var aspect = clamp(window_get_width() / max(1, window_get_height()), 4 / 3, 16 / 9);
+var title = room == Room_Title;
+var view_h = title ? 225 : 300;
+var view_w = title ? clamp(round(225 * aspect), 300, 400) : round(300 * aspect);
+// Menu pages stay in their 400-unit column; wider screens add landscape at both sides.
+global.NovaMenuInset = title ? 0 : (view_w - 400) / 2;
+camera_set_view_size(view_camera[0], view_w, view_h);
+camera_set_view_pos(view_camera[0], 200 - view_w / 2, title ? 0 : -38);
+NovaWidth = view_w * 4;
+NovaHeight = view_h * 4;
+view_set_wport(0, NovaWidth);
+view_set_hport(0, NovaHeight);
 application_surface_draw_enable(false);
 display_set_gui_maximise(window_get_width() / NovaWidth, window_get_height() / NovaHeight);
 surface_resize(application_surface, NovaWidth, NovaHeight);");
 group.QueueReplace("gml_Object_oNovaScreen_Draw_64", "draw_surface_stretched(application_surface, 0, 0, NovaWidth, NovaHeight);");
-group.QueueReplace("gml_Object_oNovaScreen_CleanUp_0", "display_set_gui_maximise(-1, -1); application_surface_draw_enable(true);");
+group.QueueReplace("gml_Object_oNovaScreen_CleanUp_0", "global.NovaMenuInset = 0; display_set_gui_maximise(-1, -1); application_surface_draw_enable(true);");
 foreach (var screen in new[] { "oTitle", "oMenu" }) {
     group.QueueAppend($"gml_Object_{screen}_Create_0", "instance_create_layer(0, 0, \"System\", oNovaScreen);");
 }
@@ -340,4 +352,4 @@ group.QueueReplace("gml_Object_oTitle_Alarm_6", "alarm[6] = -1;");
 group.QueueAppend("gml_Object_oMenu_CleanUp_0", "if (variable_global_exists(\"NovaTitleFrame\") && surface_exists(global.NovaTitleFrame)) surface_free(global.NovaTitleFrame);");
 foreach (var edit in edits) group.QueueReplace(edit.Key, GlobalInventoryCalls(edit.Value));
 group.Import();
-Console.WriteLine("4:3 overlay patch compiled.");
+Console.WriteLine("Dungeons of Infinity and Beyond patch compiled.");

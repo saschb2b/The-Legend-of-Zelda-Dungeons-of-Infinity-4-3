@@ -4,6 +4,7 @@ import hashlib
 import io
 import json
 import shutil
+import subprocess
 import sys
 import tempfile
 import time
@@ -13,8 +14,15 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from zipfile import ZipFile
 
-LAUNCHER = 'Zelda Dungeons of Infinity 4-3.sh'
-GAME_DIR = 'zeldadoi-43'
+LAUNCHER = 'Zelda Dungeons of Infinity and Beyond.sh'
+GAME_DIR = 'zeldadoi-beyond'
+INSTALLER_LAUNCHER = 'Install Zelda Dungeons of Infinity and Beyond.sh'
+PAYLOAD_DIR = 'zeldadoi-beyond-installer'
+# Releases before 2.0.0 were the 4:3 edition and installed under these names.
+LEGACY_LAUNCHER = 'Zelda Dungeons of Infinity 4-3.sh'
+LEGACY_GAME_DIR = 'zeldadoi-43'
+LEGACY_INSTALLER_LAUNCHER = 'Install Zelda Dungeons of Infinity 4-3.sh'
+LEGACY_PAYLOAD_DIR = 'zeldadoi-43-installer'
 ROOT = Path(__file__).resolve().parent
 
 
@@ -78,7 +86,7 @@ def ensure_game_stopped(destination, proc=Path('/proc')):
             program = (entry / 'cmdline').read_bytes().split(b'\0', 1)[0]
             if Path(program.decode(errors='replace')).name.startswith('gmloadernext'):
                 if (entry / 'cwd').resolve() == destination.resolve():
-                    raise RuntimeError('Close the 4:3 edition before installing the update.')
+                    raise RuntimeError('Close Dungeons of Infinity before installing the update.')
         except (OSError, PermissionError):
             continue
 
@@ -134,24 +142,57 @@ def backup_legacy_saves(destination, work, target_schema):
         print(f'Saved a copy of the existing saves in save-backups/{name}.', flush=True)
 
 
+def prepare_legacy(ports):
+    legacy = ports / LEGACY_GAME_DIR
+    if not legacy.is_dir():
+        return None
+    # An interrupted 4:3 update can hold the only complete copy of the game; restore it first.
+    recovery = ports / f'.{LEGACY_GAME_DIR}-update' / 'recovery.py'
+    if recovery.is_file():
+        subprocess.run([sys.executable, str(recovery), 'recover', '--game-dir', str(legacy)], check=True)
+    ensure_game_stopped(legacy)
+    if (ports / GAME_DIR).exists():
+        raise RuntimeError(f'Both {LEGACY_GAME_DIR} and {GAME_DIR} exist. Keep the folder with your saves, then run the installer again.')
+    return legacy
+
+
+def finish_legacy(ports, legacy):
+    # One rename on the same file system keeps saves, backups and every other file together.
+    legacy.replace(ports / GAME_DIR)
+    (ports / LEGACY_LAUNCHER).unlink(missing_ok=True)
+    work = ports / f'.{LEGACY_GAME_DIR}-update'
+    if work.is_dir() and not (work / 'transaction.json').exists():
+        shutil.rmtree(work)
+    print(f'Moved the 4:3 edition and its saves to {GAME_DIR}.', flush=True)
+
+
+def remove_legacy_installer(ports):
+    # The old installer would reinstall the 4:3 edition beside this one.
+    payload = ports / LEGACY_PAYLOAD_DIR
+    if (payload / 'install.py').is_file() and (payload / 'manifest.json').is_file():
+        shutil.rmtree(payload)
+        (ports / LEGACY_INSTALLER_LAUNCHER).unlink(missing_ok=True)
+
+
 def install(ports, upstream_path=None, refresh=True):
     ports = ports.resolve()
     ports.mkdir(parents=True, exist_ok=True)
     destination = ports / GAME_DIR
+    legacy = prepare_legacy(ports)
     ensure_game_stopped(destination)
     manifest = json.loads((ROOT / 'manifest.json').read_text())
     patch = (ROOT / 'patches/game.droid.bsdiff').read_bytes()
     verify(patch, manifest['patch_sha256'], 'Patch')
-    with tempfile.TemporaryDirectory(prefix='.doi43-install-', dir=ports) as temporary:
+    with tempfile.TemporaryDirectory(prefix='.doi-install-', dir=ports) as temporary:
         work = Path(temporary)
         if upstream_path is None:
             print('Downloading the official PortMaster package (44 MiB)...', flush=True)
             upstream_path = work / 'upstream.zip'
-            req = urllib.request.Request(manifest['upstream_url'], headers={'User-Agent': 'DOI-4-3-Installer/' + manifest['version']})
+            req = urllib.request.Request(manifest['upstream_url'], headers={'User-Agent': 'DOI-Beyond-Installer/' + manifest['version']})
             with urllib.request.urlopen(req, timeout=60) as response, upstream_path.open('wb') as output:
                 shutil.copyfileobj(response, output)
         verify(upstream_path.read_bytes(), manifest['upstream_sha256'], 'PortMaster package')
-        print('Applying the 4:3 patch...', flush=True)
+        print('Applying the patch...', flush=True)
         stage = work / GAME_DIR
         stage.mkdir()
         with ZipFile(upstream_path) as upstream:
@@ -184,12 +225,14 @@ def install(ports, upstream_path=None, refresh=True):
             shutil.copyfile(ROOT / helper, stage / helper)
         (stage / 'patch-version.txt').write_text(manifest['version'] + '\n')
         if manifest.get('save_schema', 0) >= 1:
-            backup_legacy_saves(destination, work, manifest['save_schema'])
+            backup_legacy_saves(legacy or destination, work, manifest['save_schema'])
             (stage / 'save-schema.txt').write_text(str(manifest['save_schema']) + '\n')
         staged_launcher = work / LAUNCHER
         shutil.copyfile(ROOT / LAUNCHER, staged_launcher)
         staged_launcher.chmod(0o755)
         print('Installing files and keeping existing saves...', flush=True)
+        if legacy:
+            finish_legacy(ports, legacy)
         destination.mkdir(exist_ok=True)
         for source in sorted(stage.rglob('*')):
             if source.is_file():
@@ -197,13 +240,14 @@ def install(ports, upstream_path=None, refresh=True):
                 target.parent.mkdir(parents=True, exist_ok=True)
                 source.replace(target)
         staged_launcher.replace(ports / LAUNCHER)
+    remove_legacy_installer(ports)
     if refresh:
         refresh_artwork(ports)
-    print('Installation complete. Launch Zelda Dungeons of Infinity 4-3 from Ports.', flush=True)
+    print('Installation complete. Launch Zelda Dungeons of Infinity and Beyond from Ports.', flush=True)
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Install the Dungeons of Infinity 4:3 patch for Nova on ROCKNIX.')
+    parser = argparse.ArgumentParser(description='Install the Dungeons of Infinity and Beyond patch on ROCKNIX.')
     parser.add_argument('--ports-dir', type=Path, required=True)
     parser.add_argument('--upstream-zip', type=Path, help='Use a previously downloaded official PortMaster ZIP.')
     parser.add_argument('--no-refresh', action='store_true', help='Skip the local EmulationStation metadata update.')

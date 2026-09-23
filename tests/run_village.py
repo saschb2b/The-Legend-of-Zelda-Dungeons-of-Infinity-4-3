@@ -19,7 +19,7 @@ from install import GAME_DIR, LAUNCHER
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Leave a separate playable village test on a Nova.')
+    parser = argparse.ArgumentParser(description='Leave a separate playable village test on a device.')
     parser.add_argument('host')
     parser.add_argument('--control-path', type=Path)
     parser.add_argument('--ports-dir', default='/storage/roms/ports')
@@ -30,7 +30,7 @@ def main():
                   'NOVA VILLAGE PREVIEW COMPILED')
     build.verify_runner_format(game.read_bytes())
     token = uuid.uuid4().hex[:12]
-    stage = f'/storage/.cache/doi43-village-{token}'
+    stage = f'/storage/.cache/doi-village-{token}'
     launcher = f'{args.ports_dir}/DOI Village Test.sh'
     source = f'{args.ports_dir}/{GAME_DIR}'
     request = lambda command, data=None: remote(args.host, args.control_path, command, data)
@@ -52,7 +52,7 @@ config=json.loads((stage/'gmloader.json').read_text())
 config['save_dir']='village-test-savedata'
 (stage/'gmloader.json').write_text(json.dumps(config))
 text=LAUNCHER_TEXT
-for old,new in [('python3 "$GAMEDIR/updater.py" serve --game-dir "$GAMEDIR" --parent "$$"','sleep 3600'),('GAMEDIR="/$directory/ports/zeldadoi-43"','GAMEDIR='+repr(str(stage)))]:
+for old,new in [('python3 "$GAMEDIR/updater.py" serve --game-dir "$GAMEDIR" --parent "$$"','sleep 3600'),('GAMEDIR="/$directory/ports/zeldadoi-beyond"','GAMEDIR='+repr(str(stage)))]:
  if text.count(old)!=1: raise RuntimeError('Unrecognised launcher boundary: '+old)
  text=text.replace(old,new)
 launcher.write_text(text)

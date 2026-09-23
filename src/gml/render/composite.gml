@@ -1,3 +1,6 @@
+var _nova_w = display_get_gui_width();
+var _nova_h = display_get_gui_height();
+var _nova_layout = global.NovaHUDLayout(_nova_w, _nova_h);
 if (!surface_exists(NovaFrame))
 {
     NovaFrame = surface_create(1024, 896);
@@ -13,7 +16,7 @@ NovaTransitionHUD = instance_exists(oCamera) && (oCamera.RoomTransition != 0 || 
 var _nova_ui = instance_exists(oInventory) || instance_exists(oMenu_Game) || instance_exists(oDialogueBox) || instance_exists(oMap);
 var _nova_modal = global.Paused || _nova_ui;
 var _nova_travel = NovaTransitionHUD || (instance_exists(oLink) && oLink.StairsAutoMove);
-if (global.Users[global.UserIndex].Prefs[2] && !_nova_modal)
+if (global.Users[global.UserIndex].Prefs[2] && !_nova_modal && !_nova_layout.docked)
 {
     draw_surface_part_ext(application_surface, 0, 304, 288, 592, 16, 436, 0.75, 0.75, c_white, 0.9);
     draw_surface_part_ext(application_surface, 1312, 0, 288, 896, 792, 208, 0.75, 0.75, c_white, 0.9);
@@ -28,17 +31,40 @@ if (global.ArcadeVP_Show)
     CRT_Do_Stretch(global.ArcadeVP_Surface, global.ArcadeVP_RenderX - 288, global.ArcadeVP_RenderY, global.ArcadeVP_RenderW, global.ArcadeVP_RenderH, global.ArcadeVP_Sizes, true, 0.2, true, 0.025, 80, true, true, true, 0.04);
 }
 surface_reset_target();
-var _nova_w = display_get_gui_width();
-var _nova_h = display_get_gui_height();
+var _nova_wx = _nova_layout.world_left;
+var _nova_wy = _nova_layout.world_top;
+var _nova_ww = _nova_layout.world_width;
+var _nova_wh = _nova_layout.world_height;
+if (_nova_ww < _nova_w || _nova_wh < _nova_h)
+{
+    draw_set_color(c_black);
+    draw_rectangle(0, 0, _nova_w, _nova_wy - 1, false);
+    draw_rectangle(0, _nova_wy + _nova_wh, _nova_w, _nova_h, false);
+    draw_rectangle(0, 0, _nova_wx - 1, _nova_h, false);
+    draw_rectangle(_nova_wx + _nova_ww, 0, _nova_w, _nova_h, false);
+    draw_set_color(c_white);
+}
 if (global.Users[global.UserIndex].Prefs[3] && !global.ArcadeVP_Show)
 {
-    NovaCRT_Draw(NovaFrame, _nova_w, _nova_h);
+    NovaCRT_Draw(NovaFrame, _nova_ww, _nova_wh, _nova_wx, _nova_wy);
 }
 else
 {
-    draw_surface_stretched(NovaFrame, 0, 0, _nova_w, _nova_h);
+    draw_surface_stretched(NovaFrame, _nova_wx, _nova_wy, _nova_ww, _nova_wh);
 }
-var _nova_layout = global.NovaHUDLayout(_nova_w, _nova_h);
+// Wide screens show the original side panels beside the playfield at whole-pixel scale.
+if (_nova_layout.docked && global.Users[global.UserIndex].Prefs[2] && instance_exists(oHUD) && !_nova_modal && !global.ArcadeVP_Show)
+{
+    var _nova_panel_filter = gpu_get_texfilter();
+    gpu_set_texfilter(false);
+    var _nova_ps = _nova_layout.panel_scale;
+    var _nova_pw = 72 * _nova_ps;
+    var _nova_px = floor((_nova_wx - _nova_pw) / 2);
+    var _nova_py = _nova_wy + floor((_nova_wh - 224 * _nova_ps) / 2);
+    draw_surface_part_ext(application_surface, 0, 304, 288, 592, _nova_px, _nova_py + 76 * _nova_ps, _nova_ps / 4, _nova_ps / 4, c_white, 1);
+    draw_surface_part_ext(application_surface, 1312, 0, 288, 896, _nova_w - _nova_px - _nova_pw, _nova_py, _nova_ps / 4, _nova_ps / 4, c_white, 1);
+    gpu_set_texfilter(_nova_panel_filter);
+}
 // Compose native HUD pixels after world scaling and CRT distortion.
 if (instance_exists(oHUD) && ((!_nova_ui && (!global.Paused || _nova_travel)) || global.NovaInventoryHUD()) && !global.ArcadeVP_Show)
 {
@@ -66,7 +92,8 @@ if (instance_exists(oMap) && !oMap.Close) {
     global.NovaPromptDraw(binding, "CLOSE", _nova_layout.right - width, _nova_layout.footer_y, sx, sy, size);
     draw_set_alpha(1);
 }
-if (instance_exists(oHUD) && !_nova_modal && !global.ArcadeVP_Show && !global.Users[global.UserIndex].Prefs[2]) {
+// Docked panels leave the playfield clear, so the Status and interaction hints stay visible.
+if (instance_exists(oHUD) && !_nova_modal && !global.ArcadeVP_Show && !global.NovaStatusCovers()) {
     var sx = _nova_layout.scale;
     var sy = sx;
     var size = 12 * sx;
@@ -81,4 +108,4 @@ if (instance_exists(oHUD) && !_nova_modal && !global.ArcadeVP_Show && !global.Us
 
 global.NovaArcadePrompts(_nova_layout);
 // Options draw over the finished frame, so CRT changes show behind them immediately.
-if (instance_exists(oMenu_Game)) global.NovaPauseOverlay(oMenu_Game, _nova_w, _nova_h);
+if (instance_exists(oMenu_Game)) global.NovaPauseOverlay(oMenu_Game, _nova_ww, _nova_wh, _nova_wx, _nova_wy);

@@ -300,21 +300,24 @@ function NovaPageHeading(label) {
     global.NovaPromptDraw(global.NovaBinding("nova_bag_next"), "", 332, 28, 0.75, 0.75, 16);
 }
 function NovaLandscape() {
+    // The scene spans the widened menu view: mountains at its left edge, the castle at its right.
+    var left = -global.NovaMenuInset;
+    var right = 400 + global.NovaMenuInset;
     draw_set_alpha(1);
     draw_clear(make_color_rgb(0, 150, 216));
-    draw_sprite_stretched(sTitle_Foreground_Sky, 0, 0, 176, 400, 21);
-    draw_sprite(sTitle_Foreground_Mountain, 0, 0, 174);
-    for (var px = 0; px < 400; px += 16) draw_sprite(sTitle_Foreground_Trees, 0, px, 193);
-    var clouds = [1,48,337];
+    draw_sprite_stretched(sTitle_Foreground_Sky, 0, left, 176, right - left, 21);
+    draw_sprite(sTitle_Foreground_Mountain, 0, left, 174);
+    for (var px = left; px < right; px += 16) draw_sprite(sTitle_Foreground_Trees, 0, px, 193);
+    var clouds = [left + 1, left + 48, right - 63];
     for (var i = 0; i < 3; i++) draw_sprite(sTitle_Foreground_Cloud, 0, clouds[i], 167);
-    draw_sprite(sTitle_Foreground_Castle, 0, 352, 121);
-    for (var px = 0; px < 400; px += 16) draw_sprite_stretched(sTitle_Water_Sky, 0, px, 215, 16, 47);
-    for (var px = 0; px < 400; px += 16) draw_sprite(sTitle_Water_Trees, 0, px, 205);
-    draw_sprite(sTitle_Water_Mountain, 0, 0, 217);
-    draw_sprite_stretched(sTitle_Water_Castle, 0, 352, 232, 41, 32);
+    draw_sprite(sTitle_Foreground_Castle, 0, right - 48, 121);
+    for (var px = left; px < right; px += 16) draw_sprite_stretched(sTitle_Water_Sky, 0, px, 215, 16, 47);
+    for (var px = left; px < right; px += 16) draw_sprite(sTitle_Water_Trees, 0, px, 205);
+    draw_sprite(sTitle_Water_Mountain, 0, left, 217);
+    draw_sprite_stretched(sTitle_Water_Castle, 0, right - 48, 232, 41, 32);
     draw_set_color(make_color_rgb(8, 15, 27));
     draw_set_alpha(0.78);
-    draw_rectangle(0, -38, 400, 262, false);
+    draw_rectangle(left, -38, right, 262, false);
     draw_set_alpha(1);
     draw_set_color(c_white);
 }
@@ -356,7 +359,7 @@ function NovaAdventureDraw() {
         NovaFooter(NovaFocus == 0 && summary.saved ? "Continue" : "Select");
         draw_set_alpha(1);
         if (variable_global_exists("NovaTitleFrame") && surface_exists(global.NovaTitleFrame) && NovaTransition < 12)
-            draw_surface_ext(global.NovaTitleFrame, 0, -38, 400 / surface_get_width(global.NovaTitleFrame), 300 / surface_get_height(global.NovaTitleFrame), 0, c_white, 1 - NovaTransition / 12);
+            draw_surface_ext(global.NovaTitleFrame, -global.NovaMenuInset, -38, (400 + 2 * global.NovaMenuInset) / surface_get_width(global.NovaTitleFrame), 300 / surface_get_height(global.NovaTitleFrame), 0, c_white, 1 - NovaTransition / 12);
         return;
     }
     var name = global.Users[global.UserIndex].Name;

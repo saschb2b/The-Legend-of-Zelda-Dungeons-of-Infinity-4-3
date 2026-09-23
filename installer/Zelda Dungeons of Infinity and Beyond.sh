@@ -17,7 +17,7 @@ source $controlfolder/control.txt
 get_controls
 
 # Variables
-GAMEDIR="/$directory/ports/zeldadoi-43"
+GAMEDIR="/$directory/ports/zeldadoi-beyond"
 SPLASHFILE="splash.png"
 PORT_LAUNCHER="$(readlink -f "${BASH_SOURCE[0]}")"
 RECOVERY="${GAMEDIR%/*}/.${GAMEDIR##*/}-update/recovery.py"

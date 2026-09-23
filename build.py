@@ -117,7 +117,7 @@ def check_release(original, rebuilt, manifest):
         with ZipFile(Path(directory) / 'release.zip') as release:
             release.extractall(Path(directory) / 'release')
         source_root = install.ROOT
-        install.ROOT = Path(directory) / 'release/zeldadoi-43-installer'
+        install.ROOT = Path(directory) / 'release' / package_release.PAYLOAD_DIR
         try:
             install.install(ports, BUILD / 'port.zip', refresh=False)
             install.install(ports, BUILD / 'port.zip', refresh=False)
@@ -145,7 +145,7 @@ def main():
         shutil.copyfile(upstream, BUILD / 'port.zip')
     tool = args.utmt.resolve() if args.utmt else toolchain()
     output = BUILD / 'patched.droid'
-    run_umt(tool, BUILD / 'game.droid', 'src/apply.csx', output, '4:3 overlay patch compiled.')
+    run_umt(tool, BUILD / 'game.droid', 'src/apply.csx', output, 'Dungeons of Infinity and Beyond patch compiled.')
     verify_runner_format(output.read_bytes())
     run_umt(tool, output, 'tests/verify.csx', sentinel='NOVA BUILD VERIFIED')
     if args.check_release:

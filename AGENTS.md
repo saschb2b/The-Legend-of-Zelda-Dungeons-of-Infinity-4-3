@@ -2,7 +2,7 @@
 
 ## Project and scope
 
-Dungeons of Infinity: 4:3 edition is a patch for the Retroid Nova on ROCKNIX. The base is PortMaster's **1.1.6 GameMaker VM** build, with selected 1.2.x backports. Patch release numbers are independent of the original game's versions.
+Dungeons of Infinity and Beyond (the 4:3 edition before 2.0.0) is a patch for ROCKNIX handhelds with 4:3, 16:9 and other screens. The reference devices are the Retroid Nova (1280×960) and Retroid Pocket Flip 2 (1920×1080). The base is PortMaster's **1.1.6 GameMaker VM** build, with selected 1.2.x backports. Patch release numbers are independent of the original game's versions.
 
 Use Linux x86-64 and Python 3.11 or newer for builds. `build.py` downloads and verifies the pinned upstream package and UndertaleModTool CLI. The installer uses Python's standard library. Release packaging also needs `requirements-build.txt`.
 
@@ -63,14 +63,16 @@ Preserve these decisions unless the requested change explicitly revises them:
 - Resolve prompts from the current action binding, including remapped controls and keyboard input. Keep physical controller translation separate from logical game actions.
 - Use the checked-in **Kenney Nintendo Switch 2/Double** glyphs. Retain their filenames, checksums and license. Do not redraw or invent replacements.
 - Place action hints at the bottom right, label before glyph. A precedes B Close. Keep L/R beside page headings and reserve space for the longest label.
-- Size gameplay, inventory, map and arcade prompts from `NovaHUDLayout`. Anchor footer rows to its `right`, `footer_y` and `footer_width`. Keep page glyphs beside their headings on whole screen pixels. Title and adventure menus use their own scale.
+- Size gameplay, inventory, map and arcade prompts from `NovaHUDLayout`. Anchor footer rows to its `right`, `footer_y` and `footer_width`. Keep page glyphs beside their headings on whole screen pixels. Title and adventure menus use their own scale. Place new gameplay overlays from the layout's `world_left`, `world_top`, `world_width` and `world_height`, never from the full screen.
 - Keep one Options screen, `src/gml/menus/options.gml`, for the adventure and pause menus. Settings apply immediately and explain themselves below the list. Defaults restores one tab after confirmation. Nested pages keep the tab strip, name their parents in the header breadcrumb and label B as **Back**. Confirmations open as a dialog over the page they affect. Pause draws the screen after the CRT pass.
 - Use **Status** for the collapsible HUD panels and **Close** for dismissal. Actions, Equip and Use have distinct meanings documented in the README.
 - New adventure (`src/gml/menus/setup.gml`) keeps Begin one press away and explains the highlighted choice. Challenge presets are Hero's Path, Second Quest and Master Quest. Each player's last setup is stored as plain numbers under `[Setup]` in `nova-menu.ini`, because ini values cannot hold JSON. Last-played dates share that file under `[LastPlayed]`. Player cards and Details live in `src/gml/menus/players.gml`; Delete stays on Details and always opens a Cancel-first dialog.
 - The pause menu (`src/gml/menus/pause.gml`, input in `pause_cancel.gml`) draws after the CRT pass on an offscreen canvas with separate alpha blending. The game saves only at Save Tents; quit options must say so. Gameplay cannot use `global.CharacterSprites`, which the title menu frees; use `global.NovaCharacterDraw`.
 - Keep the centered title logo, then transition to the adventure menu. Continue resumes the selected player's save. Keep setup within one active frame.
 - Match the game's existing fonts, sprites and window frames. Use original artwork for backports and record its provenance. Distinguish recovered behavior from patch adaptations.
-- Preserve the complete 256×224 playfield and its 4:3 pixel-aspect correction. Render the HUD separately at an integer scale with square pixels, 3× on the Nova.
+- Preserve the complete 256×224 playfield and its 4:3 pixel-aspect correction on every screen shape; `NovaWorldRect` centers it with black borders. Square pixels (8:7) and integer scaling are device options. Never widen the camera: rooms are exactly one screen. Render the HUD separately at an integer scale with square pixels, 3× on the Nova and 4× at 1080p.
+- Where the side borders fit the original 72-pixel Status panels at 2× or more (`layout.docked`), dock the panels there at a whole-number scale and default Status to open. Otherwise they open over the playfield. Status hides the interaction hint only when it covers the playfield (`NovaStatusCovers`).
+- Start screens follow the display between 4:3 and 16:9. The title view widens from 300×225 to the original 400×225; menus keep their 400-unit column and `global.NovaMenuInset` extends the landscape and footer to the edges.
 - Keep four-digit rupees and full heart rows visible. Keep the HUD visible through room travel. Suppress contextual actions when the player cannot use them.
 - Render HUD and gameplay hints after the world CRT pass. Arcade machines retain their own effect. The gameplay shader is CRT-Lottes.
 
@@ -92,7 +94,7 @@ Run checks appropriate to the files and behavior changed:
 
 For regressions, add a test that fails through the affected game event, then verify the fix and neighboring behavior. A floor-generation fix needs actual generation and transition coverage. Test cancellation, remapping, save/load or vanished instances when the change affects those paths.
 
-GitHub CI runs host tests and compiles the device suite. It **does not execute the Nova runtime**. Compilation also cannot prove GPU shader support, physical button mapping or visual quality. Report those limits if device validation is unavailable.
+GitHub CI runs host tests and compiles the device suite. It **does not execute the device runtime**. Compilation also cannot prove GPU shader support, physical button mapping or visual quality. Report those limits if device validation is unavailable.
 
 ## Device work and crash investigation
 
@@ -107,7 +109,7 @@ python3 tests/run_device.py root@your-device.local \
 
 Confirm the device is idle before testing or replacing files. Do not terminate a player's active run to make room for tests. The runner checks EmulationStation's `runningGame` endpoint and creates a disposable installation with fresh saves.
 
-- Production lives in `/storage/roms/ports/zeldadoi-43`. Game code is `assets/game.droid` inside `zeldadoi.port`.
+- Production lives in `/storage/roms/ports/zeldadoi-beyond` (`zeldadoi-43` before 2.0.0; the installer migrates it). Game code is `assets/game.droid` inside `zeldadoi.port`.
 - Preserve `savedata/` and `save-backups/`. Verify save hashes around deployment. Install only the verified production build, never an instrumented test or village-preview build.
 - After a crash, preserve `log.txt` and the relevant saves locally before relaunching. Read the first error and call chain before attributing it to the latest visible change.
 - Reproduce with isolated fixtures or a private copy of the affected save. Keep the regression report and crash log under ignored `.build/`.

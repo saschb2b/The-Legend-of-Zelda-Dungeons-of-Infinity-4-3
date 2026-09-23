@@ -2,11 +2,17 @@
 // Drawing uses the adventure menu's 400x300 view, whose top edge is y = -38.
 global.NovaRemapping = false;
 global.NovaOptionsSurface = -1;
+global.NovaMenuInset = 0;
+// Picture settings belong to the screen, so they apply to every player on this device.
+ini_open("options.ini");
+global.NovaSquarePixels = ini_read_real("Display", "SquarePixels", 0) == 1;
+global.NovaIntegerScale = ini_read_real("Display", "IntegerScale", 0) == 1;
+ini_close();
 global.NovaMenuLayout = function() {
     return {
         x: 24, y: 10, width: 352, height: 216,
         header_y: -20, header_width: 352, header_height: 20,
-        left: 42, right: 358, footer_y: 242, footer_left: 28, footer_right: 372
+        left: 42, right: 358, footer_y: 242, footer_left: 28 - global.NovaMenuInset, footer_right: 372 + global.NovaMenuInset
     };
 };
 global.NovaOptionsLayout = function() {
@@ -25,7 +31,7 @@ global.NovaOptionsState = function(context) {
 global.NovaOptionRows = function(tab) {
     switch (tab) {
         case "Game": return ["item_messages", "skip_title"];
-        case "Display": return ["crt", "gore"];
+        case "Display": return ["crt", "square_pixels", "integer_scale", "gore"];
         case "Audio": return ["music", "sfx"];
         case "Controls": return ["gamepad", "keyboard"];
         case "About": return ["updates", "credits"];
@@ -37,6 +43,8 @@ global.NovaOptionInfo = function(row) {
         case "item_messages": return {label: "Item messages", kind: "toggle", fallback: 1, help: "Show a message when you pick up an item."};
         case "skip_title": return {label: "Skip title intro", kind: "toggle", fallback: 1, help: "Press Start or confirm to skip the opening title animation."};
         case "crt": return {label: "CRT effect", kind: "toggle", fallback: 0, help: "Scanlines, a phosphor grille and soft bloom on the playfield. The HUD stays sharp. Saved for this player."};
+        case "square_pixels": return {label: "Square pixels", kind: "toggle", fallback: 0, help: "Show game pixels square instead of the slightly wide SNES shape. Narrows the playfield."};
+        case "integer_scale": return {label: "Integer scaling", kind: "toggle", fallback: 0, help: "Scale the playfield by whole numbers so all pixel rows match. Adds wider borders."};
         case "gore": return {label: "Blood and remains", kind: "toggle", fallback: 1, help: "Show blood and remains in dungeons. Takes effect on the next floor."};
         case "music": return {label: "Music", kind: "volume", fallback: 7, help: "Volume of the background music."};
         case "sfx": return {label: "Sound effects", kind: "volume", fallback: 10, help: "Volume of combat, item and menu sounds."};
@@ -59,6 +67,8 @@ global.NovaOptionGet = function(row) {
         case "skip_title": return global.CanSkipTitle ? 1 : 0;
         case "crt": return user.Prefs[3] ? 1 : 0;
         case "gore": return global.Gore ? 1 : 0;
+        case "square_pixels": return global.NovaSquarePixels ? 1 : 0;
+        case "integer_scale": return global.NovaIntegerScale ? 1 : 0;
         // A muted player keeps the device volume for when they unmute.
         case "music": return user.Prefs[1] ? round(global.MusicVol * 10) : 0;
         case "sfx": return user.Prefs[0] ? round(global.SFXVol * 10) : 0;
@@ -73,6 +83,14 @@ global.NovaOptionSet = function(row, value) {
         case "skip_title":
             global.CanSkipTitle = value == 1;
             global.NovaOptionWrite("Preferences", "CanSkipTitle", value);
+            break;
+        case "square_pixels":
+            global.NovaSquarePixels = value == 1;
+            global.NovaOptionWrite("Display", "SquarePixels", value);
+            break;
+        case "integer_scale":
+            global.NovaIntegerScale = value == 1;
+            global.NovaOptionWrite("Display", "IntegerScale", value);
             break;
         case "gore":
             global.Gore = value == 1;

@@ -40,7 +40,7 @@ class InstallerTests(unittest.TestCase):
     def test_running_game_blocks_install_but_input_helper_does_not(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            game = root / 'zeldadoi-43'
+            game = root / 'zeldadoi-beyond'
             game.mkdir()
             proc = root / 'proc'
 
@@ -57,7 +57,7 @@ class InstallerTests(unittest.TestCase):
             (proc / 'self').mkdir()
             install.ensure_game_stopped(game, proc)
             game_process = process(10717, b'./gmloadernext.aarch64', b'-c', b'gmloader.json')
-            with self.assertRaisesRegex(RuntimeError, 'Close the 4:3 edition'):
+            with self.assertRaisesRegex(RuntimeError, 'Close Dungeons of Infinity'):
                 install.ensure_game_stopped(game, proc)
             (game_process / 'cmdline').write_bytes(b'')
             install.ensure_game_stopped(game, proc)
@@ -85,7 +85,84 @@ class InstallerTests(unittest.TestCase):
                     install.install(ports, upstream, refresh=False)
             self.assertEqual((game / 'savedata/Users').read_bytes(), b'keep this save')
             self.assertEqual((game / 'zeldadoi.port').read_bytes(), b'keep this game')
-            self.assertFalse(list(ports.glob('.doi43-install-*')))
+            self.assertFalse(list(ports.glob('.doi-install-*')))
+
+
+    def legacy_ports(self, root):
+        ports = root / 'ports'
+        legacy = ports / install.LEGACY_GAME_DIR
+        (legacy / 'savedata').mkdir(parents=True)
+        (legacy / 'savedata/Users').write_bytes(b'4:3 save')
+        (legacy / 'save-backups').mkdir()
+        (legacy / 'save-backups/before-content-v3.zip').write_bytes(b'backup')
+        (ports / install.LEGACY_LAUNCHER).write_text('old launcher')
+        return ports, legacy
+
+    def test_legacy_install_moves_to_the_new_folder(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            ports, legacy = self.legacy_ports(Path(temporary))
+            (ports / f'.{install.LEGACY_GAME_DIR}-update').mkdir()
+            found = install.prepare_legacy(ports)
+            self.assertEqual(found, legacy)
+            self.assertTrue(legacy.is_dir(), 'Checks must not move anything')
+            install.finish_legacy(ports, found)
+            game = ports / install.GAME_DIR
+            self.assertEqual((game / 'savedata/Users').read_bytes(), b'4:3 save')
+            self.assertEqual((game / 'save-backups/before-content-v3.zip').read_bytes(), b'backup')
+            self.assertFalse(legacy.exists())
+            self.assertFalse((ports / install.LEGACY_LAUNCHER).exists())
+            self.assertFalse((ports / f'.{install.LEGACY_GAME_DIR}-update').exists())
+
+    def test_legacy_migration_refuses_two_folders(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            ports, legacy = self.legacy_ports(Path(temporary))
+            (ports / install.GAME_DIR).mkdir()
+            with self.assertRaisesRegex(RuntimeError, 'Both'):
+                install.prepare_legacy(ports)
+            self.assertEqual((legacy / 'savedata/Users').read_bytes(), b'4:3 save')
+
+    def test_legacy_migration_restores_an_interrupted_update_first(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            ports, legacy = self.legacy_ports(Path(temporary))
+            recovery = ports / f'.{install.LEGACY_GAME_DIR}-update' / 'recovery.py'
+            recovery.parent.mkdir()
+            recovery.write_text('')
+            with patch.object(install.subprocess, 'run') as run:
+                install.prepare_legacy(ports)
+            command = run.call_args.args[0]
+            self.assertEqual(command[1:], [str(recovery), 'recover', '--game-dir', str(legacy)])
+
+    def test_failed_download_leaves_the_legacy_install_untouched(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            ports, legacy = self.legacy_ports(root)
+            payload = root / 'payload'
+            (payload / 'patches').mkdir(parents=True)
+            data = b'test patch'
+            (payload / 'patches/game.droid.bsdiff').write_bytes(data)
+            (payload / 'manifest.json').write_text(json.dumps({'patch_sha256': hashlib.sha256(data).hexdigest(), 'upstream_sha256': '0' * 64}))
+            upstream = root / 'bad.zip'
+            upstream.write_bytes(b'invalid download')
+            with patch.object(install, 'ROOT', payload):
+                with self.assertRaisesRegex(ValueError, 'checksum mismatch'):
+                    install.install(ports, upstream, refresh=False)
+            self.assertEqual((legacy / 'savedata/Users').read_bytes(), b'4:3 save')
+            self.assertTrue((ports / install.LEGACY_LAUNCHER).exists())
+            self.assertFalse((ports / install.GAME_DIR).exists())
+
+    def test_old_installer_is_removed_only_when_recognized(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            ports = Path(temporary)
+            payload = ports / install.LEGACY_PAYLOAD_DIR
+            payload.mkdir()
+            (ports / install.LEGACY_INSTALLER_LAUNCHER).write_text('old installer')
+            install.remove_legacy_installer(ports)
+            self.assertTrue(payload.exists(), 'An unrecognized folder must stay')
+            (payload / 'install.py').write_text('')
+            (payload / 'manifest.json').write_text('{}')
+            install.remove_legacy_installer(ports)
+            self.assertFalse(payload.exists())
+            self.assertFalse((ports / install.LEGACY_INSTALLER_LAUNCHER).exists())
 
 
 if __name__ == '__main__':

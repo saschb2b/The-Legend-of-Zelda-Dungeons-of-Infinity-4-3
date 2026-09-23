@@ -13,11 +13,14 @@ import urllib.request
 from pathlib import Path
 from zipfile import BadZipFile, ZipFile
 
-REPOSITORY = 'saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3'
-API = f'https://api.github.com/repos/{REPOSITORY}/releases/latest'
+REPOSITORY = 'saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond'
+# The numeric repository ID keeps release checks working if the repository is renamed again.
+API = 'https://api.github.com/repositories/1377115680/releases/latest'
 DOWNLOAD = f'https://github.com/{REPOSITORY}/releases/download/'
-LAUNCHER = 'Zelda Dungeons of Infinity 4-3.sh'
-GAME = 'zeldadoi-43'
+LAUNCHER = 'Zelda Dungeons of Infinity and Beyond.sh'
+INSTALLER_LAUNCHER = 'Install Zelda Dungeons of Infinity and Beyond.sh'
+PAYLOAD = 'zeldadoi-beyond-installer'
+GAME = 'zeldadoi-beyond'
 MAX_INSTALLER = 8 * 1024 * 1024
 MAX_UPSTREAM = 128 * 1024 * 1024
 
@@ -46,7 +49,7 @@ def read_json(path):
 
 def fetch(url, limit, progress=None):
     request = urllib.request.Request(url, headers={
-        'User-Agent': 'DOI-4-3-Updater', 'Accept': 'application/vnd.github+json',
+        'User-Agent': 'DOI-Beyond-Updater', 'Accept': 'application/vnd.github+json',
         'X-GitHub-Api-Version': '2026-03-10',
     })
     chunks = []
@@ -76,7 +79,7 @@ def select_release(release, installed):
         raise ValueError('The latest release is not a stable patch.')
     if key <= version_key(installed):
         return None
-    filename = f'Dungeons-of-Infinity-4-3-v{version}-Nova-Patch-Installer.zip'
+    filename = f'Dungeons-of-Infinity-and-Beyond-v{version}-Patch-Installer.zip'
     assets = {item['name']: item for item in release['assets']}
     archive = assets[filename]
     checksum = assets[filename + '.sha256']
@@ -135,11 +138,11 @@ def unpack_installer(data, destination, version):
             total += entry.file_size
             if (path.is_absolute() or '..' in path.parts or '\\' in name or name in seen
                     or stat.S_ISLNK(mode) or total > 32 * 1024 * 1024
-                    or not (name == 'Install Zelda Dungeons of Infinity 4-3.sh' or name.startswith('zeldadoi-43-installer/'))):
+                    or not (name == INSTALLER_LAUNCHER or name.startswith(PAYLOAD + '/'))):
                 raise ValueError('Invalid installer archive.')
             seen.add(name)
         zipped.extractall(destination)
-    payload = destination / 'zeldadoi-43-installer'
+    payload = destination / PAYLOAD
     manifest = read_json(payload / 'manifest.json')
     if manifest['version'] != version:
         raise ValueError('Installer version does not match the release.')
@@ -315,10 +318,10 @@ class Updater:
         self.publish('installing', 'Installing update. Keep the device on.')
         try:
             shutil.copytree(self.game, staged_game)
-            command = [sys.executable, '-u', str(prepared / 'zeldadoi-43-installer/install.py'),
+            command = [sys.executable, '-u', str(prepared / PAYLOAD / 'install.py'),
                        '--ports-dir', str(staged_ports), '--upstream-zip', str(prepared / 'upstream.zip'), '--no-refresh']
             subprocess.run(command, check=True, timeout=240)
-            manifest = read_json(prepared / 'zeldadoi-43-installer/manifest.json')
+            manifest = read_json(prepared / PAYLOAD / 'manifest.json')
             with ZipFile(staged_game / 'zeldadoi.port') as port:
                 install.verify(port.read('assets/game.droid'), manifest['patched_game_sha256'], 'Installed game')
             if (staged_game / 'patch-version.txt').read_text().strip() != ready['version']:
@@ -346,7 +349,7 @@ class Updater:
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Update the Nova patch from its stable GitHub releases.')
+    parser = argparse.ArgumentParser(description='Update Dungeons of Infinity and Beyond from its stable GitHub releases.')
     parser.add_argument('command', choices=('serve', 'apply', 'recover'))
     parser.add_argument('--game-dir', type=Path, required=True)
     parser.add_argument('--parent', type=int, default=os.getppid())

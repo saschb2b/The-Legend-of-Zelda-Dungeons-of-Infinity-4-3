@@ -11,8 +11,9 @@ UPSTREAM_HASH = 'cf13009f3f8f5578a17ca4a45de051ea1315280037f01434c187ebc9d9e9135
 UPSTREAM_URL = 'https://github.com/PortsMaster-MV/PortMaster-MV-New/releases/download/2024-12-03_1532/zeldadoi.zip'
 
 PAYLOAD_FILES = ('install.py', 'controller.py', 'updater.py', 'manifest.json', 'patches/game.droid.bsdiff', 'README.md',
-                 'gameinfo.xml', 'Zelda Dungeons of Infinity 4-3.sh')
-INSTALLER_LAUNCHER = 'Install Zelda Dungeons of Infinity 4-3.sh'
+                 'gameinfo.xml', 'Zelda Dungeons of Infinity and Beyond.sh')
+INSTALLER_LAUNCHER = 'Install Zelda Dungeons of Infinity and Beyond.sh'
+PAYLOAD_DIR = 'zeldadoi-beyond-installer'
 
 
 def source(root, name):
@@ -32,7 +33,7 @@ def write_archive(root, output):
 
         add(INSTALLER_LAUNCHER, INSTALLER_LAUNCHER)
         for name in PAYLOAD_FILES:
-            add(name, 'zeldadoi-43-installer/' + name)
+            add(name, PAYLOAD_DIR + '/' + name)
 
 
 def validate_production(patched):
@@ -43,7 +44,7 @@ def validate_production(patched):
 def main():
     import bsdiff4
 
-    parser = argparse.ArgumentParser(description='Build a patch-only Nova installer release.')
+    parser = argparse.ArgumentParser(description='Build a patch-only installer release.')
     parser.add_argument('--original-game', type=Path, required=True)
     parser.add_argument('--patched-game', type=Path, required=True)
     parser.add_argument('--version', required=True)

@@ -32,7 +32,7 @@ def copy(host, control, source, destination):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Run instrumented game events in a disposable Nova installation.')
+    parser = argparse.ArgumentParser(description='Run instrumented game events in a disposable device installation.')
     parser.add_argument('host', help='SSH destination with key or existing control-socket authentication')
     parser.add_argument('--control-path', type=Path)
     parser.add_argument('--game', type=Path, default=ROOT / '.build/runtime-tests.droid')
@@ -48,8 +48,8 @@ def main():
     game_digest = hashlib.sha256(game_bytes).hexdigest()
     request = lambda command, data=None: remote(args.host, args.control_path, command, data)
     token = uuid.uuid4().hex[:12]
-    stage = f'/storage/.cache/doi43-harness-{token}'
-    launcher = f'{args.ports_dir}/DOI43 Harness {token}.sh'
+    stage = f'/storage/.cache/doi-harness-{token}'
+    launcher = f'{args.ports_dir}/DOI Harness {token}.sh'
     source = f'{args.ports_dir}/{GAME_DIR}'
     args.report_dir.mkdir(parents=True, exist_ok=True)
     report = None
@@ -76,7 +76,7 @@ text=LAUNCHER_TEXT
 service='python3 "$GAMEDIR/updater.py" serve --game-dir "$GAMEDIR" --parent "$$"'
 if text.count(service)!=1: raise RuntimeError('Updater service boundary missing.')
 text=text.replace(service, 'sleep 3600')
-anchor='GAMEDIR="/$directory/ports/zeldadoi-43"'
+anchor='GAMEDIR="/$directory/ports/zeldadoi-beyond"'
 if text.count(anchor)!=1: raise RuntimeError('Unrecognised launcher layout.')
 text=text.replace(anchor,'GAMEDIR='+repr(str(stage)))
 launcher.write_text(text)
@@ -127,6 +127,8 @@ print(urllib.request.urlopen(r,timeout=10).read().decode())
                             (args.report_dir / f'{capture}-sample{sample + 2}.png').write_bytes(request('cat ' + shlex.quote(path)))
                     captures.add(capture)
                     request('touch ' + shlex.quote(stage + '/harness-savedata/nova-capture-done.txt'))
+                    # Large screenshots over a slow link can outlast the fixed limit; each capture shows progress.
+                    deadline = max(deadline, time.monotonic() + 60)
             error = request(f'grep -A5 "ERROR in action" {shlex.quote(stage + "/log.txt")} 2>/dev/null || true')
             if error:
                 raise RuntimeError('Game runner failed: ' + error.decode(errors='replace'))

@@ -1,10 +1,26 @@
 # Changelog
 
-These versions identify the 4:3 patch, independently of the original game's version. Each entry describes changes since the preceding release.
+These versions identify the patch, independently of the original game's version. Versions before 2.0.0 were released as the 4:3 edition. Each entry describes changes since the preceding release.
 
 ## Unreleased
 
-## [1.8.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.8.0) - 2026-09-23
+The 4:3 edition becomes **Dungeons of Infinity and Beyond** and adapts to the screen it runs on.
+
+### Screens
+
+- The playfield keeps its 4:3 SNES shape on every display, with black borders where the screen is wider or taller. It no longer stretches on 16:9 screens.
+- On screens wide enough, such as 1920×1080, the equipment, minimap and dungeon panels dock beside the playfield at a whole-number scale, as in the original 16:9 game. Status starts open there, and the interaction and Status hints stay visible.
+- The title shows the full original 16:9 scene on wide screens. Menus extend the landscape to the screen edges and keep button hints in the corner.
+- The pause menu and Options stay over the playfield instead of stretching.
+- **Options > Display** adds **Square pixels** (8:7 playfield) and **Integer scaling** (whole-number pixel rows). Both apply to the whole device.
+
+### Name and installation
+
+- The project, launcher and install folder are renamed. The game installs to `zeldadoi-beyond` and appears in Ports as **Zelda Dungeons of Infinity and Beyond**.
+- The installer moves an existing `zeldadoi-43` installation, including saves and backups, to the new folder. It restores an interrupted 4:3 update first and removes the old launcher and installer. It stops if both folders exist.
+- In-game updates from 1.x cannot find this release. Install it manually once; later updates work in the game again.
+
+## [1.8.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/tag/v1.8.0) - 2026-09-23
 
 Every menu outside gameplay is rebuilt in one consistent style, with descriptions, clearer choices and safer confirmations.
 
@@ -22,8 +38,8 @@ Every menu outside gameplay is rebuilt in one consistent style, with description
 <th width="50%">v1.8.0</th>
 </tr>
 <tr>
-<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.3/screenshots/adventure-setup.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.3/screenshots/adventure-setup.png" alt="Old New adventure screen with a static sprite, Bonus None and Challenges Standard" width="640"></a></td>
-<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.8.0/docs/screenshots/adventure-setup.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.8.0/docs/screenshots/adventure-setup.png" alt="New adventure with a character preview, Wooden Shield bonus, the Second Quest preset with its level meter and icons, and Begin adventure" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.7.3/screenshots/adventure-setup.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.7.3/screenshots/adventure-setup.png" alt="Old New adventure screen with a static sprite, Bonus None and Challenges Standard" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.8.0/docs/screenshots/adventure-setup.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.8.0/docs/screenshots/adventure-setup.png" alt="New adventure with a character preview, Wooden Shield bonus, the Second Quest preset with its level meter and icons, and Begin adventure" width="640"></a></td>
 </tr>
 </table>
 
@@ -40,8 +56,8 @@ Every menu outside gameplay is rebuilt in one consistent style, with description
 <th width="50%">v1.8.0</th>
 </tr>
 <tr>
-<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.3/screenshots/pause.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.3/screenshots/pause.png" alt="Old grey pause menu with Resume Game, New Game, Options and two quit options" width="640"></a></td>
-<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.8.0/docs/screenshots/pause.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.8.0/docs/screenshots/pause.png" alt="New pause menu with a run summary, a divider above the destructive options and the Save Tent warning" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.7.3/screenshots/pause.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.7.3/screenshots/pause.png" alt="Old grey pause menu with Resume Game, New Game, Options and two quit options" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.8.0/docs/screenshots/pause.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.8.0/docs/screenshots/pause.png" alt="New pause menu with a run summary, a divider above the destructive options and the Save Tent warning" width="640"></a></td>
 </tr>
 </table>
 
@@ -55,8 +71,8 @@ Every menu outside gameplay is rebuilt in one consistent style, with description
 
 <table>
 <tr>
-<td width="50%"><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.8.0/docs/screenshots/options.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.8.0/docs/screenshots/options.png" alt="Options with Game, Display, Audio, Controls and About tabs, volume bars and a description line" width="640"></a></td>
-<td width="50%"><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.8.0/docs/screenshots/controls.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.8.0/docs/screenshots/controls.png" alt="Gamepad remapping grouped by Combat and World, with two changed actions marked and the default shown" width="640"></a></td>
+<td width="50%"><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.8.0/docs/screenshots/options.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.8.0/docs/screenshots/options.png" alt="Options with Game, Display, Audio, Controls and About tabs, volume bars and a description line" width="640"></a></td>
+<td width="50%"><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.8.0/docs/screenshots/controls.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.8.0/docs/screenshots/controls.png" alt="Gamepad remapping grouped by Combat and World, with two changed actions marked and the default shown" width="640"></a></td>
 </tr>
 </table>
 
@@ -66,7 +82,7 @@ Every menu outside gameplay is rebuilt in one consistent style, with description
 - Details replaces Manage. It shows the current run, lifetime records with the best time highlighted, and Play, Rename and Delete player.
 - Deleting a player opens a dialog that starts on Cancel and names the run it erases. Rename shows a letter counter; L erases a letter and R adds a space.
 
-<a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.8.0/docs/screenshots/players.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.8.0/docs/screenshots/players.png" alt="Players as cards with character, floor, play time, challenge level, hearts, wins and deaths, and a New player card" width="640"></a>
+<a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.8.0/docs/screenshots/players.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.8.0/docs/screenshots/players.png" alt="Players as cards with character, floor, play time, challenge level, hearts, wins and deaths, and a New player card" width="640"></a>
 
 ### Fixed
 
@@ -74,15 +90,15 @@ Every menu outside gameplay is rebuilt in one consistent style, with description
 
 Unedited Nova captures from test saves. Existing saves and remapped controls remain compatible.
 
-Validation: 39 unit tests and 1,704 device assertions passed. The [testing guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.8.0/docs/TESTING.md#nova-runtime-suite) records a separate, pre-existing native shutdown fault after test completion.
+Validation: 39 unit tests and 1,704 device assertions passed. The [testing guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/blob/v1.8.0/docs/TESTING.md#nova-runtime-suite) records a separate, pre-existing native shutdown fault after test completion.
 
 From v1.7.3, choose **Options > About > Updates** from the adventure menu. From v1.6.0 through v1.7.2, run the **Nova patch installer ZIP** under Assets once.
 
-For a fresh installation, follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.8.0/README.md#install-on-the-nova).
+For a fresh installation, follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/blob/v1.8.0/README.md#install-on-the-nova).
 
-[Changes from v1.7.3](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.7.3...v1.8.0).
+[Changes from v1.7.3](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/compare/v1.7.3...v1.8.0).
 
-## [1.7.3](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.7.3) - 2026-09-22
+## [1.7.3](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/tag/v1.7.3) - 2026-09-22
 
 In-game updates install again.
 
@@ -92,15 +108,15 @@ In-game updates install again.
 
 ### Updating from v1.6.0 through v1.7.2
 
-The update step uses the check from the installed version, so **Options > Updates** cannot install this release. Install it once with the **Nova patch installer ZIP** under Assets, following the [update instructions](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.7.3/README.md#install-on-the-nova). Later releases will install from the adventure menu. The game itself is unchanged from v1.7.2. Existing saves remain compatible.
+The update step uses the check from the installed version, so **Options > Updates** cannot install this release. Install it once with the **Nova patch installer ZIP** under Assets, following the [update instructions](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/blob/v1.7.3/README.md#install-on-the-nova). Later releases will install from the adventure menu. The game itself is unchanged from v1.7.2. Existing saves remain compatible.
 
 Validation: 39 unit tests passed. On the Nova, the update step installed a release while a controller helper with the game's arguments was running, and preserved saves.
 
-For a fresh installation, follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.7.3/README.md#install-on-the-nova).
+For a fresh installation, follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/blob/v1.7.3/README.md#install-on-the-nova).
 
-[Changes from v1.7.2](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.7.2...v1.7.3).
+[Changes from v1.7.2](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/compare/v1.7.2...v1.7.3).
 
-## [1.7.2](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.7.2) - 2026-09-21
+## [1.7.2](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/tag/v1.7.2) - 2026-09-21
 
 Menu hints now match the compact gameplay HUD.
 
@@ -118,22 +134,22 @@ Menu hints now match the compact gameplay HUD.
 <th width="50%">v1.7.2</th>
 </tr>
 <tr>
-<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.1/screenshots/inventory.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.1/screenshots/inventory.png" alt="Bag inventory with larger shoulder glyphs and action hints" width="640"></a></td>
-<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.2/screenshots/inventory.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.2/screenshots/inventory.png" alt="Bag inventory with compact shoulder glyphs and action hints at the gameplay HUD scale" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.7.1/screenshots/inventory.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.7.1/screenshots/inventory.png" alt="Bag inventory with larger shoulder glyphs and action hints" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.7.2/screenshots/inventory.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.7.2/screenshots/inventory.png" alt="Bag inventory with compact shoulder glyphs and action hints at the gameplay HUD scale" width="640"></a></td>
 </tr>
 </table>
 
 Unedited Nova captures from test saves. Existing saves remain compatible.
 
-Validation: 38 unit tests and 1,535 device assertions passed. The [testing guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.7.2/TESTING.md#nova-runtime-suite) records a separate, pre-existing native shutdown fault after test completion.
+Validation: 38 unit tests and 1,535 device assertions passed. The [testing guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/blob/v1.7.2/TESTING.md#nova-runtime-suite) records a separate, pre-existing native shutdown fault after test completion.
 
-Run the **Nova patch installer ZIP** under Assets. **Options > Updates** cannot install this release; [v1.7.3](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.7.3) fixes in-game updates.
+Run the **Nova patch installer ZIP** under Assets. **Options > Updates** cannot install this release; [v1.7.3](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/tag/v1.7.3) fixes in-game updates.
 
-For a fresh installation, follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.7.2/README.md#install-on-the-nova).
+For a fresh installation, follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/blob/v1.7.2/README.md#install-on-the-nova).
 
-[Changes from v1.7.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.7.1...v1.7.2).
+[Changes from v1.7.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/compare/v1.7.1...v1.7.2).
 
-## [1.7.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.7.1) - 2026-09-21
+## [1.7.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/tag/v1.7.1) - 2026-09-21
 
 More room for the dungeon, smoother interaction hints, and a CRT-Lottes effect tuned for the Nova.
 
@@ -155,8 +171,8 @@ More room for the dungeon, smoother interaction hints, and a CRT-Lottes effect t
 <th width="50%">CRT-Lottes</th>
 </tr>
 <tr>
-<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.1/screenshots/crt-before.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.1/screenshots/crt-before.png" alt="Previous CRT effect with prominent horizontal lines" width="640"></a></td>
-<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.1/screenshots/crt-after.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.1/screenshots/crt-after.png" alt="CRT-Lottes with a phosphor grille, soft bloom and a crisp HUD" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.7.1/screenshots/crt-before.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.7.1/screenshots/crt-before.png" alt="Previous CRT effect with prominent horizontal lines" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.7.1/screenshots/crt-after.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.7.1/screenshots/crt-after.png" alt="CRT-Lottes with a phosphor grille, soft bloom and a crisp HUD" width="640"></a></td>
 </tr>
 </table>
 
@@ -170,8 +186,8 @@ Both captures use the compact HUD to isolate the shader change. Open an image at
 <th width="50%">In the inventory</th>
 </tr>
 <tr>
-<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.1/screenshots/playfield.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.1/screenshots/playfield.png" alt="Compact HUD leaves more of the village visible, with CRT disabled" width="640"></a></td>
-<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.1/screenshots/inventory.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.1/screenshots/inventory.png" alt="Bag inventory beneath the compact HUD, with controller hints below the frame" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.7.1/screenshots/playfield.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.7.1/screenshots/playfield.png" alt="Compact HUD leaves more of the village visible, with CRT disabled" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.7.1/screenshots/inventory.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.7.1/screenshots/inventory.png" alt="Bag inventory beneath the compact HUD, with controller hints below the frame" width="640"></a></td>
 </tr>
 </table>
 
@@ -181,13 +197,13 @@ Unedited Nova screenshots from test saves.
 
 Choose **Options > Updates** from the adventure menu, or download the **Nova patch installer ZIP** under Assets. Existing saves remain compatible.
 
-For a fresh installation, follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.7.1/README.md#install-on-the-nova).
+For a fresh installation, follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/blob/v1.7.1/README.md#install-on-the-nova).
 
 Validation: 38 unit tests and 1,498 device assertions passed. The Nova test scene ran at 60 fps with CRT both enabled and disabled.
 
-[Changes from v1.7.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.7.0...v1.7.1).
+[Changes from v1.7.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/compare/v1.7.0...v1.7.1).
 
-## [1.7.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.7.0) - 2026-09-21
+## [1.7.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/tag/v1.7.0) - 2026-09-21
 
 Take a break on floor 6: the village arcade has a claw machine, and the pub has Mothula's Money.
 
@@ -210,8 +226,8 @@ Reach the village after the sewers on **floor 5**. Enter the arcade and inspect 
 <th width="50%">Pub: Mothula's Money</th>
 </tr>
 <tr>
-<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.0/screenshots/village-claw.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.0/screenshots/village-claw.png" alt="Link playing the original claw cabinet, with Grab A and Close B hints" width="640"></a></td>
-<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.0/screenshots/village-slots.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.0/screenshots/village-slots.png" alt="Mothula's Money with three reels, payout symbols, balance, bet and controller hints" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.7.0/screenshots/village-claw.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.7.0/screenshots/village-claw.png" alt="Link playing the original claw cabinet, with Grab A and Close B hints" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.7.0/screenshots/village-slots.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.7.0/screenshots/village-slots.png" alt="Mothula's Money with three reels, payout symbols, balance, bet and controller hints" width="640"></a></td>
 </tr>
 </table>
 
@@ -223,13 +239,13 @@ If you already installed v1.7.0, rerun the replacement patch installer ZIP under
 
 From an earlier version, choose **Options > Updates** from the adventure menu or run the installer.
 
-For a fresh installation, follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.7.0/README.md#install-on-the-nova).
+For a fresh installation, follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/blob/v1.7.0/README.md#install-on-the-nova).
 
 Validation includes 38 unit tests, 1,349 device assertions, both buildings' entry and exit paths, and physical playtesting on the Nova.
 
-[Changes from v1.6.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.6.1...v1.7.0).
+[Changes from v1.6.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/compare/v1.6.1...v1.7.0).
 
-## [1.6.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.6.1) - 2026-09-20
+## [1.6.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/tag/v1.6.1) - 2026-09-20
 
 Continue your adventure in one press, with a simpler start menu and clearer controls throughout the game.
 
@@ -252,8 +268,8 @@ Continue your adventure in one press, with a simpler start menu and clearer cont
 <table>
 <tr><th width="50%">Before · v1.6.0</th> <th width="50%">After · v1.6.1</th></tr>
 <tr>
-<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.6.0/screenshots/profile.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.6.0/screenshots/profile.png" alt="Player Select in v1.6.0, with five save slots and Updates" width="640"></a></td>
-<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.6.1/screenshots/profile.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.6.1/screenshots/profile.png" alt="Adventure menu in v1.6.1, with LINK and Floor 5 beneath Continue" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.6.0/screenshots/profile.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.6.0/screenshots/profile.png" alt="Player Select in v1.6.0, with five save slots and Updates" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.6.1/screenshots/profile.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.6.1/screenshots/profile.png" alt="Adventure menu in v1.6.1, with LINK and Floor 5 beneath Continue" width="640"></a></td>
 </tr>
 </table>
 
@@ -262,8 +278,8 @@ Continue your adventure in one press, with a simpler start menu and clearer cont
 <table>
 <tr><th width="50%">Before · v1.6.0</th> <th width="50%">After · v1.6.1</th></tr>
 <tr>
-<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.6.0/screenshots/inventory.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.6.0/screenshots/inventory.png" alt="Inventory in v1.6.0, with colored button hints inside the frame" width="640"></a></td>
-<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.6.1/screenshots/inventory.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.6.1/screenshots/inventory.png" alt="Inventory in v1.6.1, with Switch 2 hints below the frame and L/R beside the heading" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.6.0/screenshots/inventory.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.6.0/screenshots/inventory.png" alt="Inventory in v1.6.0, with colored button hints inside the frame" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.6.1/screenshots/inventory.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.6.1/screenshots/inventory.png" alt="Inventory in v1.6.1, with Switch 2 hints below the frame and L/R beside the heading" width="640"></a></td>
 </tr>
 </table>
 
@@ -272,8 +288,8 @@ Continue your adventure in one press, with a simpler start menu and clearer cont
 <table>
 <tr><th width="50%">Before · v1.6.0</th> <th width="50%">After · v1.6.1</th></tr>
 <tr>
-<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.6.0/screenshots/playfield.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.6.0/screenshots/playfield.png" alt="Gameplay in v1.6.0, with only a Status hint" width="640"></a></td>
-<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.6.1/screenshots/interaction.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.6.1/screenshots/interaction.png" alt="Gameplay in v1.6.1, with Talk and its mapped A button beside Status" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.6.0/screenshots/playfield.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.6.0/screenshots/playfield.png" alt="Gameplay in v1.6.0, with only a Status hint" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.6.1/screenshots/interaction.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v1.6.1/screenshots/interaction.png" alt="Gameplay in v1.6.1, with Talk and its mapped A button beside Status" width="640"></a></td>
 </tr>
 </table>
 
@@ -283,11 +299,11 @@ Screenshots are unedited captures from a Nova, using test saves. Select an image
 
 On v1.6.0, open **Updates** from Player Select. After this update, it lives under **Options > Updates**. The installer preserves saves and migration backups.
 
-For a fresh installation or an older version, use the patch installer ZIP under Assets and follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.6.1/README.md#install-on-the-nova).
+For a fresh installation or an older version, use the patch installer ZIP under Assets and follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/blob/v1.6.1/README.md#install-on-the-nova).
 
-[Changes from v1.6.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.6.0...v1.6.1).
+[Changes from v1.6.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/compare/v1.6.0...v1.6.1).
 
-## [1.6.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.6.0) - 2026-09-20
+## [1.6.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/tag/v1.6.0) - 2026-09-20
 
 ### Added
 
@@ -299,11 +315,11 @@ For a fresh installation or an older version, use the patch installer ZIP under 
 - Rework Player Select around a spacious Zelda-style frame, original character sprites, and saved hearts and floor. Keep all five profiles visible, with Updates and Exit below them and button hints clear of the frame.
 - Give Updates the same frame position, title panel, and button-hint row as Player Select. Show more release notes per page.
 
-The installer preserves existing saves and migration backups. Install this release once to get the in-game updater. Follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.6.0/README.md#install-on-the-nova).
+The installer preserves existing saves and migration backups. Install this release once to get the in-game updater. Follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/blob/v1.6.0/README.md#install-on-the-nova).
 
-[Changes from v1.5.3](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.5.3...v1.6.0).
+[Changes from v1.5.3](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/compare/v1.5.3...v1.6.0).
 
-## [1.5.3](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.5.3) - 2026-09-20
+## [1.5.3](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/tag/v1.5.3) - 2026-09-20
 
 ### Fixed
 
@@ -315,11 +331,11 @@ The installer preserves existing saves and migration backups. Install this relea
 - Restore B for the sword and A for interactions on the Nova by correcting PortMaster's A/B translation. Menus use A to confirm and B to close, with matching glyphs and Controls labels.
 - Close shop dialogs with B or Escape without buying or consuming a coupon. Consume the opening press so it cannot also act inside the dialog.
 
-The installer preserves existing saves and migration backups. Follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.5.3/README.md#install-on-the-nova) to update.
+The installer preserves existing saves and migration backups. Follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/blob/v1.5.3/README.md#install-on-the-nova) to update.
 
-[Changes from v1.5.2](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.5.2...v1.5.3).
+[Changes from v1.5.2](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/compare/v1.5.2...v1.5.3).
 
-## [1.5.2](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.5.2) - 2026-09-19
+## [1.5.2](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/tag/v1.5.2) - 2026-09-19
 
 ### Changed
 
@@ -337,19 +353,19 @@ The installer preserves existing saves and migration backups. Follow the [instal
 - Keep all remapping rows inside the Controls window, including keyboard directions and the two bag controls.
 - Split large migrated inventories across additional overflow pages so every retained item remains reachable in the compact layout.
 
-The installer preserves existing saves and migration backups. Follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.5.2/README.md#install-on-the-nova) to update.
+The installer preserves existing saves and migration backups. Follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/blob/v1.5.2/README.md#install-on-the-nova) to update.
 
-[Changes from v1.5.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.5.1...v1.5.2).
+[Changes from v1.5.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/compare/v1.5.1...v1.5.2).
 
-## [1.5.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.5.1) - 2026-09-19
+## [1.5.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/tag/v1.5.1) - 2026-09-19
 
 ### Changed
 
 - Rename the right-stick hint from PANELS to STATUS to describe the equipment, stats, map, and dungeon progress it reveals.
 
-[Changes from v1.5.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.5.0...v1.5.1).
+[Changes from v1.5.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/compare/v1.5.0...v1.5.1).
 
-## [1.5.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.5.0) - 2026-09-19
+## [1.5.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/tag/v1.5.0) - 2026-09-19
 
 ### Added
 
@@ -363,13 +379,13 @@ The installer preserves existing saves and migration backups. Follow the [instal
 - Rod capacities to the recovered values: 20, 16, 16, 16, 12, and 12 charges. Existing rods retain excess charges until spent.
 - The installer creates `save-backups/before-content-v3.zip` before this content upgrade. Existing saves and earlier backups remain intact.
 
-This remains a 1.1.6 backport. Arcade games, the new prisoner, seasonal decorations, and character customization remain unported. See the [backport audit](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.5.0/BACKPORTS.md) for adaptations and coverage.
+This remains a 1.1.6 backport. Arcade games, the new prisoner, seasonal decorations, and character customization remain unported. See the [backport audit](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/blob/v1.5.0/BACKPORTS.md) for adaptations and coverage.
 
-Follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.5.0/README.md#install-on-the-nova) to install or update.
+Follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/blob/v1.5.0/README.md#install-on-the-nova) to install or update.
 
-[Changes from v1.4.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.4.1...v1.5.0).
+[Changes from v1.4.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/compare/v1.4.1...v1.5.0).
 
-## [1.4.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.4.1) - 2026-09-19
+## [1.4.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/tag/v1.4.1) - 2026-09-19
 
 ### Fixed
 
@@ -380,9 +396,9 @@ Follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-
 
 Updates from v1.4.0 migrate candle ownership automatically. Regression tests cover dropping, pickup, lighting, and save/load.
 
-[Changes from v1.4.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.4.0...v1.4.1).
+[Changes from v1.4.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/compare/v1.4.0...v1.4.1).
 
-## [1.4.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.4.0) - 2026-09-19
+## [1.4.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/tag/v1.4.0) - 2026-09-19
 
 ### Added
 
@@ -400,14 +416,14 @@ Updates from v1.4.0 migrate candle ownership automatically. Regression tests cov
 
 ### Changed
 
-- Rod boss damage and charge limits, and fairy-orb contents. Some values in this release are patch adaptations, documented in the [audit](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.4.0/BACKPORTS.md).
+- Rod boss damage and charge limits, and fairy-orb contents. Some values in this release are patch adaptations, documented in the [audit](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/blob/v1.4.0/BACKPORTS.md).
 - Existing inventory migrates into the new compartments. Excess items stay accessible on an overflow page.
 
 The installer creates `save-backups/before-inventory-v1.zip` before migration. Keep it to restore saves when returning to an earlier inventory format.
 
-[Changes from v1.3.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.3.0...v1.4.0).
+[Changes from v1.3.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/compare/v1.3.0...v1.4.0).
 
-## [1.3.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.3.0) - 2026-09-19
+## [1.3.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/tag/v1.3.0) - 2026-09-19
 
 ### Added
 
@@ -420,9 +436,9 @@ The installer creates `save-backups/before-inventory-v1.zip` before migration. K
 - Medusas and cannons firing while frozen, stoned, or paused. Attacks resume after the status ends.
 - Pikits stealing items while Link falls into a pit or over an edge.
 
-[Changes from v1.2.2](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.2.2...v1.3.0).
+[Changes from v1.2.2](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/compare/v1.2.2...v1.3.0).
 
-## [1.2.2](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.2.2) - 2026-09-19
+## [1.2.2](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/tag/v1.2.2) - 2026-09-19
 
 ### Fixed
 
@@ -430,17 +446,17 @@ The installer creates `save-backups/before-inventory-v1.zip` before migration. K
 - Magic-meter proportions and stepped caps, while retaining four-digit rupees and the separate key counter.
 - The unreadable right-stick hint. It uses the icon pack's explicit R3 glyph at screen resolution, including with CRT enabled.
 
-[Changes from v1.2.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.2.1...v1.2.2).
+[Changes from v1.2.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/compare/v1.2.1...v1.2.2).
 
-## [1.2.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.2.1) - 2026-09-19
+## [1.2.1](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/tag/v1.2.1) - 2026-09-19
 
 ### Added
 
 - A bottom-right stick-click hint labelled PANELS while the side panels are hidden. Opening panels or menus hides the hint.
 
-[Changes from v1.2.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.2.0...v1.2.1).
+[Changes from v1.2.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/compare/v1.2.0...v1.2.1).
 
-## [1.2.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.2.0) - 2026-09-19
+## [1.2.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/tag/v1.2.0) - 2026-09-19
 
 ### Added
 
@@ -452,9 +468,9 @@ The installer creates `save-backups/before-inventory-v1.zip` before migration. K
 - Smaller side panels below the HUD, containing equipment, attack/defence, the minimap, and dungeon progress. The panels omit duplicate metrics.
 - Menus and dialogue hide both HUD layers. The CRT effect includes the HUD.
 
-[Changes from v1.1.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.1.0...v1.2.0).
+[Changes from v1.1.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/compare/v1.1.0...v1.2.0).
 
-## [1.1.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.1.0) - 2026-09-19
+## [1.1.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/tag/v1.1.0) - 2026-09-19
 
 ### Fixed
 
@@ -465,10 +481,10 @@ The installer creates `save-backups/before-inventory-v1.zip` before migration. K
 
 - Distribution to a patch-only installer. It downloads the official PortMaster package, verifies checksums, and applies the patch locally.
 
-[Changes from v1.0.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.0.0...v1.1.0).
+[Changes from v1.0.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/compare/v1.0.0...v1.1.0).
 
-## [1.0.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.0.0) - 2026-09-19
+## [1.0.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/tag/v1.0.0) - 2026-09-19
 
 Initial Nova 4:3 gameplay layout, hidden-by-default overlay panels, right-stick toggle, CRT composition, and Select + Start exit.
 
-The original bundled download was withdrawn. Use the [latest patch-only installer](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/latest).
+The original bundled download was withdrawn. Use the [latest patch-only installer](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/latest).

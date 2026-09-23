@@ -127,7 +127,7 @@ global.NovaPauseDraw = function(pause, selector) {
     draw_set_valign(fa_top);
 };
 // Pause and its Options render at the adventure menu's 4x canvas, then scale like that menu.
-global.NovaPauseOverlay = function(pause, width, height) {
+global.NovaPauseOverlay = function(pause, width, height, left = 0, top = 0) {
     if (!surface_exists(global.NovaOptionsSurface)) global.NovaOptionsSurface = surface_create(1600, 1200);
     surface_set_target(global.NovaOptionsSurface);
     draw_clear_alpha(c_black, 0);
@@ -143,8 +143,8 @@ global.NovaPauseOverlay = function(pause, width, height) {
     surface_reset_target();
     draw_set_color(c_black);
     draw_set_alpha(0.35 * pause.Alpha);
-    draw_rectangle(0, 0, width, height, false);
+    draw_rectangle(left, top, left + width, top + height, false);
     draw_set_color(c_white);
-    draw_surface_stretched_ext(global.NovaOptionsSurface, 0, 0, width, height, c_white, pause.Alpha);
+    draw_surface_stretched_ext(global.NovaOptionsSurface, left, top, width, height, c_white, pause.Alpha);
     draw_set_alpha(1);
 };

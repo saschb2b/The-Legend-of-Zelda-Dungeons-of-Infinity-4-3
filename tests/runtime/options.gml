@@ -54,6 +54,18 @@ function OptionsMenuTests() {
     Record("CRT changes immediately for this player", global.Users[0].Prefs[3]);
     OptionsPress("down");
     OptionsPress("right");
+    Record("square pixels are stored for the device", global.NovaSquarePixels && OptionsIni("Display", "SquarePixels") == 1
+        && global.NovaHUDLayout(1920, 1080).world_width == round(1080 * 8 / 7));
+    OptionsPress("left");
+    Record("square pixels turn off again", !global.NovaSquarePixels && OptionsIni("Display", "SquarePixels") == 0);
+    OptionsPress("down");
+    OptionsPress("right");
+    Record("integer scaling is stored for the device", global.NovaIntegerScale && OptionsIni("Display", "IntegerScale") == 1
+        && global.NovaHUDLayout(1920, 1080).world_height == 896);
+    OptionsPress("left");
+    Record("integer scaling turns off again", !global.NovaIntegerScale && OptionsIni("Display", "IntegerScale") == 0);
+    OptionsPress("down");
+    OptionsPress("right");
     Record("blood setting is stored for the device", !global.Gore && OptionsIni("Preferences", "Gore") == 0);
 
     OptionsOpenTab("Audio", 0);

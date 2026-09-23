@@ -6,7 +6,7 @@ Testing has three layers. Each catches a different failure:
 | --- | --- | --- |
 | Unit and installer integration | Python, no downloads | Controller mapping, BSDIFF decoding, checksum failures, interrupted downloads, save preservation, repeated installation, archive traversal, release contents, compiler failure detection, inventory-save backup, runner binary format |
 | Clean build | Linux x86-64 | Pinned upstream and compiler hashes, exact patch anchors, GML compilation, compiled room and code invariants, production/test separation, release delta equality, installation of the real package |
-| Runtime regression | Nova with ROCKNIX | Real GameMaker menus, combat, inventory migration, Topaz and challenge save/load, gem recipes, challenge limits, Wallmaster attacks, dungeon templates, and enemy status events |
+| Runtime regression | ROCKNIX device (Nova, Flip 2) | Real GameMaker menus, combat, inventory migration, Topaz and challenge save/load, gem recipes, challenge limits, Wallmaster attacks, dungeon templates, and enemy status events |
 
 ## Local and CI checks
 
@@ -26,7 +26,7 @@ The compiler can exit successfully after a script exception. The build requires 
 
 `--check-release` requires the checked-in delta to reconstruct exactly the bytes from the clean source build. Branch and pull-request CI builds source and the runtime harness. Version-tag CI also checks the release delta and installer. Before publishing a tag, run `python3 build.py --check-release --runtime-tests` locally. CI uploads only `.build/build-report.json`. It never uploads full games, runtimes, saves, or instrumented builds.
 
-## Nova runtime suite
+## Device runtime suite
 
 CRT checks compile the shader on the device and render black, gray, impulse and edge patterns. They check brightness, neutral grays, bloom, full-frame coverage, native-pixel sampling, stable phosphors, fallback behavior and restored graphics state. The report includes average and 95th-percentile frame times for 120 gameplay frames with CRT disabled and enabled, after a warm-up. Existing HUD checks run with both settings.
 
@@ -39,7 +39,7 @@ python3 tests/run_device.py root@your-device.local
 
 Optional arguments include `--control-path /path/to/socket`, `--ports-dir /storage/roms/ports`, and `--report-dir .build/device-results`. Add `--capture` to save screenshots of all seven inventory categories, item actions and information, keyboard prompts, CRT mode, a second overflow page, curse text, the map footer, the pause menu with a cursed run, its quit dialog, and pause Options over the CRT after the assertions. Status captures cover the default binding, CRT mode, a remapped button, and keyboard input. Review the screenshots for clipping, HUD overlap, and incomplete frames. Screenshot comparisons are manual.
 
-The runner creates a disposable game directory under `/storage/.cache/`, with fresh saves, and a temporary Ports launcher. It launches through EmulationStation and runs the suite automatically. It writes the JSON assertion report and game log locally, removes the disposable installation, and compares production save hashes. It never switches the production game to a test build. If SSH disconnects before cleanup, remove the reported `doi43-harness-*` directory and matching `DOI43 Harness *.sh` launcher after closing the test game.
+The runner creates a disposable game directory under `/storage/.cache/`, with fresh saves, and a temporary Ports launcher. It launches through EmulationStation and runs the suite automatically. It writes the JSON assertion report and game log locally, removes the disposable installation, and compares production save hashes. It never switches the production game to a test build. If SSH disconnects before cleanup, remove the reported `doi-harness-*` directory and matching `DOI Harness *.sh` launcher after closing the test game.
 
 Inspect `game.log` even when every assertion passes. Some runs log a native `gmloadernext` segmentation fault after `###game_end###0`, including builds before v1.7.2. Allowing five seconds before cleanup did not prevent it. The JSON result verifies the assertions, but does not establish clean native shutdown. This remains unresolved and is separate from the village fixture's enemy-reset crash.
 
@@ -53,7 +53,7 @@ Facing tests cover every starting direction against eight movement directions an
 
 HUD tests call the compiled renderer with room-scroll, doorway-exit, door-closing, and stair states. They cover all four scroll directions, CRT on and off, and returning control to the player. Draw counters check HUD and Status-hint visibility. A pixel sample checks that the magic meter stays at its screen position while camera coordinates change. Pause-menu, map, dialogue, inventory, and unrelated-pause cases check visibility outside travel. These fixtures test the renderer's response to transition states, not an entire doorway crossing.
 
-HUD scaling tests render four-digit rupees, full magic and twenty hearts at eight resolutions from 256×224 to 1920×1440. They compare individual output pixel blocks with the native HUD surface, check integer positions and equal side margins, and verify separation between counters and hearts. Inventory tests check the shared footer baseline and scale, keyboard fit at four resolutions, and fixed shoulder glyphs beside every page heading. The build checks that gameplay prompts receive the HUD layout and that the HUD pass follows world scaling and restores texture filtering. Use `--capture` to inspect full inventories, maximum counters and CRT rendering on the device.
+HUD scaling tests render four-digit rupees, full magic and twenty hearts at eight resolutions from 256×224 to 1920×1440. They compare individual output pixel blocks with the native HUD surface, check integer positions and equal side margins, and verify separation between counters and hearts. Each layout must keep a centered 4:3 playfield with the HUD inside it. Screen-shape cases cover 16:9 and 720p pillarboxing with docked panels, 4:3 and 3:2 without docking, 1:1 letterboxing, square pixels, and integer scaling with both pixel shapes. Inventory tests check the shared footer baseline and scale, keyboard fit at four resolutions, and fixed shoulder glyphs beside every page heading. The build checks that gameplay prompts receive the HUD layout and that the HUD pass follows world scaling and restores texture filtering. Use `--capture` to inspect full inventories, maximum counters and CRT rendering on the device. Its last capture, `status-panels`, opens Status: docked beside the playfield on wide screens, over it on 4:3. The build checks that the compositor draws the playfield, CRT pass and pause overlay into the layout's playfield rectangle and that start screens size their views from the window.
 
 Shop tests use an actual merchant, item, and purchase script with keyboard and controller profiles. They check closing from every choice, item information, and insufficient-funds messages, including simultaneous confirm and close presses. Closing must preserve goods, rupees, and coupons. Confirming Buy must charge once and start receiving the item. The opening interaction must not also submit or close the dialog.
 
@@ -81,7 +81,7 @@ Options tests drive the adventure-menu screen through tab wrapping, remembered r
 
 Use `--capture-profiles` for the adventure menu, setup, challenges, players, Options tabs, the defaults dialog, player cards, Details, Rename, the delete dialog, gamepad and keyboard remapping pages, a remap in progress and Credits, or `--capture-updates` for the updater. `--capture` includes both. Menu captures include three consecutive samples because remote captures can omit parts of a frame. Inspect the two-row heart display, selected cursor, and footer spacing on the device.
 
-The updater downloads and verifies the installer and upstream package while the game runs. After the game exits, it installs into a separate directory. A recovery journal protects the directory switch and launcher replacement. The launcher restores an interrupted transaction before starting the game. Diagnostics are in `zeldadoi-43/update.log`.
+The updater downloads and verifies the installer and upstream package while the game runs. After the game exits, it installs into a separate directory. A recovery journal protects the directory switch and launcher replacement. The launcher restores an interrupted transaction before starting the game. Diagnostics are in `zeldadoi-beyond/update.log`.
 
 To show that the assertions catch the original regressions:
 
@@ -93,7 +93,7 @@ python3 tests/run_device.py root@your-device.local \
 
 The baseline contains the unpatched 1.1.6 game with the same instrumentation. That command must fail on the behaviors the patch adds. Review each named failure. Some original bugs terminate the runner before the report can complete. Retain the partial assertion report and the named error in `game.log`. A launch error does not prove regression coverage.
 
-GitHub-hosted CI compiles the runtime suite but cannot execute the Nova's ARM/GPU runtime. Before releasing, run the suite on a device. Also check the physical confirm/cancel buttons, title animation, remapped Status toggling, shoulder paging, item actions and information, pause layout, CRT mode, and Select + Start. Verify that the glyph matches the button that actually triggers each action. Inspect all three challenge pages, including the longest values and returning to the start menu. Runtime assertions measure the text columns and window bounds, but screenshots still need review. Injected input does not verify physical controller mapping, rendering quality, audio, or an entire generated dungeon run.
+GitHub-hosted CI compiles the runtime suite but cannot execute the device's ARM/GPU runtime. Before releasing, run the suite on a device. Also check the physical confirm/cancel buttons, title animation, remapped Status toggling, shoulder paging, item actions and information, pause layout, CRT mode, and Select + Start. Verify that the glyph matches the button that actually triggers each action. Inspect all three challenge pages, including the longest values and returning to the start menu. Runtime assertions measure the text columns and window bounds, but screenshots still need review. Injected input does not verify physical controller mapping, rendering quality, audio, or an entire generated dungeon run.
 
 For inventory prompts, compare empty slots, equipment, usable items, action lists, and item information. Close must retain its position throughout. Shoulder hints must stay fixed across all page titles, including both overflow pages. Check remapped buttons and keyboard keycaps for overlap. This follows [XAG 112's guidance on consistent prompt locations and order](https://learn.microsoft.com/en-us/xbox/accessibility/xbox-accessibility-guidelines/112). The specific Equip / Close / primary-action row is a design choice for this compact layout.
 
@@ -114,7 +114,7 @@ The test starts outside the village arcade with 500 rupees and normal physical c
 
 The slot rendering checks compare pixels before the CRT pass: title font and baseline, Bet/Spin buttons, payout suffixes, payline markers and reel-strip wrapping. They also require the CRT shader to compile on the device and produce a dark border with filtered interior pixels. Compare the final capture with the original 1.2.1 screen; a passing economy test does not establish visual parity.
 
-Each launch starts a fresh village adventure in an isolated save directory. The script checks production save and backup hashes, disables the updater worker, and records the test paths in `.build/village-preview.json`. After closing the test, remove its `DOI Village Test.sh` launcher and the recorded `doi43-village-*` directory. The build and release packager reject the preview object in production binaries.
+Each launch starts a fresh village adventure in an isolated save directory. The script checks production save and backup hashes, disables the updater worker, and records the test paths in `.build/village-preview.json`. After closing the test, remove its `DOI Village Test.sh` launcher and the recorded `doi-village-*` directory. The build and release packager reject the preview object in production binaries.
 
 ## Versioning and release cadence
 
@@ -139,7 +139,7 @@ Use the title `vX.Y.Z: Short description` and copy that version's changelog sect
 ## Release procedure
 
 1. Review the Unreleased changes, choose the increment using the policy above, and run unit tests and `python3 build.py --runtime-tests`.
-2. Run the Nova suite and inspect any failures. Complete the physical-control and visual checks above.
+2. Run the device suite on a 4:3 device (Nova) and a 16:9 device (Flip 2) and inspect any failures. Complete the physical-control and visual checks above.
 3. Create the delta and patch-only installer with an unused version and output filename:
 
    ```sh
@@ -150,7 +150,7 @@ Use the title `vX.Y.Z: Short description` and copy that version's changelog sect
      --original-game .build/game.droid \
      --patched-game .build/patched.droid \
      --version "$release_version" \
-     --output "dist/Dungeons-of-Infinity-4-3-v${release_version}-Nova-Patch-Installer.zip"
+     --output "dist/Dungeons-of-Infinity-and-Beyond-v${release_version}-Patch-Installer.zip"
    python3 build.py --check-release --runtime-tests
    ```
 

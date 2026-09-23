@@ -9,8 +9,11 @@ string Code(string name) {
     var code = GetDecompiledText(name, null, new Underanalyzer.Decompiler.DecompileSettings());
     return Regex.Replace(code, @"UnknownEnum\.Value_(\d+)", "$1");
 }
-Check(Data.Rooms.ByName("Room_Title").Views[0].ViewWidth == 300, "Title must use the 4:3 view");
+// Rooms keep their 4:3 defaults; oNovaScreen widens the views to the display at runtime.
+Check(Data.Rooms.ByName("Room_Title").Views[0].ViewWidth == 300, "Title must default to the 4:3 view");
 Check(Data.Rooms.ByName("Room_Menu").Views[0].ViewHeight == 300, "Menus must fit vertically");
+var screen = Code("gml_Object_oNovaScreen_Create_0");
+Check(screen.Contains("camera_set_view_size(view_camera[0]") && screen.Contains("global.NovaMenuInset") && screen.Contains("window_get_width()"), "Start screens must follow the display shape");
 var buttons = Data.Sprites.ByName("sNovaButtons");
 Check(buttons.Width == 128 && buttons.Height == 128 && buttons.Textures.Count == 24, "Controller glyph frames missing or resized");
 Check(Data.Sprites.ByName("sItem_Gem").Textures.Count == 10, "Topaz texture missing");
@@ -46,6 +49,8 @@ Check(crtPosition >= 0 && crtPosition < compositor.IndexOf("NovaHUD_Draw(_nova_l
 Check(compositor.IndexOf("draw_surface_stretched(NovaFrame") < compositor.IndexOf("NovaHUD_Draw(_nova_layout)"), "HUD must be composed after world scaling");
 Check(compositor.Contains("gpu_set_texfilter(false)") && compositor.Contains("gpu_set_texfilter(_nova_filter)"), "HUD must use nearest-neighbor scaling and restore filtering");
 Check(!Regex.IsMatch(compositor, @"_nova_[wh] / (256|224)"), "Compositor prompts must use the HUD layout, not the world scale");
+Check(compositor.Contains("NovaCRT_Draw(NovaFrame, _nova_ww, _nova_wh, _nova_wx, _nova_wy)") && compositor.Contains("draw_surface_stretched(NovaFrame, _nova_wx, _nova_wy, _nova_ww, _nova_wh)"), "The playfield must keep its shape inside the screen");
+Check(compositor.Contains("global.NovaPauseOverlay(oMenu_Game, _nova_ww, _nova_wh, _nova_wx, _nova_wy)"), "Pause must stay over the playfield");
 foreach (var caller in new[] { "global.NovaInventoryPrompts(oInventory, _nova_layout)", "global.NovaArcadePrompts(_nova_layout)" })
     Check(compositor.Contains(caller), "Prompt layer must receive the HUD layout: " + caller);
 foreach (var name in new[] { "gml_GlobalScript___Input", "gml_GlobalScript___Arcade" })

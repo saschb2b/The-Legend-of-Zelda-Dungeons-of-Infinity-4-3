@@ -89,7 +89,7 @@ function ControlTests() {
         ui.NovaPage = page;
         var pager = global.NovaInventoryPager(ui, layout);
         var half_title = string_width(global.NovaInventoryHeading(ui)) * layout.world_x / 2;
-        var center = (ui.X - oCamera.X + ui.W / 2) * layout.world_x;
+        var center = layout.world_left + (ui.X - oCamera.X + ui.W / 2) * layout.world_x;
         var clearance = 8 * layout.world_x;
         Record("page " + string(page) + " keeps both shoulder hints fixed", pager[0].x == pager_before[0].x && pager[1].x == pager_before[1].x && pager[0].y == pager_before[0].y && pager[1].y == pager_before[1].y);
         Record("page " + string(page) + " title fits between shoulder hints", pager[0].x + pager[0].width + clearance <= center - half_title && center + half_title + clearance <= pager[1].x);
@@ -181,7 +181,7 @@ function ControlTests() {
     for (var i = 0; i < 3; i++) {
         var prompt = footer_unbound[i];
         Record("hint label precedes glyph " + string(i), prompt.icon_x >= prompt.x + string_width(prompt.label) * prompt.scale_x);
-        Record("footer clears inventory and curse text " + string(i), prompt.y - prompt.size / 2 > (ui.Y - oCamera.Y + ui.H + 23) * layout.world_y);
+        Record("footer clears inventory and curse text " + string(i), prompt.y - prompt.size / 2 > layout.world_top + (ui.Y - oCamera.Y + ui.H + 23) * layout.world_y);
         if (i < 2) Record("unbound prompt spacing " + string(i), prompt.right < footer_unbound[i + 1].x);
     }
     input_profile_import(keyboard_before, "keyboard");

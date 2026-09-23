@@ -1,43 +1,50 @@
-# Dungeons of Infinity: 4:3 edition
+# Dungeons of Infinity and Beyond
 
-**The full dungeon on your Retroid Nova.**
+**The full dungeon on your handheld, whatever its screen.**
 
-Play Dungeons of Infinity fullscreen on ROCKNIX, with a classic Zelda HUD and a layout made for the Nova's 4:3 display. Keep health, magic, your active item, and supplies in view. Click the right stick when you need equipment, the map, or dungeon progress.
+Play Dungeons of Infinity fullscreen on ROCKNIX, with a classic Zelda HUD and a layout that adapts to 4:3, 16:9 and other displays. Keep health, magic, your active item, and supplies in view. On wide screens, equipment, the map and dungeon progress sit beside the playfield. On 4:3 screens, click the right stick to show them.
 
-[**Download the installer**](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/latest) · [Installation](#install-on-the-nova) · [Controls](#controls) · [What's changed](CHANGELOG.md)
+This project was the 4:3 edition for the Retroid Nova until version 2.0.0.
+
+[**Download the installer**](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/latest) · [Installation](#install) · [Controls](#controls) · [What's changed](CHANGELOG.md)
 
 ![Dungeons of Infinity on the Nova, with the classic HUD and Status button hint](docs/screenshots/playfield.png)
 
-- The complete playfield fills the display. Title screens and menus fit too.
-- Health and supplies stay visible while status panels open over the game.
+![Dungeons of Infinity on a 16:9 Retroid Pocket Flip 2, with equipment, pendants and crystals left of the playfield and the minimap and floor progress to its right](docs/screenshots/widescreen.png)
+
+- The complete playfield keeps its SNES shape on any screen. The title and menus widen to fill 16:9 displays.
+- Health and supplies stay visible. Status panels dock beside the playfield where they fit and open over it where they don't.
+- Options for square pixels and integer scaling.
 - Selected updates from the newer game include inventory bags, sword poke and spin, Topaz, adjustable challenges, and Wallmaster mode.
 - Visit the village arcade for the claw machine, or play Mothula's Money in the pub.
 
-## Install on the Nova
+## Install
 
-You need ROCKNIX, PortMaster, Wi-Fi, and about 300 MiB of free space.
+You need ROCKNIX, PortMaster, Wi-Fi, and about 300 MiB of free space. The patch is tested on the Retroid Nova (4:3) and Retroid Pocket Flip 2 (16:9).
 
-1. Download the **Nova patch installer ZIP** from the [latest release](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/latest).
+1. Download the **patch installer ZIP** from the [latest release](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/latest).
 2. Extract the ZIP and copy both items into `/storage/roms/ports/`:
 
    ```text
    ports/
-   ├── Install Zelda Dungeons of Infinity 4-3.sh
-   └── zeldadoi-43-installer/
+   ├── Install Zelda Dungeons of Infinity and Beyond.sh
+   └── zeldadoi-beyond-installer/
    ```
 
-3. Refresh the game list and run **Install Zelda Dungeons of Infinity 4-3** from Ports.
-4. Wait for installation to finish, then launch **Zelda Dungeons of Infinity 4-3**.
+3. Refresh the game list and run **Install Zelda Dungeons of Infinity and Beyond** from Ports.
+4. Wait for installation to finish, then launch **Zelda Dungeons of Infinity and Beyond**.
 
 The installer downloads the official PortMaster package and applies the patch automatically. You do not need to download or patch game files yourself.
 
-**Updating:** close the game, replace the installer files with the newer download, and run the installer again. Your saves stay in `zeldadoi-43/savedata/`. The installer preserves them and keeps migration backups in `zeldadoi-43/save-backups/`.
+**Updating:** close the game, replace the installer files with the newer download, and run the installer again. Your saves stay in `zeldadoi-beyond/savedata/`. The installer preserves them and keeps migration backups in `zeldadoi-beyond/save-backups/`.
+
+**Coming from the 4:3 edition (1.x):** install 2.0.0 manually once; the in-game updater of 1.x cannot find the renamed release. The installer moves `zeldadoi-43` with all saves to `zeldadoi-beyond` and removes the old launcher and installer.
 
 For updates over Wi-Fi, choose **Options > About > Updates** from the adventure menu. It shows the installed and available patch versions and the changes since your version. Use L/R to page through the notes. Choose **Install update** to download the update and restart the game. Press **B** to close or cancel a download.
 
 The updater checks stable releases only when you open Updates or choose Check again. It verifies downloads before installation and preserves your saves. If installation fails, the previous version remains available. Keep the device powered on during installation.
 
-If installation fails, check `zeldadoi-43-installer/install.log`. For another attempt, run the installer again.
+If installation fails, check `zeldadoi-beyond-installer/install.log`. For another attempt, run the installer again.
 
 ## Controls
 
@@ -78,7 +85,7 @@ Input hints sit together at the bottom right, with each action label followed by
 | --- | --- |
 | ![Compact bag inventory below health and counters, with Switch 2 button hints below the frame](docs/screenshots/inventory.png) | ![Item action list with a confirm hint that names the highlighted Info action](docs/screenshots/inventory-actions.png) |
 
-Inventory and menu screenshots use test saves to show progress and full inventories. All screenshots come from the game running on a Nova.
+Inventory and menu screenshots use test saves to show progress and full inventories. The screenshots come from the game running on a Nova.
 
 | Status at a stick-click | Continue your adventure |
 | --- | --- |
@@ -94,7 +101,7 @@ The centered title screen leads into an adventure menu with your last selected p
 
 ![Options with Game, Display, Audio, Controls and About tabs, volume bars and a description of the selected setting](docs/screenshots/options.png)
 
-**Options** opens the same screen from the adventure menu and the pause menu. L/R switch between Game, Display, Audio and Controls, and left/right changes the highlighted setting. Changes apply immediately, and a line below the list explains each setting. **Defaults** restores the current tab after confirmation. Gamepad and Keyboard list every action by group. Choose one and press its new button; a button another action already uses swaps between them. Changed actions are marked, the help line shows the default, and **Reset** restores just the highlighted action. **Restore all defaults** at the end of the list asks first. Menu Confirm (A), Back (B) and Pause (Select) stay fixed, so remapping can never lock you out of the menus. Select cancels a remap, which also stops after ten seconds. Music and sound effects have ten volume steps; zero mutes them. Controls, CRT and item messages are saved for each player. Volume, blood and title skipping apply to the whole device. Updates and credits are under **About** in the adventure menu.
+**Options** opens the same screen from the adventure menu and the pause menu. L/R switch between Game, Display, Audio and Controls, and left/right changes the highlighted setting. **Display** holds the CRT effect, **Square pixels** and **Integer scaling**. Changes apply immediately, and a line below the list explains each setting. **Defaults** restores the current tab after confirmation. Gamepad and Keyboard list every action by group. Choose one and press its new button; a button another action already uses swaps between them. Changed actions are marked, the help line shows the default, and **Reset** restores just the highlighted action. **Restore all defaults** at the end of the list asks first. Menu Confirm (A), Back (B) and Pause (Select) stay fixed, so remapping can never lock you out of the menus. Select cancels a remap, which also stops after ten seconds. Music and sound effects have ten volume steps; zero mutes them. Controls, CRT and item messages are saved for each player. Volume, blood, title skipping, square pixels and integer scaling apply to the whole device. Updates and credits are under **About** in the adventure menu.
 
 ## Playing and updating
 
@@ -126,7 +133,7 @@ Reinstallation preserves both backups. Keep them if you plan to return to an ear
 
 The repository distributes patch code and binary deltas. Installer downloads contain no standalone game or runtime. Checksums verify the upstream package and patched output.
 
-[TESTING.md](docs/TESTING.md) covers builds, GitHub CI, the isolated Nova regression suite, and the release procedure. Patch versions are independent of the original game's versions. Related fixes stay under Unreleased until the batch is ready.
+[TESTING.md](docs/TESTING.md) covers builds, GitHub CI, the isolated device regression suite, and the release procedure. Patch versions are independent of the original game's versions. Related fixes stay under Unreleased until the batch is ready.
 
 <details>
 <summary>Build the patch on Linux</summary>
@@ -140,18 +147,20 @@ python3 build.py --check-release --runtime-tests
 
 The build downloads the pinned PortMaster package and UndertaleModTool CLI 0.9.2.0, checks their hashes, and compiles the patch. It verifies the checked-in delta against the clean build, then tests installation and reinstallation. Full game archives stay in the ignored `.build/` directory.
 
-GitHub Actions runs the unit suite and build checks on pushes and pull requests. Runtime assertions run separately on a Nova. The installer uses Python's standard library. Release packaging uses `requirements-build.txt`.
+GitHub Actions runs the unit suite and build checks on pushes and pull requests. Runtime assertions run separately on a device. The installer uses Python's standard library. Release packaging uses `requirements-build.txt`.
 
 </details>
 
 <details>
 <summary>Rendering and device support</summary>
 
-Testing covers the Retroid Nova on ROCKNIX. The launcher selects Freedreno and SDL's evdev controller backend.
+Testing covers the Retroid Nova (1280×960) and Retroid Pocket Flip 2 (1920×1080) on ROCKNIX. The launcher selects Freedreno, which requires a Qualcomm Adreno GPU, and SDL's evdev controller backend.
 
-Gameplay presents the complete 256×224 playfield at 4:3 with horizontal pixel aspect correction. The title uses a centered 300×225 view, and profile menus use a 400×300 view. Status panels use 75% scale and 90% opacity.
+Gameplay presents the complete 256×224 playfield at 4:3 with horizontal pixel aspect correction, centered with black borders on other screen shapes. **Square pixels** shows it at 8:7 instead. **Integer scaling** rounds its height down to a whole multiple of 224. Where the side borders fit the original 72-pixel Status panels at 2× or more, the panels dock there at a whole-number scale, as in the original 16:9 game, and Status starts open. Elsewhere they open over the playfield at 75% scale and 90% opacity.
 
-The HUD renders after the playfield at its own integer scale, with square pixels and a smaller footprint. On the Nova's 1280×960 screen, it uses 3× scaling. Equipment and counters sit at the left edge, with hearts at the right. The CRT option affects the world while the HUD and gameplay hints stay crisp.
+The title widens from a 300×225 view on 4:3 screens to the original 400×225 scene on 16:9. Menus keep their 400×300 layout; wider screens extend the landscape at both sides and move the button hints to the corner.
+
+The HUD renders after the playfield at its own integer scale, with square pixels and a smaller footprint. On the Nova's 1280×960 screen, it uses 3× scaling; on a 1920×1080 screen, 4×. Equipment and counters sit at the playfield's left edge, with hearts at the right. The CRT option affects the world while the HUD and gameplay hints stay crisp.
 
 Inventory, map and arcade hints share the HUD scale, footer baseline and right margin. Smaller L/R glyphs stay beside the inventory heading. Item artwork and descriptions retain their larger scale for browsing.
 
@@ -161,7 +170,7 @@ Enable **CRT** for shaped scanlines, a phosphor grille and soft bloom. The CRT-L
 
 ## Credits
 
-Justin Bohemier created Dungeons of Infinity. The [PortMaster package](https://github.com/PortsMaster-MV/PortMaster-MV-New/tree/main/ports/zeldadoi) supplies the game files and [GMLoader-next](https://github.com/JohnnyonFlame/gmloader-next) runtime during installation. The installer preserves upstream license files in `zeldadoi-43/license/`.
+Justin Bohemier created Dungeons of Infinity. The [PortMaster package](https://github.com/PortsMaster-MV/PortMaster-MV-New/tree/main/ports/zeldadoi) supplies the game files and [GMLoader-next](https://github.com/JohnnyonFlame/gmloader-next) runtime during installation. The installer preserves upstream license files in `zeldadoi-beyond/license/`.
 
 Controller glyphs use Kenney's Input Prompts 1.5A, from `Nintendo Switch 2/Double`, under [CC0](assets/buttons/LICENSE.txt). [The asset manifest](assets/buttons/manifest.json) records source filenames and checksums. The patch copies this artwork without redrawing it.
 

@@ -32,6 +32,8 @@ The references are the developer's bundled change log, manual, Gem Combo Poster,
 
 ## Adaptations for this patch
 
+The original 1.1.6 game renders a 400×225 (16:9) canvas: the 256×224 playfield with a 72-pixel side panel on each side. Until 2.0.0 this patch cropped the playfield to 4:3 and drew the panels over it. On screens with room beside the playfield, 2.0.0 restores the original arrangement. It copies the same panel pixels from the upstream canvas into the side borders at a whole-number scale. The 4:3 pixel-aspect correction, black borders, square-pixel and integer-scaling options, and the widened menu landscape are patch adaptations. The full-width title scene is the original view.
+
 Inventory uses pages sized for the 4:3 playfield. In the unreleased control update, LB/RB changes pages while D-pad navigation stays in the item grid. The narrower window sits below the HUD. Slot upgrades use the heart-container price and treasure limiter. Their loot pools support incremental upgrades. This does not reproduce an undisclosed upstream probability table.
 
 The candle occupies the light slot and the oil lamp replaces it when collected. Dropping either removes its light and prevents torch ignition until you recover a light source.

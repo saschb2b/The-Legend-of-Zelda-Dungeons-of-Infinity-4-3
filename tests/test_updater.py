@@ -13,7 +13,7 @@ import updater
 
 class ReleaseSelectionTests(unittest.TestCase):
     def release(self, version='1.6.0'):
-        name = f'Dungeons-of-Infinity-4-3-v{version}-Nova-Patch-Installer.zip'
+        name = f'Dungeons-of-Infinity-and-Beyond-v{version}-Patch-Installer.zip'
         return {'tag_name': 'v' + version, 'draft': False, 'prerelease': False, 'assets': [
             {'name': asset, 'state': 'uploaded', 'size': 100, 'digest': 'sha256:' + 'a' * 64,
              'browser_download_url': updater.DOWNLOAD + 'v' + version + '/' + asset}
@@ -60,7 +60,7 @@ class ReleaseSelectionTests(unittest.TestCase):
     def test_archive_traversal_is_rejected_before_extraction(self):
         buffer = io.BytesIO()
         with ZipFile(buffer, 'w') as archive:
-            archive.writestr('zeldadoi-43-installer/../../escape', 'bad')
+            archive.writestr('zeldadoi-beyond-installer/../../escape', 'bad')
         with tempfile.TemporaryDirectory() as directory:
             with self.assertRaisesRegex(ValueError, 'archive'):
                 updater.unpack_installer(buffer.getvalue(), Path(directory), '1.6.0')
@@ -94,7 +94,7 @@ class UpdateTransactionTests(unittest.TestCase):
         (self.game / 'zeldadoi.port').write_bytes(b'old game')
         (self.ports / updater.LAUNCHER).write_text('old launcher')
         self.worker = updater.Updater(self.game)
-        payload = self.worker.work / 'prepared/zeldadoi-43-installer'
+        payload = self.worker.work / 'prepared/zeldadoi-beyond-installer'
         payload.mkdir(parents=True)
         (payload / 'manifest.json').write_text(json.dumps({'patched_game_sha256': hashlib.sha256(b'new game').hexdigest()}))
         updater.write_json(self.worker.work / 'ready.json', {'id': 'test', 'version': '1.6.0'})
@@ -230,11 +230,11 @@ class DownloadAndInstallTests(unittest.TestCase):
         root = Path(__file__).resolve().parents[1]
         with ZipFile(installer, 'w') as archive:
             for name in ('install.py', 'controller.py', 'updater.py', 'README.md', 'gameinfo.xml', updater.LAUNCHER):
-                archive.writestr('zeldadoi-43-installer/' + name, (root / name if name == 'README.md' else root / 'installer' / name).read_bytes())
-            archive.writestr('zeldadoi-43-installer/manifest.json', json.dumps(manifest))
-            archive.writestr('zeldadoi-43-installer/patches/game.droid.bsdiff', delta)
+                archive.writestr('zeldadoi-beyond-installer/' + name, (root / name if name == 'README.md' else root / 'installer' / name).read_bytes())
+            archive.writestr('zeldadoi-beyond-installer/manifest.json', json.dumps(manifest))
+            archive.writestr('zeldadoi-beyond-installer/patches/game.droid.bsdiff', delta)
         self.installer = installer.getvalue()
-        self.worker.release = {'version': '1.6.0', 'name': 'Dungeons-of-Infinity-4-3-v1.6.0-Nova-Patch-Installer.zip',
+        self.worker.release = {'version': '1.6.0', 'name': 'Dungeons-of-Infinity-and-Beyond-v1.6.0-Patch-Installer.zip',
                                'sha256': hashlib.sha256(self.installer).hexdigest(), 'size': len(self.installer)}
 
     def fetch(self, url, limit, progress=None):

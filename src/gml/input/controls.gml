@@ -163,9 +163,9 @@ global.NovaInventoryPager = function(inventory, layout) {
     var scale = layout.scale;
     var size = 12 * scale;
     var widths = [global.NovaPromptWidth(bindings[0], "", scale, size), global.NovaPromptWidth(bindings[1], "", scale, size)];
-    var center = round((inventory.X - oCamera.X + inventory.W / 2) * layout.world_x);
+    var center = layout.world_left + round((inventory.X - oCamera.X + inventory.W / 2) * layout.world_x);
     var offset = ceil((heading_width / 2 + 8) * layout.world_x);
-    var py = round((inventory.Y - oCamera.Y + 14) * layout.world_y);
+    var py = layout.world_top + round((inventory.Y - oCamera.Y + 14) * layout.world_y);
     draw_set_font(font);
     return [
         {binding: bindings[0], x: center - offset - widths[0], y: py, width: widths[0], size: size, scale: scale},
@@ -205,15 +205,29 @@ global.NovaInventoryPrompts = function(inventory, layout) {
     }
 };
 
+// The playfield keeps the SNES 4:3 picture, or 8:7 with square pixels; other screen shapes add borders.
+global.NovaWorldRect = function(width, height) {
+    var aspect = global.NovaSquarePixels ? 8 / 7 : 4 / 3;
+    var h = min(height, floor(width / aspect));
+    // Integer scaling gives every game pixel the same whole number of screen rows.
+    if (global.NovaIntegerScale && h >= 224) h = 224 * floor(h / 224);
+    var w = min(width, round(h * aspect));
+    return {x: floor((width - w) / 2), y: floor((height - h) / 2), w: w, h: h};
+};
 global.NovaHUDLayout = function(width, height) {
-    var fit = min(width / 256, height / 224);
+    var world = global.NovaWorldRect(width, height);
+    var fit = min(world.w / 256, world.h / 224);
     var scale = max(1, min(floor(fit), round(fit * 0.75)));
-    var columns = floor(width / scale);
-    var rows = floor(height / scale);
-    var left = floor((width - columns * scale) / 2);
-    var top = floor((height - rows * scale) / 2);
+    var columns = floor(world.w / scale);
+    var rows = floor(world.h / scale);
+    var left = world.x + floor((world.w - columns * scale) / 2);
+    var top = world.y + floor((world.h - rows * scale) / 2);
+    // Side gutters wide enough for the original 72-pixel Status panels dock them there.
+    var panel_scale = floor(min((world.x - 8) / 72, world.h / 224));
     return {scale: scale, width: columns, height: rows, x: left, y: top,
-        world_x: width / 256, world_y: height / 224,
+        world_left: world.x, world_top: world.y, world_width: world.w, world_height: world.h,
+        screen_width: width, screen_height: height, panel_scale: panel_scale, docked: panel_scale >= 2,
+        world_x: world.w / 256, world_y: world.h / 224,
         right: left + (columns - 16) * scale, footer_y: top + (rows - 15) * scale,
         footer_left: left + 16 * scale, footer_width: (columns - 32) * scale};
 };
@@ -268,8 +282,12 @@ global.NovaContextAdvance = function(motion, label, seconds) {
         motion.text_alpha = 1;
     }
 };
+// Status panels cover the hint row only when they open over the playfield.
+global.NovaStatusCovers = function() {
+    return global.Users[global.UserIndex].Prefs[2] && !global.NovaHUDLayout(display_get_gui_width(), display_get_gui_height()).docked;
+};
 global.NovaContextUpdate = function(seconds) {
-    if (global.NovaContextBlocked() || !instance_exists(oHUD) || global.Users[global.UserIndex].Prefs[2]) {
+    if (global.NovaContextBlocked() || !instance_exists(oHUD) || global.NovaStatusCovers()) {
         oRender.NovaContext = global.NovaContextMotion();
         return;
     }
