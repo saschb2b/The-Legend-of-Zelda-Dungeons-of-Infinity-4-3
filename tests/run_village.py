@@ -15,7 +15,7 @@ sys.path.insert(0, str(ROOT))
 INSTALLER = ROOT / 'installer'
 sys.path.insert(0, str(INSTALLER))
 import build
-from install import GAME_DIR, LAUNCHER
+from install import GAME_DIR, LAUNCHER, LEGACY_GAME_DIR
 
 
 def main():
@@ -34,6 +34,9 @@ def main():
     launcher = f'{args.ports_dir}/DOI Village Test.sh'
     source = f'{args.ports_dir}/{GAME_DIR}'
     request = lambda command, data=None: remote(args.host, args.control_path, command, data)
+    # A device still on the 4:3 edition keeps the runtime in the legacy folder; tests only read from it.
+    if not request(f'test -d {shlex.quote(source)} && echo found || true').strip():
+        source = f'{args.ports_dir}/{LEGACY_GAME_DIR}'
     constants = f'SOURCE={source!r}\nSTAGE={stage!r}\nLAUNCHER={launcher!r}\nLAUNCHER_TEXT={(INSTALLER / LAUNCHER).read_text()!r}\n'
     snapshot = '''import hashlib,json,pathlib,shutil,urllib.request
 source=pathlib.Path(SOURCE)

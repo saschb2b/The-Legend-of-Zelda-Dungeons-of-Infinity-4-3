@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 INSTALLER = ROOT / 'installer'
 sys.path.insert(0, str(INSTALLER))
-from install import GAME_DIR, LAUNCHER
+from install import GAME_DIR, LAUNCHER, LEGACY_GAME_DIR
 
 
 def remote(host, control, command, data=None):
@@ -51,6 +51,9 @@ def main():
     stage = f'/storage/.cache/doi-harness-{token}'
     launcher = f'{args.ports_dir}/DOI Harness {token}.sh'
     source = f'{args.ports_dir}/{GAME_DIR}'
+    # A device still on the 4:3 edition keeps the runtime in the legacy folder; tests only read from it.
+    if not request(f'test -d {shlex.quote(source)} && echo found || true').strip():
+        source = f'{args.ports_dir}/{LEGACY_GAME_DIR}'
     args.report_dir.mkdir(parents=True, exist_ok=True)
     report = None
     created = False
