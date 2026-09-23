@@ -4,7 +4,20 @@ These versions identify the patch, independently of the original game's version.
 
 ## Unreleased
 
+## [2.0.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/tag/v2.0.0) - 2026-09-23
+
 The 4:3 edition becomes **Dungeons of Infinity and Beyond** and adapts to the screen it runs on.
+
+<table>
+<tr>
+<th width="50%">v1.8.0 on a 16:9 screen</th>
+<th width="50%">v2.0.0 on a 16:9 screen</th>
+</tr>
+<tr>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v2.0.0/docs/screenshots/widescreen-v1.8.0.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v2.0.0/docs/screenshots/widescreen-v1.8.0.png" alt="Version 1.8.0 on a Retroid Pocket Flip 2, with the playfield stretched across the whole screen" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v2.0.0/docs/screenshots/widescreen.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/v2.0.0/docs/screenshots/widescreen.png" alt="Version 2.0.0 on a Retroid Pocket Flip 2, with the playfield in its 4:3 shape and the equipment, minimap and floor progress panels beside it" width="640"></a></td>
+</tr>
+</table>
 
 ### Screens
 
@@ -21,6 +34,16 @@ The 4:3 edition becomes **Dungeons of Infinity and Beyond** and adapts to the sc
 - The installer moves an existing `zeldadoi-43` installation, including saves and backups, to the new folder. It restores an interrupted 4:3 update first and removes the old launcher and installer. It stops if both folders exist.
 - In-game updates from 1.x cannot find this release. Install it manually once; later updates work in the game again.
 - The launcher selects the Freedreno graphics driver only on Qualcomm GPUs, so devices with other GPUs are no longer forced onto it.
+
+Unedited captures from a Retroid Pocket Flip 2 with test saves. Saves, backups and remapped controls carry over unchanged.
+
+Validation: 48 host tests and a 250-test device suite (1,751 checks) passed on a Retroid Nova (4:3) and a Retroid Pocket Flip 2 (16:9). Devices with Mali GPUs and two-screen devices are untested.
+
+From any 1.x version, run the **patch installer ZIP** under Assets once; it moves the 4:3 edition and its saves. Later updates work from **Options > About > Updates**.
+
+For a fresh installation, follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/blob/v2.0.0/README.md#install).
+
+[Changes from v1.8.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/compare/v1.8.0...v2.0.0).
 
 ## [1.8.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/tag/v1.8.0) - 2026-09-23
 
