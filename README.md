@@ -43,6 +43,8 @@ If installation fails, check `zeldadoi-43-installer/install.log`. For another at
 
 These are the default controller bindings. Change them under **Options > Controls**, from the adventure menu or the pause menu. Each button hint follows your current mapping, including keyboard bindings.
 
+![Gamepad remapping grouped by Combat and World, with two changed actions marked and the default shown](docs/screenshots/controls.png)
+
 | Button | During play | In the inventory |
 | --- | --- | --- |
 | D-pad / left stick | Move | Highlight an object or action |
@@ -85,6 +87,8 @@ Inventory and menu screenshots use test saves to show progress and full inventor
 The centered title screen leads into an adventure menu with your last selected player. Their name and floor sit beneath **Continue**, which resumes the saved run in one press. **New adventure** shows your character beside the bonus and challenges, with a line below explaining the highlighted choice. Press **A** on any row except Challenges to begin, and **Begin adventure** is selected by default. **Random** picks another character. Each player's last setup is remembered. A fresh player starts as Link, with no required name entry.
 
 ![New adventure with a character preview, Wooden Shield bonus, the Second Quest challenge preset with its level meter and icons, and Begin adventure](docs/screenshots/adventure-setup.png)
+
+![Players as cards with character, floor, play time, challenge level, hearts, wins and deaths, and a New player card](docs/screenshots/players.png)
 
 **Change player** shows each player as a card with their character, floor, play time, hearts, wins and deaths, and it opens on the current player. The line below says when each player last played. Select a player to return to their adventure, or press **Details** for their full records, **Rename** and **Delete player**. Deleting asks first, with Cancel selected, and names the run that will be erased. When renaming, L erases a letter and R adds a space. Starting over an existing save asks for confirmation. Options, controls, updates and credits are available before entering the dungeon.
 

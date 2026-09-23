@@ -4,24 +4,83 @@ These versions identify the 4:3 patch, independently of the original game's vers
 
 ## Unreleased
 
-### Changed
+## [1.8.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.8.0) - 2026-09-23
 
-- Replace the separate title and pause options with one Options screen. L/R switch between Game, Display, Audio and Controls. Each setting explains itself, applies immediately, and has a Defaults option per tab that asks first.
-- Add music and sound-effect volume in ten steps, and expose the blood and title-skip preferences. Controls can now be remapped from the pause menu.
-- Move Updates and Credits to Options > About. Show D-pad glyphs for left/right hints.
-- Keep nested Options pages inside the Options panel. The header shows the path, such as Options > Controls > Gamepad, the tabs stay visible, and B reads Back. Restoring defaults asks in a dialog over the affected page.
-- Show gamepad bindings as button glyphs instead of long text that overflowed the Gamepad page. Remapping highlights the action it is waiting for.
-- Remap one action at a time instead of walking through every action. A button already in use swaps between the two actions. Changed actions are marked, the help line shows the default, and Reset restores a single action. Restore all defaults asks first and is inactive when nothing changed. Actions are grouped as Movement, Combat, World and Menus.
-- Rebuild New adventure around a character preview with a floor shadow and subtle idle motion, the bonus item's artwork, and a help line for the highlighted choice. Begin adventure is the largest element and one A press away from every row except Challenges. Random picks another character.
-- Add challenge presets named Hero's Path, Second Quest and Master Quest, a level meter that adds up every challenge, and icons for the active ones. A custom mix stays available while browsing presets.
-- Give the Challenges page tabs, a breadcrumb, a description and icon for each challenge, marked changes and a Defaults dialog.
-- Show players as cards with their character, floor, play time, hearts, wins, deaths and challenge level. Players opens on the current player and says when each one last played. An empty slot reads New player.
-- Replace Manage with a Details page: the current run, lifetime records with the best time highlighted, and Play, Rename and Delete player. Deleting opens a dialog that starts on Cancel and names the run it erases.
-- Rename shows a letter counter, explains a blank name, and adds L to erase and R for a space.
-- Redesign the pause menu in the Options style. It shows the run's floor, time, hearts, bosses, bonus, challenges and curse. Resume, Options and a new Controls shortcut come first; Start over, Quit to title and Quit to desktop sit below a divider. Each quit explains that progress since the last Save Tent is lost and asks in a dialog that starts on Cancel.
-- Remember each player's last character, bonus and challenges. Saves started with challenges show their level beside the floor.
-- Keep menu Confirm (A), Back (B) and Pause (Select) fixed. Remapping Sword or Interact no longer moves the menu buttons, so a remap cannot lock players out. Select or Esc cancels a remap, and an unanswered remap stops after ten seconds.
-- Remove the pause menu's HUD toggle. The Status button still shows and hides the panels.
+Every menu outside gameplay is rebuilt in one consistent style, with descriptions, clearer choices and safer confirmations.
+
+### New adventure
+
+- A character preview sits beside the bonus and challenges, with a line below explaining the highlighted choice. Random picks another character.
+- Challenges have three presets: Hero's Path, Second Quest and Master Quest. A level meter adds up every challenge, and icons show the active ones. A custom mix stays available while you browse the presets.
+- Begin adventure is the most prominent choice and one press away from every row except Challenges.
+- Each player's last character, bonus and challenges are remembered.
+- The Challenges page has tabs, a description and icon for each challenge, marked changes and a Defaults dialog.
+
+<table>
+<tr>
+<th width="50%">v1.7.3</th>
+<th width="50%">v1.8.0</th>
+</tr>
+<tr>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.3/screenshots/adventure-setup.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.3/screenshots/adventure-setup.png" alt="Old New adventure screen with a static sprite, Bonus None and Challenges Standard" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.8.0/docs/screenshots/adventure-setup.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.8.0/docs/screenshots/adventure-setup.png" alt="New adventure with a character preview, Wooden Shield bonus, the Second Quest preset with its level meter and icons, and Begin adventure" width="640"></a></td>
+</tr>
+</table>
+
+### Pause menu
+
+- The pause menu uses the same panel over the dimmed game. It shows the run's floor, time, hearts, bosses, bonus, challenges and any curse.
+- Resume is selected when you pause. Resume, Options and a new Controls shortcut come first. Start over, Quit to title and Quit to desktop sit below a divider.
+- The game saves only at Save Tents. Each quit now says that progress since the last tent is lost, and asks in a dialog that starts on Cancel.
+- The HUD toggle is gone; the Status button still shows and hides the panels.
+
+<table>
+<tr>
+<th width="50%">v1.7.3</th>
+<th width="50%">v1.8.0</th>
+</tr>
+<tr>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.3/screenshots/pause.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.7.3/screenshots/pause.png" alt="Old grey pause menu with Resume Game, New Game, Options and two quit options" width="640"></a></td>
+<td><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.8.0/docs/screenshots/pause.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.8.0/docs/screenshots/pause.png" alt="New pause menu with a run summary, a divider above the destructive options and the Save Tent warning" width="640"></a></td>
+</tr>
+</table>
+
+### Options and controls
+
+- The adventure menu and the pause menu share one Options screen. L/R switch between Game, Display, Audio and Controls. Each setting explains itself and applies immediately, and each tab has Defaults, which asks first.
+- Music and sound effects have ten volume steps. Blood and title skipping can be changed in the menu.
+- Controls are remapped one action at a time. A button already in use swaps between the two actions. Changed actions are marked, the help line shows the default, and Reset restores one action.
+- Menu Confirm (A), Back (B) and Pause (Select) stay fixed, so remapping Sword or Interact can no longer strand you in a menu. Select cancels a remap.
+- Nested pages keep the tabs and show their path, such as Options > Controls > Gamepad. Updates and Credits moved to Options > About.
+
+<table>
+<tr>
+<td width="50%"><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.8.0/docs/screenshots/options.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.8.0/docs/screenshots/options.png" alt="Options with Game, Display, Audio, Controls and About tabs, volume bars and a description line" width="640"></a></td>
+<td width="50%"><a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.8.0/docs/screenshots/controls.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.8.0/docs/screenshots/controls.png" alt="Gamepad remapping grouped by Combat and World, with two changed actions marked and the default shown" width="640"></a></td>
+</tr>
+</table>
+
+### Players
+
+- Players appear as cards with their character, floor, play time, hearts, wins, deaths and challenge level. The list opens on the current player and says when each one last played.
+- Details replaces Manage. It shows the current run, lifetime records with the best time highlighted, and Play, Rename and Delete player.
+- Deleting a player opens a dialog that starts on Cancel and names the run it erases. Rename shows a letter counter; L erases a letter and R adds a space.
+
+<a href="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.8.0/docs/screenshots/players.png"><img src="https://raw.githubusercontent.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/v1.8.0/docs/screenshots/players.png" alt="Players as cards with character, floor, play time, challenge level, hearts, wins and deaths, and a New player card" width="640"></a>
+
+### Fixed
+
+- Gamepad bindings show as button glyphs instead of long text that overflowed the remapping page.
+
+Unedited Nova captures from test saves. Existing saves and remapped controls remain compatible.
+
+Validation: 39 unit tests and 1,704 device assertions passed. The [testing guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.8.0/docs/TESTING.md#nova-runtime-suite) records a separate, pre-existing native shutdown fault after test completion.
+
+From v1.7.3, choose **Options > About > Updates** from the adventure menu. From v1.6.0 through v1.7.2, run the **Nova patch installer ZIP** under Assets once.
+
+For a fresh installation, follow the [installation guide](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/blob/v1.8.0/README.md#install-on-the-nova).
+
+[Changes from v1.7.3](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/compare/v1.7.3...v1.8.0).
 
 ## [1.7.3](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-4-3/releases/tag/v1.7.3) - 2026-09-22
 
