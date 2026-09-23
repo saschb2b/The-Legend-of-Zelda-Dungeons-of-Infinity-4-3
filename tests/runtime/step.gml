@@ -5,6 +5,8 @@ try {
         case 0:
             if (!instance_exists(oTitle)) break;
             Record("title skipping defaults on", variable_global_exists("CanSkipTitle") && global.CanSkipTitle);
+            // The harness uses the unpatched package, so no installer bundled a version file.
+            Record("start screens label a build without a bundled version", global.NovaPatchVersion == "" && global.NovaVersionLabel == "VERSION DEV - GAME 1.1.6 VM");
             global.CanSkipTitle = false;
             oTitle.AllowStart = false;
             oTitle.ShowBG = false;

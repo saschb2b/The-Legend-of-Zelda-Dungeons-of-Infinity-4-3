@@ -357,6 +357,11 @@ function NovaAdventureDraw() {
             draw_set_alpha(t);
         }
         NovaFooter(NovaFocus == 0 && summary.saved ? "Continue" : "Select");
+        var version = global.NovaMenuLayout();
+        draw_set_alpha(t * 0.9);
+        draw_set_valign(fa_middle);
+        global.NovaVersionDraw(version.footer_left, version.footer_y);
+        draw_set_valign(fa_top);
         draw_set_alpha(1);
         if (variable_global_exists("NovaTitleFrame") && surface_exists(global.NovaTitleFrame) && NovaTransition < 12)
             draw_surface_ext(global.NovaTitleFrame, -global.NovaMenuInset, -38, (400 + 2 * global.NovaMenuInset) / surface_get_width(global.NovaTitleFrame), 300 / surface_get_height(global.NovaTitleFrame), 0, c_white, 1 - NovaTransition / 12);

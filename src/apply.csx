@@ -166,7 +166,7 @@ menu.Height = 300;
 menu.Views[0].ViewY = -38;
 menu.Views[0].ViewHeight = 300;
 menu.Views[0].PortHeight = 1200;
-group.QueueReplace("gml_Object_oTitle_Draw_0", ReplaceOnce(Read("gml_Object_oTitle_Draw_0"), "draw_text(8, 212,", "draw_text(camera_get_view_x(view_camera[0]) + 8, 212,") + @"
+group.QueueReplace("gml_Object_oTitle_Draw_0", ReplaceOnce(ReplaceOnce(Read("gml_Object_oTitle_Draw_0"), "draw_set_alpha(lerp(0, 0.65, _Brightness));", "draw_set_alpha(lerp(0, 0.9, _Brightness));"), "draw_text(8, 212, \"1.1.6 - VM\");", "global.NovaVersionDraw(camera_get_view_x(view_camera[0]) + 8, 212);") + @"
 if (AllowStart) {
     draw_set_font(global.MenuFont_Innactive);
     var binding = input_binding_get(""menu_input"", 0, 1);

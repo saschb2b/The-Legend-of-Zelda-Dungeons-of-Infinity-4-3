@@ -25,6 +25,7 @@ foreach (var name in new[] { "sNovaFoodBag", "sNovaPendantBag" }) {
 var hand = Data.Sprites.ByName("sNovaWallmaster");
 Check(hand.Textures.Count == 2 && hand.Width == 24 && hand.Height == 23, "Wallmaster texture bounds changed");
 Check(Code("gml_Object_oTitle_Step_0").Contains("global.CanSkipTitle"), "Title skip option missing");
+Check(Code("gml_Object_oTitle_Draw_0").Contains("global.NovaVersionDraw("), "Title must show the patch version");
 var menuDraw = Code("gml_Object_oMenu_Draw_0");
 var menuCreate = Code("gml_Object_oMenu_Create_0");
 Check(menuDraw.Contains("NovaAdventureDraw()") && menuCreate.Contains("NovaDraft") && menuCreate.Contains("global.NovaOptionsStep(NovaOptions") && Code("gml_GlobalScript___Input").Contains("Previous bag"), "Adventure, challenge and control paths must coexist");

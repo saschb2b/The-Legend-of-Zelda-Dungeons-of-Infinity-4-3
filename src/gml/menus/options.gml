@@ -3,6 +3,26 @@
 global.NovaRemapping = false;
 global.NovaOptionsSurface = -1;
 global.NovaMenuInset = 0;
+// The installer bundles the patch version with the game; a build outside an installation shows DEV.
+global.NovaPatchVersion = "";
+if (file_exists("patch-version.txt")) {
+    var version_file = file_text_open_read("patch-version.txt");
+    global.NovaPatchVersion = string_trim(file_text_read_string(version_file));
+    file_text_close(version_file);
+}
+// The pixel font has capitals only, so release candidates read RC.
+global.NovaVersionLabel = "VERSION " + (global.NovaPatchVersion == "" ? "DEV" : string_upper(global.NovaPatchVersion)) + " - GAME 1.1.6 VM";
+// Start screens show the version in small pixel text, with a shadow so it reads over the landscape.
+global.NovaVersionDraw = function(px, py) {
+    var color = draw_get_color();
+    draw_set_font(global.HUDFont2);
+    draw_set_halign(fa_left);
+    draw_set_color(c_black);
+    draw_text(px + 1, py + 1, global.NovaVersionLabel);
+    draw_set_color(c_white);
+    draw_text(px, py, global.NovaVersionLabel);
+    draw_set_color(color);
+};
 // Picture settings belong to the screen, so they apply to every player on this device.
 ini_open("options.ini");
 global.NovaSquarePixels = ini_read_real("Display", "SquarePixels", 0) == 1;

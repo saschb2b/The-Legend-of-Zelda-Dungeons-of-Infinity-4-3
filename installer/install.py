@@ -218,6 +218,8 @@ def install(ports, upstream_path=None, refresh=True):
             with ZipFile(rebuilt_archive, 'w') as rebuilt:
                 for entry in game.infolist():
                     rebuilt.writestr(entry, patched if entry.filename == 'assets/game.droid' else game.read(entry))
+                # The start screens read the version as a file bundled with the game.
+                rebuilt.writestr('assets/patch-version.txt', manifest['version'] + '\n')
         rebuilt_archive.replace(game_archive)
         shutil.copyfile(ROOT / 'gameinfo.xml', stage / 'gameinfo.xml')
         shutil.copyfile(ROOT / 'README.md', stage / 'README.md')

@@ -13,6 +13,7 @@ The 4:3 edition becomes **Dungeons of Infinity and Beyond** and adapts to the sc
 - The title shows the full original 16:9 scene on wide screens. Menus extend the landscape to the screen edges and keep button hints in the corner.
 - The pause menu and Options stay over the playfield instead of stretching.
 - **Options > Display** adds **Square pixels** (8:7 playfield) and **Integer scaling** (whole-number pixel rows). Both apply to the whole device.
+- The title and adventure menu show the installed patch version at the bottom left.
 
 ### Name and installation
 

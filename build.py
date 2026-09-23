@@ -126,6 +126,8 @@ def check_release(original, rebuilt, manifest):
         with ZipFile(ports / install.GAME_DIR / 'zeldadoi.port') as port:
             if port.read('assets/game.droid') != rebuilt:
                 raise ValueError('Installed game differs from the clean build.')
+            if port.read('assets/patch-version.txt').decode().strip() != manifest['version']:
+                raise ValueError('Installed game lacks its patch version.')
         if (savedata / 'Users').read_bytes() != b'CI save preservation sentinel':
             raise ValueError('Installer changed savedata.')
 
