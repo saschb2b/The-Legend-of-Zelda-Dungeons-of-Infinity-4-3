@@ -10,7 +10,7 @@ from zipfile import ZipFile
 
 from run_device import copy, remote
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 INSTALLER = ROOT / 'installer'
 sys.path.insert(0, str(INSTALLER))
@@ -26,7 +26,7 @@ def main():
     args = parser.parse_args()
     tool = ROOT / '.build/utmt-0.9.2.0/UndertaleModCli'
     game = ROOT / '.build/village-preview.droid'
-    build.run_umt(tool, ROOT / '.build/patched.droid', 'tests/village.csx', game,
+    build.run_umt(tool, ROOT / '.build/patched.droid', 'tests/device/village.csx', game,
                   'NOVA VILLAGE PREVIEW COMPILED')
     build.verify_runner_format(game.read_bytes())
     token = uuid.uuid4().hex[:12]

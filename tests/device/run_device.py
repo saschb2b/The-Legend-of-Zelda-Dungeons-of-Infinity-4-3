@@ -12,7 +12,7 @@ import uuid
 from pathlib import Path
 from zipfile import ZipFile
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 INSTALLER = ROOT / 'installer'
 sys.path.insert(0, str(INSTALLER))
@@ -31,6 +31,44 @@ def copy(host, control, source, destination):
                    check=True, timeout=120)
 
 
+def summarize(report):
+    """Returns the console summary lines and whether every test passed."""
+    suites = report.get('suites', [])
+    tests = [test for suite in suites for test in suite['tests']]
+    failed = [(suite['name'], test) for suite in suites for test in suite['tests'] if not test['passed']]
+    width = max((len(suite['name']) for suite in suites), default=0)
+    lines = []
+    for suite in suites:
+        checks = int(sum(test['checks'] for test in suite['tests']))
+        broken = sum(not test['passed'] for test in suite['tests'])
+        status = 'FAIL' if broken else 'ok  '
+        lines.append(f"{status} {suite['name']:<{width}}  {len(suite['tests']):>3} tests {checks:>5} checks")
+    lines.append(f"{len(suites)} suites, {len(tests)} tests, {int(sum(test['checks'] for test in tests))} checks; "
+                 f"{len(failed)} tests failed")
+    for suite, test in failed:
+        lines.append(f"FAIL {suite} > {test['name']}")
+        lines.extend(f'     - {failure}' for failure in test['failures'])
+    return lines, not failed
+
+
+def junit(report):
+    """Renders the report as JUnit XML for CI dashboards and test viewers."""
+    from xml.etree import ElementTree as ET
+    suites = report.get('suites', [])
+    root = ET.Element('testsuites', name='device', tests=str(sum(len(s['tests']) for s in suites)),
+                      failures=str(sum(not t['passed'] for s in suites for t in s['tests'])))
+    for suite in suites:
+        element = ET.SubElement(root, 'testsuite', name=suite['name'], tests=str(len(suite['tests'])),
+                                failures=str(sum(not t['passed'] for t in suite['tests'])))
+        for test in suite['tests']:
+            case = ET.SubElement(element, 'testcase', classname=suite['name'], name=test['name'],
+                                 assertions=str(int(test['checks'])))
+            if not test['passed']:
+                failure = ET.SubElement(case, 'failure', message=test['failures'][0] if test['failures'] else 'failed')
+                failure.text = '\n'.join(test['failures'])
+    return ET.tostring(root, encoding='unicode')
+
+
 def main():
     parser = argparse.ArgumentParser(description='Run instrumented game events in a disposable device installation.')
     parser.add_argument('host', help='SSH destination with key or existing control-socket authentication')
@@ -44,6 +82,7 @@ def main():
     parser.add_argument('--capture-profiles', action='store_true', help='Capture empty and saved profiles with controller and keyboard prompts.')
     parser.add_argument('--report-dir', type=Path, default=ROOT / '.build/device-results')
     parser.add_argument('--patch-version', help='Bundle this version with the test game, as the installer does, for screenshots.')
+    parser.add_argument('--suite', action='append', default=[], help='Run only suites whose name contains this word; repeatable. Navigation suites always run.')
     args = parser.parse_args()
     game_bytes = args.game.read_bytes()
     game_digest = hashlib.sha256(game_bytes).hexdigest()
@@ -71,10 +110,10 @@ print(json.dumps(saves))
 shutil.copytree(source,stage,ignore=shutil.ignore_patterns('savedata','test-savedata','log.txt'))
 config=json.loads((stage/'gmloader.json').read_text())
 config['save_dir']='harness-savedata'
-if CAPTURE or CAPTURE_UPDATES or CAPTURE_PROFILES or CAPTURE_CONTEXT or CAPTURE_ARCADE:
- (stage/'harness-savedata').mkdir()
- for enabled,name in [(CAPTURE_ARCADE,'nova-arcade-capture-enabled.txt'),(CAPTURE_CONTEXT,'nova-context-capture-enabled.txt'),(CAPTURE,'nova-capture-enabled.txt'),(CAPTURE_UPDATES,'nova-update-capture-enabled.txt'),(CAPTURE_PROFILES,'nova-profile-capture-enabled.txt')]:
-  if enabled: (stage/'harness-savedata'/name).touch()
+(stage/'harness-savedata').mkdir()
+if FILTER: (stage/'harness-savedata'/'nova-test-filter.txt').write_text('\\n'.join(FILTER)+'\\n')
+for enabled,name in [(CAPTURE_ARCADE,'nova-arcade-capture-enabled.txt'),(CAPTURE_CONTEXT,'nova-context-capture-enabled.txt'),(CAPTURE,'nova-capture-enabled.txt'),(CAPTURE_UPDATES,'nova-update-capture-enabled.txt'),(CAPTURE_PROFILES,'nova-profile-capture-enabled.txt')]:
+ if enabled: (stage/'harness-savedata'/name).touch()
 (stage/'gmloader.json').write_text(json.dumps(config))
 text=LAUNCHER_TEXT
 service='python3 "$GAMEDIR/updater.py" serve --game-dir "$GAMEDIR" --parent "$$"'
@@ -86,7 +125,7 @@ text=text.replace(anchor,'GAMEDIR='+repr(str(stage)))
 launcher.write_text(text)
 launcher.chmod(0o755)
 '''
-        constants = f'CAPTURE_ARCADE={args.capture_arcade!r}\nCAPTURE_CONTEXT={args.capture_context!r}\nCAPTURE={args.capture!r}\nCAPTURE_UPDATES={args.capture_updates!r}\nCAPTURE_PROFILES={args.capture_profiles!r}\nSOURCE={source!r}\nSTAGE={stage!r}\nLAUNCHER={launcher!r}\nLAUNCHER_TEXT={(INSTALLER / LAUNCHER).read_text()!r}\n'
+        constants = f'FILTER={args.suite!r}\nCAPTURE_ARCADE={args.capture_arcade!r}\nCAPTURE_CONTEXT={args.capture_context!r}\nCAPTURE={args.capture!r}\nCAPTURE_UPDATES={args.capture_updates!r}\nCAPTURE_PROFILES={args.capture_profiles!r}\nSOURCE={source!r}\nSTAGE={stage!r}\nLAUNCHER={launcher!r}\nLAUNCHER_TEXT={(INSTALLER / LAUNCHER).read_text()!r}\n'
         snapshot, staging = setup.split('shutil.copytree', 1)
         before = json.loads(request('python3 -', (constants + snapshot).encode()))
         created = True
@@ -156,11 +195,10 @@ sys.stdout.buffer.write(output.getvalue())
                 for name in expected:
                     (args.report_dir / name).write_bytes(archive.read(name))
         (args.report_dir / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
-        failures = [case['name'] for case in report['results'] if not case['passed']]
-        print(f'{len(report["results"])} runtime assertions; {len(failures)} failed', flush=True)
-        for failure in failures:
-            print(f'FAIL: {failure}')
-        if failures:
+        (args.report_dir / 'junit.xml').write_text(junit(report) + '\n')
+        lines, passed = summarize(report)
+        print('\n'.join(lines), flush=True)
+        if not passed:
             raise RuntimeError('Runtime regression suite failed.')
     finally:
         if created:

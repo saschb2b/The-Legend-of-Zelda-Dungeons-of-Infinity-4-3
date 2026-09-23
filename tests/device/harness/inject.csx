@@ -8,18 +8,23 @@ Data.SetGMS2Version(2024, 6);
 Data.FORM.FUNC.CodeLocals ??= new UndertaleModLib.UndertaleSimpleList<UndertaleCodeLocals>();
 var root = Directory.GetCurrentDirectory();
 var group = new CodeImportGroup(Data) { AutoCreateAssets = true };
-group.QueueReplace("gml_Object_oNovaTests_Create_0", File.ReadAllText(Path.Combine(root, "tests/runtime/create.gml")) + "\n" + File.ReadAllText(Path.Combine(root, "tests/runtime/backports.gml")) + "\n" + File.ReadAllText(Path.Combine(root, "tests/runtime/inventory.gml")) + "\n" + File.ReadAllText(Path.Combine(root, "tests/runtime/capture.gml")) + "\n" + File.ReadAllText(Path.Combine(root, "tests/runtime/content.gml")) + "\n" + File.ReadAllText(Path.Combine(root, "tests/runtime/controls.gml")));
-group.QueueAppend("gml_Object_oNovaTests_Create_0", File.ReadAllText(Path.Combine(root, "tests/runtime/movement.gml")));
-group.QueueAppend("gml_Object_oNovaTests_Create_0", File.ReadAllText(Path.Combine(root, "tests/runtime/hud.gml")));
-group.QueueAppend("gml_Object_oNovaTests_Create_0", File.ReadAllText(Path.Combine(root, "tests/runtime/crt.gml")));
-group.QueueAppend("gml_Object_oNovaTests_Create_0", File.ReadAllText(Path.Combine(root, "tests/runtime/shop.gml")));
-group.QueueAppend("gml_Object_oNovaTests_Create_0", File.ReadAllText(Path.Combine(root, "tests/runtime/updates.gml")));
-group.QueueAppend("gml_Object_oNovaTests_Create_0", File.ReadAllText(Path.Combine(root, "tests/runtime/profiles.gml")));
-group.QueueAppend("gml_Object_oNovaTests_Create_0", File.ReadAllText(Path.Combine(root, "tests/runtime/options.gml")));
-group.QueueReplace("gml_Object_oNovaTests_Step_0", File.ReadAllText(Path.Combine(root, "tests/runtime/step.gml")));
+// The Create event holds the framework, then every suite in run order, then the screenshot
+// modes. Suites run in registration order within each phase, so this list is the run order.
+string Part(string path) => File.ReadAllText(Path.Combine(root, "tests/device", path));
+var suites = new[] {
+    "title", "menus", "setup", "profiles", "updates", "options",
+    "backports", "movement", "pause", "enemies", "inventory", "content", "controls",
+    "hud", "crt", "shop", "context", "arcade"
+};
+var captures = new[] { "menus", "gameplay", "context", "arcade" };
+var create = Part("harness/framework.gml");
+foreach (var name in suites) create += "\n" + Part("suites/" + name + ".gml");
+foreach (var name in captures) create += "\n" + Part("captures/" + name + ".gml");
+foreach (var file in Directory.GetFiles(Path.Combine(root, "tests/device/suites"), "*.gml"))
+    if (Array.IndexOf(suites, Path.GetFileNameWithoutExtension(file)) < 0) throw new Exception("Suite missing from the run order: " + file);
+group.QueueReplace("gml_Object_oNovaTests_Create_0", create);
+group.QueueReplace("gml_Object_oNovaTests_Step_0", Part("harness/sequencer.gml"));
 group.QueueAppend("gml_Object_oTitle_Create_0", "if (!instance_exists(oNovaTests)) instance_create_depth(0, 0, -100000, oNovaTests);");
-group.QueueAppend("gml_Object_oNovaTests_Create_0", File.ReadAllText(Path.Combine(root, "tests/runtime/context.gml")));
-group.QueueAppend("gml_Object_oNovaTests_Create_0", File.ReadAllText(Path.Combine(root, "tests/runtime/arcade.gml")));
 var settings = new Underanalyzer.Decompiler.DecompileSettings();
 var updateMenu = GetDecompiledText("gml_Object_oMenu_Create_0", null, settings);
 if (updateMenu.Contains("NovaUpdateStep")) {

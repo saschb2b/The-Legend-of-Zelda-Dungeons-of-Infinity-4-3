@@ -1,4 +1,4 @@
-Capture = "";
+// Gameplay screenshots: inventory pages, Status panels, the map, pause and pause Options.
 CaptureTick = 0;
 CaptureIndex = 0;
 CaptureNames = ["inventory-gear", "inventory-items", "inventory-bags", "inventory-treasure", "inventory-food", "inventory-pendants", "inventory-overflow", "inventory-actions", "inventory-info", "inventory-keyboard", "inventory-crt", "inventory-overflowextra", "status-default", "status-crt", "status-remapped", "status-keyboard", "inventory-cursed", "map-default", "pause-menu", "pause-quit", "options-pause", "status-panels"];
@@ -46,21 +46,16 @@ function CaptureStart() {
 function CaptureStep() {
     CaptureTick++;
     if (CaptureTick == 20) {
-        if (CaptureIndex == 8) Record("information retains the inventory grid", array_length(global.InventoryInst.NovaSlots) == 6 && global.InventoryInst.Alpha == 1);
+        if (CaptureIndex == 8) Check("information retains the inventory grid", array_length(global.InventoryInst.NovaSlots) == 6 && global.InventoryInst.Alpha == 1);
         Capture = CaptureNames[CaptureIndex];
         Flush();
     }
-    if (!file_exists("nova-capture-done.txt")) return;
+    if (!file_exists("nova-capture-done.txt")) return false;
     file_delete("nova-capture-done.txt");
     Capture = "";
     CaptureTick = 0;
     CaptureIndex++;
-    if (CaptureIndex == array_length(CaptureNames)) {
-        Complete = true;
-        Flush();
-        game_end();
-        return;
-    }
+    if (CaptureIndex == array_length(CaptureNames)) return true;
     if (CaptureIndex == 18) {
         with (oMap) instance_destroy();
         // A curse and a challenge preset give the run summary its full content.
@@ -74,12 +69,12 @@ function CaptureStep() {
         pause.Open = false;
         pause.Alpha = 1;
         pause.NovaPauseFocus = 4;
-        return;
+        return false;
     }
     if (CaptureIndex == 19) {
         oMenu_Game.NovaPauseDialog = true;
         oMenu_Game.NovaPauseDialogFocus = 0;
-        return;
+        return false;
     }
     if (CaptureIndex == 20) {
         // CRT stays on behind the pause Options to show the live preview.
@@ -91,7 +86,7 @@ function CaptureStep() {
         oMenu_Game.NovaOptionsOpen = true;
         oMenu_Game.NovaOptions = global.NovaOptionsState("pause");
         oMenu_Game.NovaOptions.tab = 1;
-        return;
+        return false;
     }
     if (CaptureIndex == 21) {
         // Open Status: wide screens dock the panels beside the playfield, 4:3 overlays them.
@@ -100,7 +95,7 @@ function CaptureStep() {
         global.Users[global.UserIndex].Prefs[2] = true;
         global.Users[global.UserIndex].Prefs[3] = false;
         input_profile_set("gamepad");
-        return;
+        return false;
     }
     if (CaptureIndex == 17) {
         with (oInventory) instance_destroy();
@@ -109,7 +104,7 @@ function CaptureStep() {
         global.MapInst.Open = false;
         global.MapInst.Alpha = 1;
         global.MapInst.LinkAlpha = 90;
-        return;
+        return false;
     }
     if (CaptureIndex == 16) {
         input_profile_set("gamepad");
@@ -123,7 +118,7 @@ function CaptureStep() {
         global.InventoryInst.Alpha = 1;
         global.InventoryInst.NovaPage = 0;
         with (global.InventoryInst) NovaRefresh();
-        return;
+        return false;
     }
     if (CaptureIndex >= 12) {
         with (oInventory) instance_destroy();
@@ -132,7 +127,7 @@ function CaptureStep() {
         global.Users[global.UserIndex].Prefs[3] = CaptureIndex == 13;
         input_profile_set(CaptureIndex == 15 ? "keyboard" : "gamepad");
         if (CaptureIndex == 14) input_binding_set("hud", input_binding_gamepad_button(gp_face3), 0, 0, "gamepad");
-        return;
+        return false;
     }
     var ui = global.InventoryInst;
     if (instance_exists(global.DB_Inst)) {
@@ -167,4 +162,5 @@ function CaptureStep() {
             break;
     }
     with (ui) NovaRefresh();
+    return false;
 }

@@ -36,7 +36,7 @@ Read the relevant implementation too. If documentation disagrees with code, inve
 | `src/shaders/` | CRT-Lottes port and its provenance |
 | `assets/` | Imported art: controller glyphs, arcade resources, recovered content art |
 | `installer/` | Everything the patch installer ships beside the player README: `install.py`, `updater.py`, `controller.py`, launchers, `gameinfo.xml`, `manifest.json`, `patches/game.droid.bsdiff` |
-| `tests/` | Host tests (`test_*.py`), build verification (`verify.csx`), device runners and the runtime suite in `tests/runtime/` |
+| `tests/` | `host/` Python tests, `build/verify.csx` compiled-game checks, `device/` runner, harness, feature suites and screenshot modes; see [docs/TESTING.md](docs/TESTING.md) |
 | `docs/` | Testing and release guide, backport audit, README screenshots |
 | `tools/` | Manual helpers, such as `repack.py` for a local patched port |
 
@@ -92,7 +92,7 @@ Run checks appropriate to the files and behavior changed:
 
 `--check-release` compares the checked-in release delta with a clean source build. During development, use `--runtime-tests`. Repackage before checking a changed release delta.
 
-For regressions, add a test that fails through the affected game event, then verify the fix and neighboring behavior. A floor-generation fix needs actual generation and transition coverage. Test cancellation, remapping, save/load or vanished instances when the change affects those paths.
+For regressions, add a device test (a `Test` in the feature's suite under `tests/device/suites/`) that fails through the affected game event, then verify the fix and neighboring behavior. A floor-generation fix needs actual generation and transition coverage. Test cancellation, remapping, save/load or vanished instances when the change affects those paths.
 
 GitHub CI runs host tests and compiles the device suite. It **does not execute the device runtime**. Compilation also cannot prove GPU shader support, physical button mapping or visual quality. Report those limits if device validation is unavailable.
 
@@ -102,7 +102,7 @@ Use an authenticated SSH key or existing control socket. Keep device addresses a
 
 ```sh
 python3 build.py --runtime-tests
-python3 tests/run_device.py root@your-device.local \
+python3 tests/device/run_device.py root@your-device.local \
   --control-path /path/to/socket \
   --report-dir .build/device-results
 ```

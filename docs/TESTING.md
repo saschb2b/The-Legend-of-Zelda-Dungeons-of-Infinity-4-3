@@ -2,11 +2,23 @@
 
 Testing has three layers. Each catches a different failure:
 
-| Layer | Runs on | Checks |
-| --- | --- | --- |
-| Unit and installer integration | Python, no downloads | Controller mapping, BSDIFF decoding, checksum failures, interrupted downloads, save preservation, repeated installation, archive traversal, release contents, compiler failure detection, inventory-save backup, runner binary format |
-| Clean build | Linux x86-64 | Pinned upstream and compiler hashes, exact patch anchors, GML compilation, compiled room and code invariants, production/test separation, release delta equality, installation of the real package |
-| Runtime regression | ROCKNIX device (Nova, Flip 2) | Real GameMaker menus, combat, inventory migration, Topaz and challenge save/load, gem recipes, challenge limits, Wallmaster attacks, dungeon templates, and enemy status events |
+| Layer | Location | Runs on | Checks |
+| --- | --- | --- | --- |
+| Host | `tests/host/` | Python, no downloads | Controller mapping, BSDIFF decoding, checksums, interrupted downloads, save preservation, 4:3-edition migration, repeated installation, archive traversal, release contents, compiler failure detection, runner binary format, device report formatting |
+| Build | `tests/build/verify.csx` | Linux x86-64 | Pinned upstream and compiler hashes, exact patch anchors, GML compilation, compiled room and code invariants, production/test separation, release delta equality, installation of the real package |
+| Device | `tests/device/` | ROCKNIX device (Nova 4:3, Flip 2 16:9) | Real GameMaker events: menus, combat, movement, inventory and saves, HUD and screen layouts, CRT, shops, interaction hints, arcade, floor travel |
+
+```text
+tests/
+├── host/              Python unit and integration tests (test_*.py)
+├── build/verify.csx   static checks on the compiled game
+└── device/
+    ├── run_device.py  runner: installs a disposable copy, launches it, collects the report
+    ├── harness/       framework.gml, sequencer.gml, inject.csx
+    ├── suites/        one file per feature area
+    ├── captures/      screenshot modes
+    └── run_village.py, village.csx   playable village preview (manual)
+```
 
 ## Local and CI checks
 
@@ -18,91 +30,130 @@ python3 build.py --runtime-tests
 bash -n installer/*.sh
 ```
 
-The unit suite uses temporary synthetic archives and needs no game files or third-party packages. CI runs it on Python 3.11 and 3.14. The build job uses Python 3.12 on Ubuntu 24.04. Actions use full commit pins, read-only repository permissions, and timeouts. Dependabot checks action pins monthly.
+The host suite uses temporary synthetic archives and needs no game files or third-party packages. CI runs it on Python 3.11 and 3.14. The build job uses Python 3.12 on Ubuntu 24.04. Actions use full commit pins, read-only repository permissions, and timeouts. Dependabot checks action pins monthly.
 
 `build.py` verifies every cached input before use. `--utmt /path/to/UndertaleModCli` and `--upstream-zip /path/to/zeldadoi.zip` can reuse local downloads. A custom compiler path bypasses the compiler archive download check. Use version 0.9.2.0.
 
 The compiler can exit successfully after a script exception. The build requires completion markers and an output file, then reloads the result for structural checks. The original game's audio alignment warning requires the CLI's verbose flag. The patch pins serialization to the older runner's format and verifies that the FUNC chunk includes a locals-table count. The tool can otherwise misidentify the empty upstream table as newer alignment padding and produce a file that crashes at startup.
 
-`--check-release` requires the checked-in delta to reconstruct exactly the bytes from the clean source build. Branch and pull-request CI builds source and the runtime harness. Version-tag CI also checks the release delta and installer. Before publishing a tag, run `python3 build.py --check-release --runtime-tests` locally. CI uploads only `.build/build-report.json`. It never uploads full games, runtimes, saves, or instrumented builds.
+`--check-release` requires the checked-in delta to reconstruct exactly the bytes from the clean source build. Branch and pull-request CI builds source and the device harness. Version-tag CI also checks the release delta and installer. Before publishing a tag, run `python3 build.py --check-release --runtime-tests` locally. CI uploads only `.build/build-report.json`. It never uploads full games, runtimes, saves, or instrumented builds.
 
-## Device runtime suite
+## Device suite
 
-CRT checks compile the shader on the device and render black, gray, impulse and edge patterns. They check brightness, neutral grays, bloom, full-frame coverage, native-pixel sampling, stable phosphors, fallback behavior and restored graphics state. The report includes average and 95th-percentile frame times for 120 gameplay frames with CRT disabled and enabled, after a warm-up. Existing HUD checks run with both settings.
+### Running it
 
-Close any running game first. Install this patch on the device and enable SSH access. Use a key or an existing SSH control socket. The test runner contains no credentials.
+Close any running game first. The device needs this patch installed (or a 4:3-edition installation, which the runner reads from) and SSH access with a key or an existing control socket. The runner contains no credentials.
 
 ```sh
 python3 build.py --runtime-tests
-python3 tests/run_device.py root@your-device.local
+python3 tests/device/run_device.py root@your-device.local --control-path /path/to/socket
 ```
 
-Optional arguments include `--control-path /path/to/socket`, `--ports-dir /storage/roms/ports`, `--report-dir .build/device-results`, and `--patch-version X.Y.Z`, which bundles a version file with the test game so menu screenshots show a release version instead of DEV. Add `--capture` to save screenshots of all seven inventory categories, item actions and information, keyboard prompts, CRT mode, a second overflow page, curse text, the map footer, the pause menu with a cursed run, its quit dialog, and pause Options over the CRT after the assertions. Status captures cover the default binding, CRT mode, a remapped button, and keyboard input. Review the screenshots for clipping, HUD overlap, and incomplete frames. Screenshot comparisons are manual.
+The runner creates a disposable game directory under `/storage/.cache/` with fresh saves and a temporary Ports launcher, launches it through EmulationStation, collects the report, removes the installation and checks that production save hashes are unchanged. It never switches the production game to a test build. If SSH disconnects before cleanup, remove the reported `doi-harness-*` directory and matching `DOI Harness *.sh` launcher after closing the test game.
 
-The runner creates a disposable game directory under `/storage/.cache/`, with fresh saves, and a temporary Ports launcher. It launches through EmulationStation and runs the suite automatically. It writes the JSON assertion report and game log locally, removes the disposable installation, and compares production save hashes. It never switches the production game to a test build. If SSH disconnects before cleanup, remove the reported `doi-harness-*` directory and matching `DOI Harness *.sh` launcher after closing the test game.
+It prints one line per suite and every failed test with its failed checks, and writes `report.json`, `junit.xml` and `game.log` to `--report-dir` (default `.build/device-results`). Other options:
 
-Inspect `game.log` even when every assertion passes. Some runs log a native `gmloadernext` segmentation fault after `###game_end###0`, including builds before v1.7.2. Allowing five seconds before cleanup did not prevent it. The JSON result verifies the assertions, but does not establish clean native shutdown. This remains unresolved and is separate from the village fixture's enemy-reset crash.
+| Option | Effect |
+| --- | --- |
+| `--suite WORD` | Runs only suites whose name contains the word; repeatable. The title and menu-exit suites always run because later contexts depend on them. |
+| `--capture`, `--capture-profiles`, `--capture-updates`, `--capture-context`, `--capture-arcade` | Screenshot modes, see below |
+| `--patch-version X.Y.Z` | Bundles a version file with the test game, as the installer does, so screenshots show a release version instead of `dev` |
+| `--game PATH` | Another instrumented build, such as the baseline |
 
-The suite calls the compiled game events. It substitutes input at the input-query boundary, creates actual enemy instances, and checks projectiles, timers, inventory, menu state, and profile contents. It tests recovery and normal behavior as well as blocked actions. Control cases cover remapped button and stick glyphs, alternate and empty bindings, old profile imports, label-before-glyph spacing, fixed footer positions, shoulder-page wrapping, contextual action labels, simultaneous inputs, item-information closure, and map dismissal. The test object and input substitution exist only in `runtime-tests.droid` and `runtime-baseline.droid`. Packaging rejects either test build.
+Inspect `game.log` even when every test passes. Some runs log a native `gmloadernext` segmentation fault after `###game_end###0`. The report verifies the tests, not a clean native shutdown.
 
-Movement tests measure displacement through Link's compiled Step event over eight frames in all eight directions, including walking, running, carrying, and sword-ready movement. They also check opposing inputs, strafe, doorway speed limits, corner assistance, scripted movement, knockback, and falls. Real wall instances check sliding on all four sides while walking, carrying, or holding the sword. Across eight frames, SNES walking covers 12 pixels straight or 8 per diagonal axis. Carrying and sword-ready movement cover 10 straight or 6.5 per diagonal axis. The tests use fresh saves in the starting clearing.
+### Structure
 
-Sword tests check release and charge-indicator readiness at 0, 1, 44, 45, 47, 48, and 49 held updates. They check pause and resume at the threshold, sword-level restrictions, and indicator dismissal after release. The build verifier requires the indicator to call the same readiness function as the attack.
+The instrumented build adds one object, `oNovaTests`. `inject.csx` concatenates the framework, every suite file in run order and the screenshot modes into its Create event, and the sequencer into its Step event. It fails the build when a suite file is missing from the run order. Only `runtime-tests.droid` and `runtime-baseline.droid` contain this object and the input substitution; packaging rejects both.
 
-Facing tests cover every starting direction against eight movement directions and idle input through Link's compiled Step event. Each case runs with eight random seeds and checks the first three updates while walking, running, carrying, strafing, or holding the sword ready. They also check corner-assist and knockback locks, releasing either diagonal input, and stopping. Expected ordinary turns follow the reconstructed SNES [facing routine](https://github.com/snesrev/zelda3/blob/fbbb3f967a51fafe642e6140d0753979e73b4090/src/player.c#L5932-L5967): keep a facing included in the diagonal, otherwise prefer its vertical direction. DOI's facing locks remain in effect.
+The framework follows the usual xUnit shape:
 
-HUD tests call the compiled renderer with room-scroll, doorway-exit, door-closing, and stair states. They cover all four scroll directions, CRT on and off, and returning control to the player. Draw counters check HUD and Status-hint visibility. A pixel sample checks that the magic meter stays at its screen position while camera coordinates change. Pause-menu, map, dialogue, inventory, and unrelated-pause cases check visibility outside travel. These fixtures test the renderer's response to transition states, not an entire doorway crossing.
+- A **suite** covers one feature area and names the game context it needs: `title`, `menu`, `menu-exit`, `gameplay`, or `travel` for multi-frame tests after gameplay.
+- A **test** checks one behaviour and is named as a sentence ("closing rename discards the draft"). Table-driven tests loop over their cases inside one test and name the row in each check.
+- A **check** is one expectation. A test passes when all its checks pass; a test without checks fails.
+- `BeforeAll` arranges state a whole suite needs. Exceptions fail the current test, or the suite setup, and the run continues.
+- `AsyncTest(name, start, step)` runs `step` every frame until it returns true.
 
-HUD scaling tests render four-digit rupees, full magic and twenty hearts at eight resolutions from 256×224 to 1920×1440. They compare individual output pixel blocks with the native HUD surface, check integer positions and equal side margins, and verify separation between counters and hearts. Each layout must keep a centered 4:3 playfield with the HUD inside it. Screen-shape cases cover 16:9 and 720p pillarboxing with docked panels, 4:3 and 3:2 without docking, 1:1 letterboxing, square pixels, and integer scaling with both pixel shapes. Inventory tests check the shared footer baseline and scale, keyboard fit at four resolutions, and fixed shoulder glyphs beside every page heading. The build checks that gameplay prompts receive the HUD layout and that the HUD pass follows world scaling and restores texture filtering. Use `--capture` to inspect full inventories, maximum counters and CRT rendering on the device. Its last capture, `status-panels`, opens Status: docked beside the playfield on wide screens, over it on 4:3. The build checks that the compositor draws the playfield, CRT pass and pause overlay into the layout's playfield rectangle and that start screens size their views from the window.
+The sequencer moves the game through the title, the adventure menu, back to the title, into a dungeon, and through floor and arcade travel. At each stage it runs the suites registered for that phase in file order.
 
-Shop tests use an actual merchant, item, and purchase script with keyboard and controller profiles. They check closing from every choice, item information, and insufficient-funds messages, including simultaneous confirm and close presses. Closing must preserve goods, rupees, and coupons. Confirming Buy must charge once and start receiving the item. The opening interaction must not also submit or close the dialog.
+The suites call compiled game events directly. `PressEvent` substitutes input at the input-query boundary, so a test presses Confirm by running the target's real Step event. Tests create real enemies, pots, chests, merchants and machines, and they check projectiles, timers, inventory, saves and menu state.
 
-Interaction-hint tests place real pots, chests, NPCs and shop goods within reach, then invoke Interact to verify that the hint matches the resulting action. They cover facing, floor separation, unavailable objects, carrying priority, remapping, keyboard bindings and modal suppression. Repeated hint queries must preserve inventory, saves, treasure state, merchant selection and random-number state. The build derives the read-only query from the patched interaction predicates and rejects unreviewed function calls or instance-field writes.
+### Writing a test
 
-Animation cases run at 30, 60 and 120 Hz. They check the 120 ms entrance, 100 ms exit and 120 ms label change (40 ms out, 80 ms in). They exercise the real pickup state, rapid label changes, interrupted fades, fixed glyph positions and clearing hints when a menu opens. Drawing must preserve animation state and incoming HUD opacity. The animation advances in End Step after gameplay updates. It does not delay input.
+Add it to the suite file for its feature, or create `tests/device/suites/<area>.gml` and add the name to the run order in `inject.csx`. Keep each test independent: create the instances it needs, destroy them, and restore any global it changes. GML methods do not capture locals, so tests share state only through instance variables with a suite prefix or through `BeforeAll`. Keep helper fixtures as named functions at the top of the file.
 
-Add `--capture-context` for Talk, Open, Lift, remapped-controller and keyboard screenshots. Review their spacing beside Status. The same run exports 96 `nova-context-motion-*.png` frames at simulated 60 Hz through the device's renderer. Play the frames at 60 Hz to inspect appearance, Lift-to-Throw and disappearance. This deterministic rendering preview complements the pickup-state tests. It is not a recording of physical input timing.
+```gml
+Suite("Pause menu", "gameplay", function() {
+    Test("every close input resumes", function() {
+        var pause = PauseOpen();
+        PausePress(pause, "escape");
+        Check("Escape resumes from the pause list", pause.Close && !pause.Quitting);
+        PauseClose(pause);
+    });
+});
+```
 
-Kinstone tests create all four pedestal colors and check their frames, lights and matching inventory pieces. A dropped candle must retain its lit frame. Floor tests run the floor 2-to-3 staircase animation through generation and return to movement, with both staircase orientations and CRT settings.
+For a regression, add a test that fails through the affected game event before the fix.
 
-The village fixture activates all instances before generating its floor, matching normal floor travel. A deliberately dormant soldier checks that cleanup removes enemies from the preceding floor. Skipping this step can leave invalid soldiers in the village and crash their room-reset event.
+### Coverage
 
-Village tests enumerate every slot roll and check all stakes and payouts, reel alignment, insufficient funds, wallet limits and repeated settlement. Claw tests cover weighted prize pools, purchase cancellation, payment, movement bounds, grabbing, refunds, losing stakes and item delivery. The suite also walks into and out of both buildings through their real door events. Add `--capture-arcade` for pub, slot, claw and prize screenshots. Review original sprite tiling, reel clipping and footer spacing.
+| File | Suites | Covers |
+| --- | --- | --- |
+| `title.gml` | Title screen, Adventure menu exit | Title skip option, version label, Escape back to the title |
+| `menus.gml` | Adventure menu navigation | Close, Back and Escape on every page; drafts, delete default, binding scans |
+| `setup.gml` | Challenges, New adventure setup | Presets, custom mixes, Random, remembered setups, damaged records, layout and footers |
+| `profiles.gml` | Player profiles, Players screen | Continue, partial hearts, player switching, rename, 64-bit play times, last-played dates, Cancel-first delete |
+| `updates.gml` | Updates | Update states, stale responses, confirmation, cancellation, retry, restart, window bounds; the network worker is disabled |
+| `options.gml` | Options | Tabs, toggles, device settings (including square pixels and integer scaling), volume, Defaults, remapping with swaps, Reset, timeout, Restore all, About, layout |
+| `backports.gml` | Kinstones, Backported fixes, Progression, Floor travel | Upstream fixes, Moon Pearl, Treeman, Red Armos, Zora, templates, keys, rods; the floor 2-to-3 staircase through generation with both orientations and CRT settings |
+| `movement.gml` | Movement and facing | Eight-frame SNES distances (12 px straight, 8 per diagonal axis walking; 10 and 6.5 carrying or sword-ready), the reconstructed [SNES facing routine](https://github.com/snesrev/zelda3/blob/fbbb3f967a51fafe642e6140d0753979e73b4090/src/player.c#L5932-L5967) with eight seeds, strafe, doorways, corner assistance, knockback, falls, wall sliding |
+| `pause.gml` | Pause menu | Rows, Options and Controls under Paused, Cancel-first quits, Save Tent warning, run summary, every resume input |
+| `enemies.gml` | Enemy status guards | Medusa, cannon and Pikit while frozen, stoned, paused or protected |
+| `inventory.gml` | Inventory, Sword charge | Candle and lamp, gear slots, bags, overflow, migration, save/load; poke, spin readiness at exactly 48 updates, pause, falls, pots |
+| `content.gml` | Recovered 1.2.1 items, Challenge effects, Wall Master | Gem recipes, Topaz save/load, challenge limits and legacy saves, Wall Master behaviour |
+| `controls.gml` | Controller bindings, Inventory controls, Map controls | Nintendo A/B, remapped glyphs, keyboard keycaps, old profiles, inventory footers and paging, map dismissal |
+| `hud.gml` | HUD scaling, Screen shapes, HUD visibility | Integer HUD pixels at eight resolutions, 4:3 playfield on 4:3, 16:9, 3:2, 5:3, 1:1 and 1440p screens, docked panels, square pixels, integer scaling, HUD through room transitions |
+| `crt.gml` | CRT shader, CRT image, CRT performance | Compilation, black level, neutral grays, bloom, native-pixel sampling, stable phosphors, fallback, restored graphics state; frame times with CRT off and on |
+| `shop.gml` | Shop | Closing every choice without buying, item information, insufficient funds, single charge on Buy |
+| `context.gml` | Interaction hints, Interaction hint motion | Talk, Open, Lift, Throw, Read and Inspect against the real Interact result; read-only queries; 120 ms entrance, 100 ms exit and label changes at 30, 60 and 120 Hz |
+| `arcade.gml` | Arcade slot machine, Arcade claw machine, Arcade doorways | Every slot roll, stakes and payouts, reel rendering against 1.2.1, wallet caps; claw pools, payment and refunds; walking through both doors |
 
-Controller tests check PortMaster's Nintendo A/B mapping and preserve other controls, Xbox mappings, and custom layouts. The device runner uses the repository's launcher and controller adapter. Before release, verify the physical Nova buttons: B swings the sword, A interacts, and menus use A to confirm and B to close. Logical input injection alone cannot verify the controller translation.
+The build verifier covers what needs no device: that prompts use the HUD layout, the HUD follows world scaling and restores filtering, the compositor draws into the playfield rectangle, the sword indicator uses the attack's readiness function, the interaction query stays read-only, and start screens size their views from the window.
 
-Updater tests cover stable-version selection, release URLs, checksums, archive paths, cancellation, insufficient space, installation failure, and recovery after each file-switch step. An integration test downloads fixture bytes and runs the real installer in a separate directory, preserving saves and migration backups. The running-game check must ignore gptokeyb, which the launcher leaves running during installation with the game executable in its arguments. Unit tests replace this check, so verify **Options > Updates** through the real launcher on the Nova before release.
+### Screenshots
 
-The runtime suite checks the Updates menu, stale responses, confirmation, cancellation, retry, window bounds, and controller hints. Its launcher disables the network worker so menu fixtures cannot download or install a release. `--capture` includes update-available and error screens. Check the live service separately before release.
+Screenshot modes run after the tests and report under the Screenshots suite. Menu modes take three consecutive samples, because remote captures can omit parts of a frame.
 
-Startup tests cover empty players, saved runs, partial hearts, remembered selection, direct player switching, renaming and Close behavior. They cycle every character, bonus and challenge option, and step through the Hero's Path, Second Quest and Master Quest presets without losing a custom mix. Random must change the character. Setup tests remember each player's last setup, forget it when the player is deleted, recover from a damaged record and fall back to a saved run's character. They measure the preview, bonus names, help lines, breadcrumb summary and footers. Browsing a new-run draft must leave saved progress unchanged. Replacement and deletion default to keeping progress. Canceling Create player restores the previous selection without creating a profile. Player tests open on the current player, read 64-bit play times and records, format last-played dates, rename with the shoulder shortcuts and reject blank names. Deleting must start on Cancel, close with Back, and forget the player's remembered setup and date. They measure the cards, record columns and footers. The harness intercepts start/continue at the room-change boundary, then separately enters the dungeon for gameplay regression tests. Keyboard and controller hints must clear the shared frame.
+| Option | Captures |
+| --- | --- |
+| `--capture-profiles` | Adventure menu, setup, challenges, players, Details, Rename, the delete dialog, Options tabs including About, the Defaults dialog, gamepad and keyboard remapping, a remap in progress, Credits |
+| `--capture-updates` | Update available and update error |
+| `--capture` | Both of the above, then every inventory page, item actions and information, keyboard prompts, CRT, overflow and curse text, the map, the pause menu and its quit dialog, pause Options over the CRT, Status in four variants and the Status panels (docked on wide screens) |
+| `--capture-context` | Talk, Open, Lift, a remapped button, the keyboard, and 96 motion frames at simulated 60 Hz |
+| `--capture-arcade` | Pub, slot, claw and prize screens |
 
-Options tests drive the adventure-menu screen through tab wrapping, remembered rows, toggles, volume limits and muting, stored device settings, per-tab defaults with Cancel and Close, single-action remapping, swaps on conflict, changed markers, per-action Reset, cancel and timeout, grouped scrolling that skips headings and fixed buttons, Restore all defaults, About links, and the return to the home row. Nested pages must keep their tab, header breadcrumb and Back label, and confirmations must open over the page they affect. The tests measure the tab strip, breadcrumbs, labels, two-line descriptions, binding rows, the confirmation dialog and footers for controller and keyboard. Pause tests open on Resume, wrap the list, open Options and Controls under a Paused breadcrumb and return to their rows, remap without the adventure menu and cancel with Select. Start over and both quits must start on Cancel, close with Back and explain the Save Tent consequence; confirming starts the chosen quit. Escape, Back, Select and Resume all leave pause. The run summary must read the live floor, hearts and character, and the rows, summary, help and footer must fit.
+Review captures for clipping, overlap, spacing and incomplete frames on both a 4:3 and a 16:9 device. For inventory prompts, Close must keep its position and shoulder hints must stay fixed across all page titles, following [XAG 112's guidance on consistent prompt locations](https://learn.microsoft.com/en-us/xbox/accessibility/xbox-accessibility-guidelines/112). Remote screenshots can omit parts of a frame; recheck on the physical screen before treating that as a rendering defect.
 
-Use `--capture-profiles` for the adventure menu, setup, challenges, players, Options tabs, the defaults dialog, player cards, Details, Rename, the delete dialog, gamepad and keyboard remapping pages, a remap in progress and Credits, or `--capture-updates` for the updater. `--capture` includes both. Menu captures include three consecutive samples because remote captures can omit parts of a frame. Inspect the two-row heart display, selected cursor, and footer spacing on the device.
+### Baseline and limits
 
-The updater downloads and verifies the installer and upstream package while the game runs. After the game exits, it installs into a separate directory. A recovery journal protects the directory switch and launcher replacement. The launcher restores an interrupted transaction before starting the game. Diagnostics are in `zeldadoi-beyond/update.log`.
-
-To show that the assertions catch the original regressions:
+To show that the tests catch the original regressions:
 
 ```sh
-python3 tests/run_device.py root@your-device.local \
+python3 tests/device/run_device.py root@your-device.local \
   --game .build/runtime-baseline.droid \
   --report-dir .build/baseline-results
 ```
 
-The baseline contains the unpatched 1.1.6 game with the same instrumentation. That command must fail on the behaviors the patch adds. Review each named failure. Some original bugs terminate the runner before the report can complete. Retain the partial assertion report and the named error in `game.log`. A launch error does not prove regression coverage.
+The baseline contains the unpatched 1.1.6 game with the same harness. It must fail on the behaviours the patch adds; review each failed test. Some original bugs end the run before the report completes; keep the partial report and the error in `game.log`. A launch error does not prove coverage.
 
-GitHub-hosted CI compiles the runtime suite but cannot execute the device's ARM/GPU runtime. Before releasing, run the suite on a device. Also check the physical confirm/cancel buttons, title animation, remapped Status toggling, shoulder paging, item actions and information, pause layout, CRT mode, and Select + Start. Verify that the glyph matches the button that actually triggers each action. Inspect all three challenge pages, including the longest values and returning to the start menu. Runtime assertions measure the text columns and window bounds, but screenshots still need review. Injected input does not verify physical controller mapping, rendering quality, audio, or an entire generated dungeon run.
-
-For inventory prompts, compare empty slots, equipment, usable items, action lists, and item information. Close must retain its position throughout. Shoulder hints must stay fixed across all page titles, including both overflow pages. Check remapped buttons and keyboard keycaps for overlap. This follows [XAG 112's guidance on consistent prompt locations and order](https://learn.microsoft.com/en-us/xbox/accessibility/xbox-accessibility-guidelines/112). The specific Equip / Close / primary-action row is a design choice for this compact layout.
+GitHub-hosted CI compiles the device suite but cannot execute the device's ARM/GPU runtime. Before a release, run the suite on a 4:3 and a 16:9 device. Injected input does not verify physical controller mapping, rendering quality, audio, or an entire generated dungeon run, so also check on the device: B swings the sword, A interacts, menus confirm with A and close with B, the glyphs match the buttons that trigger them, Status toggling, shoulder paging, item actions, the pause layout, CRT mode, all three challenge pages, and Select + Start. Verify **Options > Updates** through the real launcher, and check the live release service separately; the updater downloads and verifies while the game runs, installs after it exits, and logs to `zeldadoi-beyond/update.log`.
 
 ## Playable village test
 
 After a clean build, this command leaves a separate **DOI Village Test** entry in Ports and launches it:
 
 ```sh
-python3 tests/run_village.py root@your-device.local --control-path /path/to/socket
+python3 tests/device/run_village.py root@your-device.local --control-path /path/to/socket
 ```
 
 The test starts outside the village arcade with 500 rupees and normal physical controls.

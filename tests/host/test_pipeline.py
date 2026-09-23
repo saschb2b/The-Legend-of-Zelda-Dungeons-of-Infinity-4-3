@@ -9,7 +9,7 @@ from zipfile import ZipFile
 
 import build
 import install
-from tests.test_install import binary_patch
+from tests.host.test_install import binary_patch
 from hashlib import sha256
 
 

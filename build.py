@@ -149,15 +149,15 @@ def main():
     output = BUILD / 'patched.droid'
     run_umt(tool, BUILD / 'game.droid', 'src/apply.csx', output, 'Dungeons of Infinity and Beyond patch compiled.')
     verify_runner_format(output.read_bytes())
-    run_umt(tool, output, 'tests/verify.csx', sentinel='NOVA BUILD VERIFIED')
+    run_umt(tool, output, 'tests/build/verify.csx', sentinel='NOVA BUILD VERIFIED')
     if args.check_release:
         check_release(original, output.read_bytes(), manifest)
     if args.runtime_tests:
-        run_umt(tool, output, 'tests/runtime/inject.csx', BUILD / 'runtime-tests.droid', 'NOVA TEST HARNESS COMPILED')
-        run_umt(tool, BUILD / 'game.droid', 'tests/runtime/inject.csx', BUILD / 'runtime-baseline.droid', 'NOVA TEST HARNESS COMPILED')
+        run_umt(tool, output, 'tests/device/harness/inject.csx', BUILD / 'runtime-tests.droid', 'NOVA TEST HARNESS COMPILED')
+        run_umt(tool, BUILD / 'game.droid', 'tests/device/harness/inject.csx', BUILD / 'runtime-baseline.droid', 'NOVA TEST HARNESS COMPILED')
         verify_runner_format((BUILD / 'runtime-tests.droid').read_bytes())
         verify_runner_format((BUILD / 'runtime-baseline.droid').read_bytes())
-        run_umt(tool, output, 'tests/village.csx', BUILD / 'village-preview.droid', 'NOVA VILLAGE PREVIEW COMPILED')
+        run_umt(tool, output, 'tests/device/village.csx', BUILD / 'village-preview.droid', 'NOVA VILLAGE PREVIEW COMPILED')
         verify_runner_format((BUILD / 'village-preview.droid').read_bytes())
     summary = {'compiled': True, 'release_verified': args.check_release,
                'runtime_harness_compiled': args.runtime_tests,

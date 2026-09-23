@@ -196,7 +196,7 @@ class UpdateTransactionTests(unittest.TestCase):
 
 class DownloadAndInstallTests(unittest.TestCase):
     def setUp(self):
-        from tests.test_install import binary_patch
+        from tests.host.test_install import binary_patch
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
@@ -227,7 +227,7 @@ class DownloadAndInstallTests(unittest.TestCase):
                     'patched_game_sha256': hashlib.sha256(updated).hexdigest(),
                     'patched_game_size': len(updated), 'patch_sha256': hashlib.sha256(delta).hexdigest()}
         installer = io.BytesIO()
-        root = Path(__file__).resolve().parents[1]
+        root = Path(__file__).resolve().parents[2]
         with ZipFile(installer, 'w') as archive:
             for name in ('install.py', 'controller.py', 'updater.py', 'README.md', 'gameinfo.xml', updater.LAUNCHER):
                 archive.writestr('zeldadoi-beyond-installer/' + name, (root / name if name == 'README.md' else root / 'installer' / name).read_bytes())
