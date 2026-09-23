@@ -82,7 +82,7 @@ The centered title screen leads into an adventure menu with your last selected p
 
 ![New adventure with a character preview, Wooden Shield bonus, the Second Quest challenge preset with its level meter and icons, and Begin adventure](docs/screenshots/adventure-setup.png)
 
-**Change player** keeps all five save slots available, with each saved adventure's character, floor and hearts grouped in one row. Select a player to return to their adventure, or use **Manage** for records, renaming and deletion. Starting over an existing save asks for confirmation. Options, controls, updates and credits are available before entering the dungeon.
+**Change player** shows each player as a card with their character, floor, play time, hearts, wins and deaths, and it opens on the current player. The line below says when each player last played. Select a player to return to their adventure, or press **Details** for their full records, **Rename** and **Delete player**. Deleting asks first, with Cancel selected, and names the run that will be erased. When renaming, L erases a letter and R adds a space. Starting over an existing save asks for confirmation. Options, controls, updates and credits are available before entering the dungeon.
 
 ![Options with Game, Display, Audio, Controls and About tabs, volume bars and a description of the selected setting](docs/screenshots/options.png)
 

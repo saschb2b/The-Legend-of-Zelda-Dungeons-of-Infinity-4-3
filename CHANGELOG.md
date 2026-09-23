@@ -15,6 +15,9 @@ These versions identify the 4:3 patch, independently of the original game's vers
 - Rebuild New adventure around a character preview with a floor shadow and subtle idle motion, the bonus item's artwork, and a help line for the highlighted choice. Begin adventure is the largest element and one A press away from every row except Challenges. Random picks another character.
 - Add challenge presets named Hero's Path, Second Quest and Master Quest, a level meter that adds up every challenge, and icons for the active ones. A custom mix stays available while browsing presets.
 - Give the Challenges page tabs, a breadcrumb, a description and icon for each challenge, marked changes and a Defaults dialog.
+- Show players as cards with their character, floor, play time, hearts, wins, deaths and challenge level. Players opens on the current player and says when each one last played. An empty slot reads New player.
+- Replace Manage with a Details page: the current run, lifetime records with the best time highlighted, and Play, Rename and Delete player. Deleting opens a dialog that starts on Cancel and names the run it erases.
+- Rename shows a letter counter, explains a blank name, and adds L to erase and R for a space.
 - Remember each player's last character, bonus and challenges. Saves started with challenges show their level beside the floor.
 - Keep menu Confirm (A), Back (B) and Pause (Select) fixed. Remapping Sword or Interact no longer moves the menu buttons, so a remap cannot lock players out. Select or Esc cancels a remap, and an unanswered remap stops after ten seconds.
 - Remove the pause menu's HUD toggle. The Status button still shows and hides the panels.

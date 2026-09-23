@@ -36,7 +36,7 @@ function MenuTests() {
     global.Users[0].Name = "HARNESS";
     DungeonSeq_Init(0);
     oMenu.NovaTransition = 36;
-    var cases = [["setup", "home"], ["players", "home"], ["options", "home"], ["challenges", "setup"], ["replace", "setup"], ["player", "players"], ["rename", "player"], ["delete", "player"], ["records", "player"], ["credits", "options"]];
+    var cases = [["setup", "home"], ["players", "home"], ["options", "home"], ["challenges", "setup"], ["replace", "setup"], ["player", "players"], ["rename", "player"], ["credits", "options"]];
     for (var i = 0; i < array_length(cases); i++) {
         for (var key = 0; key < 2; key++) {
             oMenu.NovaPage = cases[i][0];
@@ -48,10 +48,11 @@ function MenuTests() {
     oMenu.NovaName = "UNSAVED";
     PressEvent(oMenu, global.NovaCloseVerb(), oMenu, ev_step, ev_step_normal);
     Record("Closing rename discards the draft", global.Users[0].Name == "HARNESS");
-    oMenu.NovaPage = "delete";
-    oMenu.NovaFocus = 0;
+    oMenu.NovaPage = "player";
+    oMenu.NovaPlayerDialog = true;
+    oMenu.NovaPlayerDialogFocus = 0;
     PressEvent(oMenu, "menu_input", oMenu, ev_step, ev_step_normal);
-    Record("Default delete choice preserves the player", global.Users[0].Name == "HARNESS");
+    Record("Default delete choice preserves the player", global.Users[0].Name == "HARNESS" && !oMenu.NovaPlayerDialog && oMenu.NovaPage == "player");
     oMenu.NovaPage = "options";
     oMenu.NovaOptions.page = "device";
     oMenu.NovaOptions.device = 1;

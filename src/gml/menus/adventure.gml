@@ -81,6 +81,7 @@ function NovaBegin() {
     }
     NovaRememberPlayer();
     NovaSetupSave();
+    NovaPlayedMark();
     global.LinkCharacterIndex = NovaDraft.character;
     global.StartingGear = NovaDraft.bonus;
     global.NovaResetChallenges();
@@ -99,6 +100,7 @@ function NovaContinue() {
         return;
     }
     NovaRememberPlayer();
+    NovaPlayedMark();
     Menu_ContinueGame();
 }
 function NovaClose() {
@@ -111,7 +113,7 @@ function NovaClose() {
         case "players": case "options": case "save-error": NovaGo("home"); break;
         case "challenges": case "replace": NovaGo("setup"); break;
         case "player": NovaGo("players"); break;
-        case "rename": case "delete": case "records": NovaGo("player"); break;
+        case "rename": NovaGo("player"); break;
         case "credits": NovaGo("options"); break;
     }
     audio_play_sound(Sound_Throw, 1, false);
@@ -135,8 +137,8 @@ function NovaRowCount() {
         case "home": return array_length(NovaHomeRows());
         case "setup": return 4;
         case "players": return array_length(NovaPlayerRows());
-        case "player": return 4;
-        case "replace": case "delete": return 2;
+        case "player": return 3;
+        case "replace": return 2;
         case "challenges": return array_length(NovaChallengePages[NovaChallengePage]);
     }
     return 1;
@@ -148,7 +150,7 @@ function NovaConfirm() {
             switch (rows[NovaFocus]) {
                 case "Continue": NovaContinue(); break;
                 case "New adventure": NovaNewDraft(); break;
-                case "Change player": NovaGo("players", 0); break;
+                case "Change player": NovaGo("players", NovaPlayersFocusCurrent()); break;
                 case "Options": NovaOptions.page = "list"; NovaGo("options", 0); break;
                 case "Quit game": game_end(); break;
             }
@@ -170,28 +172,24 @@ function NovaConfirm() {
             break;
         case "player":
             if (NovaFocus == 0) NovaGo("home", 0);
-            else if (NovaFocus == 1) NovaGo("records", 0);
-            else if (NovaFocus == 2) {
+            else if (NovaFocus == 1) {
                 NovaName = global.Users[global.UserIndex].Name;
                 NovaNameCell = 0;
+                NovaRenameNotice = "";
                 NovaGo("rename", 0);
-            } else NovaGo("delete", 0);
-            break;
-        case "delete":
-            if (NovaFocus == 0) NovaClose();
-            else { NovaSetupForget(global.UserIndex); User_Delete(); NovaRestorePlayer(); NovaGo("players", 0); }
+            } else {
+                NovaPlayerDialog = true;
+                NovaPlayerDialogFocus = 0;
+            }
             break;
         case "rename":
             if (NovaNameCell < string_length(NovaLetters)) {
                 if (string_length(NovaName) < 8) NovaName += string_char_at(NovaLetters, NovaNameCell + 1);
             } else if (NovaNameCell == string_length(NovaLetters)) NovaName = string_delete(NovaName, string_length(NovaName), 1);
-            else if (string_length(string_trim(NovaName)) > 0) {
-                global.Users[global.UserIndex].Name = NovaName;
-                User_Save();
-                NovaGo("player");
-            }
+            else NovaRenameSave();
+            if (NovaPage == "rename" && NovaNameCell < string_length(NovaLetters)) NovaRenameNotice = "";
             break;
-        case "records": case "save-error": NovaClose(); break;
+        case "save-error": NovaClose(); break;
     }
     audio_play_sound(Sound_TextDone, 1, false);
     input_clear_momentary(true);
@@ -209,7 +207,22 @@ function NovaAdventureStep(close) {
         return;
     }
     if (NovaPage == "challenges" && NovaChallengeDialogStep(close)) return;
+    if (NovaPage == "player" && NovaPlayerDialogStep(close)) return;
     if (close) { NovaClose(); return; }
+    if (NovaPage == "rename" && (input_check_pressed("nova_bag_previous") || input_check_pressed("nova_bag_next"))) {
+        // L erases and R adds a space, so names need fewer trips across the grid.
+        if (input_check_pressed("nova_bag_previous")) NovaName = string_delete(NovaName, string_length(NovaName), 1);
+        else if (string_length(NovaName) < 8) NovaName += " ";
+        NovaRenameNotice = "";
+        audio_play_sound(Sound_Text, 1, false);
+        input_clear_momentary(true);
+        return;
+    }
+    if (NovaPage == "player" && (input_check_pressed("left") || input_check_pressed("right"))) {
+        NovaFocus = (NovaFocus + input_check_pressed("right") - input_check_pressed("left") + 3) mod 3;
+        audio_play_sound(Sound_Text, 1, false);
+        return;
+    }
     if (NovaPage == "challenges" && input_check_pressed("item")) {
         NovaChallengeDialog = true;
         NovaChallengeDialogFocus = 0;
@@ -346,48 +359,26 @@ function NovaAdventureDraw() {
             draw_surface_ext(global.NovaTitleFrame, 0, -38, 400 / surface_get_width(global.NovaTitleFrame), 300 / surface_get_height(global.NovaTitleFrame), 0, c_white, 1 - NovaTransition / 12);
         return;
     }
-    var titles = {setup: "New adventure", players: "Players", player: "Player", challenges: ["New adventure", "Challenges"], replace: "New adventure", delete: "Delete player", rename: "Your name", records: "Records", credits: ["Options", "About", "Credits"]};
+    var name = global.Users[global.UserIndex].Name;
+    var titles = {setup: "New adventure", players: "Players", player: ["Players", name], challenges: ["New adventure", "Challenges"], replace: "New adventure", rename: ["Players", name, "Rename"], credits: ["Options", "About", "Credits"]};
     NovaMenuFrame(variable_struct_exists(titles, NovaPage) ? variable_struct_get(titles, NovaPage) : "Saved adventure");
     switch (NovaPage) {
         case "setup": NovaSetupDraw(); break;
         case "challenges": NovaChallengesDraw(); break;
-        case "players":
-            var rows = NovaPlayerRows();
-            for (var i = 0; i < array_length(rows); i++) {
-                var summary = NovaProfileSummary(rows[i]);
-                var py = 65 + i * 36;
-                NovaText(summary.name == "" ? "Create player" : summary.name, 86, py, NovaFocus == i);
-                if (NovaFocus == i) draw_sprite(sMenu_Selector_Active, Selector_Frame, 38, py - 38);
-                if (summary.name != "") {
-                    NovaText(summary.saved ? "Floor " + string(summary.floor) : "No saved run", 190, py + 3, false, 0.75);
-                    if (summary.level > 0) NovaChallengeBadge(190, py - 38 + 18, summary.level);
-                    if (summary.saved) {
-                        draw_sprite(global.CharacterSprites, summary.character, 60, py - 38);
-                        NovaHearts(summary, 264, py + 2);
-                    }
-                }
-            }
-            var chosen = rows[NovaFocus];
-            var manage = global.Users[chosen].Name != "" ? {binding: global.NovaBinding("item"), label: "Manage"} : undefined;
-            NovaFooter("Select", manage);
-            break;
-        case "player":
-            var summary = NovaProfileSummary(global.UserIndex);
-            NovaText(summary.name, 200, 65, false, 1.2, fa_center);
-            draw_sprite(global.CharacterSprites, summary.character, 320, 25);
-            var rows = ["Play", "Records", "Rename", "Delete player"];
-            for (var i = 0; i < 4; i++) NovaRow(rows[i], i, 108 + i * 36);
-            NovaFooter();
-            break;
-        case "replace": case "delete":
-            NovaText(NovaPage == "replace" ? "Replace your saved adventure?" : "Delete " + global.Users[global.UserIndex].Name + "?", 200, 90, false, 1, fa_center);
-            NovaText(NovaPage == "replace" ? "Your player and records stay." : "Your save and records will be erased.", 200, 120, false, 0.8, fa_center);
-            NovaRow(NovaPage == "replace" ? "Keep save" : "Keep player", 0, 180);
-            NovaRow(NovaPage == "replace" ? "Begin adventure" : "Delete player", 1, 220);
+        case "players": NovaPlayersDraw(); break;
+        case "player": NovaDetailsDraw(); break;
+        case "replace":
+            NovaText("Replace your saved adventure?", 200, 90, false, 1, fa_center);
+            NovaText("Your player and records stay.", 200, 120, false, 0.8, fa_center);
+            NovaRow("Keep save", 0, 180);
+            NovaRow("Begin adventure", 1, 220);
             NovaFooter();
             break;
         case "rename":
-            NovaText(NovaName + "_", 200, 66, false, 1.2, fa_center);
+            NovaText(NovaName + "_", 200, 60, false, 1.2, fa_center);
+            draw_set_alpha(0.7);
+            global.NovaOptText(NovaRenameNotice != "" ? NovaRenameNotice : string(string_length(NovaName)) + " / 8", 200, 44, false, 0.6, fa_center, NovaRenameNotice != "" ? NovaSetupChanged : c_white);
+            draw_set_alpha(1);
             for (var i = 0; i < string_length(NovaLetters); i++) {
                 var px = 53 + (i mod 13) * 24;
                 var py = 103 + (i div 13) * 24;
@@ -396,17 +387,8 @@ function NovaAdventureDraw() {
             }
             NovaText("Erase letter", 60, 239, NovaNameCell == string_length(NovaLetters));
             NovaText("Save name", 230, 239, NovaNameCell == string_length(NovaLetters) + 1);
-            NovaFooter();
-            break;
-        case "records":
-            var labels = ["Games played", "Games won", "Best time", "Deaths", "Monsters killed", "Rupees collected", "Treasures opened"];
-            var stats = global.Users[global.UserIndex].Stats;
-            var values = [string(stats[0]), string(stats[1]), stats[6] == 0 ? "-" : Time_Str(stats[6]), string(stats[2]), string(stats[3]), string(stats[4]), string(stats[5])];
-            for (var i = 0; i < 7; i++) {
-                NovaText(labels[i], 44, 68 + i * 26, false, 0.85);
-                NovaText(values[i], 352, 68 + i * 26, false, 0.85, fa_right);
-            }
-            NovaFooter("");
+            var rename_hints = NovaRenameFooter();
+            for (var i = 0; i < array_length(rename_hints); i++) global.NovaHintDraw(rename_hints[i]);
             break;
         case "credits":
             NovaPageHeading(string(NovaCreditPage + 1) + " / " + string(ceil(array_length(NovaCredits) / 10)));

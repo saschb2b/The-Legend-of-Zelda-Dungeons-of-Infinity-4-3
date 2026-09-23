@@ -44,7 +44,8 @@ function ProfileMenuTests() {
         oMenu.NovaPage = "players";
         with (oMenu) NovaAdventureDraw();
         draw_set_font(global.MenuFont_Innactive);
-        Record("Eight-letter names clear the progress column " + string(device), 86 + string_width(maximum.name) + 8 <= 190);
+        var cards = oMenu.NovaPlayersLayout();
+        Record("Eight-letter names and the current tag clear the stats column " + string(device), cards.name_x + string_width(maximum.name) * 0.8 + 8 + string_width("CURRENT") * 0.5 + 6 <= cards.stats_x);
         oMenu.NovaPage = "home";
     }
     Record("Drawing previews leaves all saves untouched", json_stringify(global.Users) == before);
@@ -82,13 +83,15 @@ function ProfileMenuTests() {
     oMenu.NovaPage = "players";
     oMenu.NovaFocus = 0;
     PressEvent(oMenu, "item", oMenu, ev_step, ev_step_normal);
-    Record("Manage opens the highlighted player's records and settings", global.UserIndex == 0 && oMenu.NovaPage == "player");
-    oMenu.NovaFocus = 2;
+    Record("Details opens the highlighted player's records and actions", global.UserIndex == 0 && oMenu.NovaPage == "player" && oMenu.NovaFocus == 0);
+    PressEvent(oMenu, "right", oMenu, ev_step, ev_step_normal);
+    Record("Details actions move left and right", oMenu.NovaFocus == 1);
     PressEvent(oMenu, "menu_input", oMenu, ev_step, ev_step_normal);
     oMenu.NovaName = "Test";
     oMenu.NovaNameCell = string_length(oMenu.NovaLetters) + 1;
     PressEvent(oMenu, "menu_input", oMenu, ev_step, ev_step_normal);
-    Record("Saving a name returns to Rename with the new name", global.Users[0].Name == "Test" && oMenu.NovaPage == "player" && oMenu.NovaFocus == 2);
+    Record("Saving a name returns to Rename with the new name", global.Users[0].Name == "Test" && oMenu.NovaPage == "player" && oMenu.NovaFocus == 1);
+    PlayerScreenTests();
     global.Users[0].Name = "LINK";
     global.NovaTestContinue = false;
     with (oMenu) NovaContinue();
@@ -158,9 +161,36 @@ function ProfileCaptureStep() {
         oMenu.NovaFocus = 1;
         Capture = "profiles-challenges";
     } else if (Capture == "profiles-challenges") {
+        // Lifetime records, a challenge level and a play date give the cards realistic content.
+        global.Users[0].SaveData.NovaChallengeOptions = oMenu.NovaPresets[1].values;
+        global.Users[0].SaveData.TimePlayed = 4980000000;
+        global.Users[1].SaveData.TimePlayed = 35940000000;
+        global.Users[1].SaveData.BossesDefeated = 31;
+        global.Users[1].Stats = [42, 3, 39, 5210, 48012, 417, 3288000000, 0];
+        global.Users[0].Stats = [5, 0, 4, 190, 1210, 23, 0, 0];
+        global.UserIndex = 0;
+        with (oMenu) NovaPlayedMark();
         oMenu.NovaPage = "players";
+        oMenu.NovaFocus = 0;
         Capture = "profiles-players";
     } else if (Capture == "profiles-players") {
+        with (oMenu) { NovaSelectPlayer(1); NovaGo("player", 0); }
+        Capture = "profiles-details";
+    } else if (Capture == "profiles-details") {
+        oMenu.NovaName = "WWWWWWWW";
+        oMenu.NovaNameCell = 0;
+        oMenu.NovaRenameNotice = "";
+        oMenu.NovaPage = "rename";
+        Capture = "profiles-rename";
+    } else if (Capture == "profiles-rename") {
+        oMenu.NovaPage = "player";
+        oMenu.NovaFocus = 2;
+        oMenu.NovaPlayerDialog = true;
+        oMenu.NovaPlayerDialogFocus = 0;
+        Capture = "profiles-delete";
+    } else if (Capture == "profiles-delete") {
+        oMenu.NovaPlayerDialog = false;
+        global.UserIndex = 0;
         oMenu.NovaOptions = global.NovaOptionsState("title");
         oMenu.NovaOptions.tab = 2;
         oMenu.NovaPage = "options";
@@ -216,4 +246,71 @@ function ProfileCaptureStep() {
     }
     Flush();
     return false;
+}
+
+function PlayerScreenTests() {
+    var profile = input_profile_get();
+    global.UserIndex = 1;
+    Record("Players opens on the current player", oMenu.NovaPlayersFocusCurrent() == 1);
+    with (oMenu) NovaGo("home", 0);
+    var home_rows = oMenu.NovaHomeRows();
+    oMenu.NovaFocus = array_get_index(home_rows, "Change player");
+    PressEvent(oMenu, "menu_input", oMenu, ev_step, ev_step_normal);
+    Record("Change player lands on the current player's card", oMenu.NovaPage == "players" && oMenu.NovaFocus == 1);
+    Record("play time reads as hours and minutes", oMenu.NovaPlayTime(0) == "0m" && oMenu.NovaPlayTime(30000000) == "1m" && oMenu.NovaPlayTime(5400000000) == "1h 30m");
+    global.Users[1].SaveData.TimePlayed = 5400000000;
+    global.Users[1].Stats[6] = 3288000000;
+    Record("large 64-bit play times and records are read", oMenu.NovaPlayerRun(1).time == 5400000000 && oMenu.NovaPlayerStat(1, 6) == 3288000000);
+    with (oMenu) NovaPlayedMark();
+    Record("last played reads as today", oMenu.NovaPlayedText(1) == "today" && string_pos("Last played today", oMenu.NovaPlayersHelp()) > 0);
+    with (oMenu) NovaPlayedForget(1);
+    Record("a player without a date shows none", oMenu.NovaPlayedText(1) == "");
+    draw_set_font(global.MenuFont_Innactive);
+    var menu = global.NovaMenuLayout();
+    for (var device = 0; device < 2; device++) {
+        input_profile_set(device == 0 ? "gamepad" : "keyboard");
+        oMenu.NovaFocus = 1;
+        var cards = oMenu.NovaPlayersFooter();
+        Record("player cards offer Details, Select and Close " + string(device), array_length(cards) == 3 && cards[0].label == "Details" && cards[1].label == "Select" && cards[2].label == "Close" && cards[0].x >= menu.footer_left - 0.01);
+        oMenu.NovaFocus = 3;
+        var empty = oMenu.NovaPlayersFooter();
+        Record("the New player card offers Create " + string(device), array_length(empty) == 2 && empty[0].label == "Create");
+        var rename = oMenu.NovaRenameFooter();
+        Record("rename hints fit " + string(device), rename[0].x >= menu.footer_left - 0.01 && rename[array_length(rename) - 1].right <= menu.footer_right + 0.01 && rename[array_length(rename) - 1].label == "Back");
+    }
+    input_profile_set(profile);
+    var layout = oMenu.NovaPlayersLayout();
+    Record("five player cards stay above the help line", layout.top + 5 * layout.height + 4 * layout.gap < layout.rule_y);
+    var details = oMenu.NovaDetailsLayout();
+    var fits = true;
+    for (var i = 0; i < array_length(oMenu.NovaPlayerRecords); i++) fits = fits && 13 + string_width(oMenu.NovaPlayerRecords[i].label) * 0.6 + string_width("999999") * 0.6 + 4 < details.column_w;
+    Record("record labels and values fit their columns", fits && details.column_a + details.column_w < details.column_b && details.column_b + details.column_w <= 358);
+
+    // Rename shortcuts, the counter and a blank name.
+    with (oMenu) { NovaSelectPlayer(2); NovaGo("player", 1); }
+    PressEvent(oMenu, "menu_input", oMenu, ev_step, ev_step_normal);
+    Record("Rename starts from the current name", oMenu.NovaPage == "rename" && oMenu.NovaName == "ZELDA");
+    PressEvent(oMenu, "nova_bag_next", oMenu, ev_step, ev_step_normal);
+    Record("R adds a space", oMenu.NovaName == "ZELDA ");
+    for (var i = 0; i < 6; i++) PressEvent(oMenu, "nova_bag_previous", oMenu, ev_step, ev_step_normal);
+    Record("L erases letters", oMenu.NovaName == "");
+    oMenu.NovaNameCell = string_length(oMenu.NovaLetters) + 1;
+    PressEvent(oMenu, "menu_input", oMenu, ev_step, ev_step_normal);
+    Record("a blank name explains itself and keeps the old name", oMenu.NovaPage == "rename" && oMenu.NovaRenameNotice != "" && global.Users[2].Name == "ZELDA");
+    PressEvent(oMenu, global.NovaCloseVerb(), oMenu, ev_step, ev_step_normal);
+    Record("Back from Rename returns to Details", oMenu.NovaPage == "player");
+
+    // Delete asks first, starts on Cancel and forgets the player's setup and date.
+    with (oMenu) { NovaPlayedMark(); NovaSetupSave(); NovaGo("player", 2); }
+    PressEvent(oMenu, "menu_input", oMenu, ev_step, ev_step_normal);
+    Record("Delete player opens a dialog on Cancel", oMenu.NovaPlayerDialog && oMenu.NovaPlayerDialogFocus == 0 && oMenu.NovaPage == "player");
+    PressEvent(oMenu, global.NovaCloseVerb(), oMenu, ev_step, ev_step_normal);
+    Record("Back closes the dialog and keeps the player", !oMenu.NovaPlayerDialog && oMenu.NovaPage == "player" && global.Users[2].Name == "ZELDA");
+    PressEvent(oMenu, "menu_input", oMenu, ev_step, ev_step_normal);
+    PressEvent(oMenu, "down", oMenu, ev_step, ev_step_normal);
+    PressEvent(oMenu, "menu_input", oMenu, ev_step, ev_step_normal);
+    Record("confirming deletes the player and returns to Players", global.Users[2].Name == "" && oMenu.NovaPage == "players" && !oMenu.NovaPlayerDialog);
+    Record("deleting forgets the setup and last played date", oMenu.NovaPlayedText(2) == "" && oMenu.NovaSetupLoad(2).bonus == 0);
+    global.UserIndex = 0;
+    with (oMenu) NovaGo("player", 0);
 }

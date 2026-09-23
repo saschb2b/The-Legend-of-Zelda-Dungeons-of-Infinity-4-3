@@ -73,6 +73,7 @@ edits["gml_Object_oMenu_Create_0"] = FlattenEnums(Read("gml_Object_oMenu_Create_
 edits["gml_Object_oMenu_Create_0"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "src/gml/menus/updates.gml"));
 edits["gml_Object_oMenu_Create_0"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "src/gml/menus/profiles.gml"));
 edits["gml_Object_oMenu_Create_0"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "src/gml/menus/setup.gml"));
+edits["gml_Object_oMenu_Create_0"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "src/gml/menus/players.gml"));
 group.QueueAppend("gml_Object_oMenu_Game_Create_0", "NovaOptionsOpen = false; NovaOptions = undefined;");
 Edit("gml_Object_oMenu_Game_Step_0", "Index = 1;", "NovaOptionsOpen = true; NovaOptions = global.NovaOptionsState(\"pause\");");
 Edit("gml_Object_oMenu_Game_Draw_0", "draw_sprite_stretched(sprite_index, 0, FrameX, FrameY, FrameW, FrameH);",
