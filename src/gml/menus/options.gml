@@ -10,17 +10,20 @@ if (file_exists("patch-version.txt")) {
     global.NovaPatchVersion = string_trim(file_text_read_string(version_file));
     file_text_close(version_file);
 }
-// The pixel font has capitals only, so release candidates read RC.
-global.NovaVersionLabel = "VERSION " + (global.NovaPatchVersion == "" ? "DEV" : string_upper(global.NovaPatchVersion)) + " - GAME 1.1.6 VM";
-// Start screens show the version in small pixel text, with a shadow so it reads over the landscape.
-global.NovaVersionDraw = function(px, py) {
+global.NovaVersionLabel = global.NovaPatchVersion == "" ? "dev" : "v" + global.NovaPatchVersion;
+global.NovaVersionDetail = "Patch " + global.NovaVersionLabel + " for Dungeons of Infinity 1.1.6 VM";
+// Start screens mark the version quietly on the hint row, in the hint font and size at reduced opacity.
+global.NovaVersionDraw = function(px, py, scale, alpha, tone = make_color_rgb(204, 204, 204)) {
     var color = draw_get_color();
-    draw_set_font(global.HUDFont2);
+    var previous = draw_get_alpha();
+    draw_set_font(global.MenuFont_Innactive);
     draw_set_halign(fa_left);
-    draw_set_color(c_black);
-    draw_text(px + 1, py + 1, global.NovaVersionLabel);
-    draw_set_color(c_white);
-    draw_text(px, py, global.NovaVersionLabel);
+    draw_set_valign(fa_middle);
+    draw_set_color(tone);
+    draw_set_alpha(alpha);
+    draw_text_transformed(px, py, global.NovaVersionLabel, scale, scale, 0);
+    draw_set_valign(fa_top);
+    draw_set_alpha(previous);
     draw_set_color(color);
 };
 // Picture settings belong to the screen, so they apply to every player on this device.
@@ -578,6 +581,10 @@ global.NovaOptionsDrawList = function(state, selector, show_focus = true) {
             draw_set_alpha(focused ? 1 : 0.7);
             global.NovaOptText(string(value), 356, py + 1, false, 0.75, fa_right);
         }
+        if (rows[i] == "updates") {
+            draw_set_alpha(focused ? 1 : 0.7);
+            global.NovaOptText(global.NovaVersionLabel, layout.value_center, py + 1, false, 0.85, fa_center);
+        }
         if (rows[i] == "gamepad" || rows[i] == "keyboard") {
             var custom = global.NovaRemapCustom(rows[i] == "gamepad" ? 0 : 1);
             draw_set_alpha(focused ? 1 : 0.7);
@@ -589,6 +596,11 @@ global.NovaOptionsDrawList = function(state, selector, show_focus = true) {
             global.NovaOptArrow(layout.arrow_left, cy, -1);
             global.NovaOptArrow(layout.arrow_right, cy, 1);
         }
+        draw_set_alpha(1);
+    }
+    if (state.tabs[state.tab] == "About") {
+        draw_set_alpha(0.6);
+        global.NovaOptText(global.NovaVersionDetail, layout.label_x, layout.rows_y + array_length(rows) * layout.row_height + 8, false, 0.7);
         draw_set_alpha(1);
     }
     global.NovaOptionsHelp(global.NovaOptionInfo(rows[focus]).help);

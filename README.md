@@ -55,7 +55,7 @@ The playfield always shows the full 256×224 picture in the SNES's 4:3 shape. On
 
 ![Dungeons of Infinity on a 4:3 Retroid Nova, with the classic HUD and Status button hint](docs/screenshots/playfield.png)
 
-The title shows its full scene on wide screens, and the menus extend their landscape to the edges. The title and adventure menu show the installed version at the bottom left.
+The title shows its full scene on wide screens, and the menus extend their landscape to the edges. The title and adventure menu show the installed version at the bottom left, and **Options > About** lists it with the base game version.
 
 Under **Options > Display**, **Square pixels** draws game pixels square instead of slightly wide, which narrows the playfield. **Integer scaling** gives every pixel row the same height, with wider borders. Both apply to the whole device. **CRT effect** adds scanlines, a phosphor grille and soft bloom to the playfield and is saved for each player.
 

@@ -199,6 +199,11 @@ function ProfileCaptureStep() {
         oMenu.NovaOptions.tab = 1;
         Capture = "options-display";
     } else if (Capture == "options-display") {
+        // About shows the installed version beside Updates and the base game below the list.
+        oMenu.NovaOptions.tab = 4;
+        oMenu.NovaOptions.focus = 0;
+        Capture = "options-about";
+    } else if (Capture == "options-about") {
         oMenu.NovaOptions.tab = 2;
         oMenu.NovaOptions.page = "confirm";
         oMenu.NovaOptions.confirm = "tab";

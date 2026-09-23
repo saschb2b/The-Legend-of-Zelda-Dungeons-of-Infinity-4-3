@@ -6,7 +6,8 @@ try {
             if (!instance_exists(oTitle)) break;
             Record("title skipping defaults on", variable_global_exists("CanSkipTitle") && global.CanSkipTitle);
             // The runner bundles a version file only when asked to, as the installer does.
-            Record("start screens label the bundled version", global.NovaVersionLabel == "VERSION " + (global.NovaPatchVersion == "" ? "DEV" : string_upper(global.NovaPatchVersion)) + " - GAME 1.1.6 VM");
+            Record("start screens label the bundled version", global.NovaVersionLabel == (global.NovaPatchVersion == "" ? "dev" : "v" + global.NovaPatchVersion)
+                && string_pos("1.1.6 VM", global.NovaVersionDetail) > 0);
             global.CanSkipTitle = false;
             oTitle.AllowStart = false;
             oTitle.ShowBG = false;
