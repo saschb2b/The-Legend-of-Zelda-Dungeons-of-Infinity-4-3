@@ -202,6 +202,14 @@ function ScreenShapeTests() {
     Record("4:3 keeps panels over the playfield", !global.NovaHUDLayout(1280, 960).docked && global.NovaHUDLayout(1280, 960).world_width == 1280);
     Record("3:2 borders stay too narrow for panels", !global.NovaHUDLayout(1620, 1080).docked);
     var tall = global.NovaHUDLayout(720, 720);
+    var mini = global.NovaHUDLayout(1240, 1080);
+    Record("31:27 screens letterbox the playfield", mini.world_width == 1240 && mini.world_height == 930 && mini.world_top == 75 && !mini.docked);
+    var ace = global.NovaHUDLayout(1620, 1080);
+    Record("3:2 1080p keeps panels over the playfield", ace.world_width == 1440 && ace.world_left == 90 && !ace.docked && ace.scale == 4);
+    var rg552 = global.NovaHUDLayout(1920, 1152);
+    Record("5:3 docks the side panels at 2x", rg552.world_width == 1536 && rg552.docked && rg552.panel_scale == 2);
+    var qhd = global.NovaHUDLayout(2560, 1440);
+    Record("1440p docks the side panels at 4x beside a 5x HUD", qhd.world_width == 1920 && qhd.docked && qhd.panel_scale == 4 && qhd.scale == 5);
     Record("square screens letterbox the playfield", tall.world_width == 720 && tall.world_height == 540 && tall.world_top == 90 && !tall.docked);
     global.NovaSquarePixels = true;
     var pixels = global.NovaHUDLayout(1920, 1080);

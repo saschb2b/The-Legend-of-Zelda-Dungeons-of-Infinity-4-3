@@ -154,7 +154,7 @@ GitHub Actions runs the unit suite and build checks on pushes and pull requests.
 <details>
 <summary>Rendering and device support</summary>
 
-Testing covers the Retroid Nova (1280×960) and Retroid Pocket Flip 2 (1920×1080) on ROCKNIX. The launcher selects Freedreno, which requires a Qualcomm Adreno GPU, and SDL's evdev controller backend.
+Testing covers the Retroid Nova (1280×960) and Retroid Pocket Flip 2 (1920×1080) on ROCKNIX. The layout is also checked against the other screens of ROCKNIX devices that meet the port's 4 GB requirement: 1240×1080, 1620×1080, 1920×1152 and 2560×1440. On Qualcomm Adreno GPUs the launcher selects Freedreno; other GPUs keep Mesa's default. It also selects SDL's evdev controller backend.
 
 Gameplay presents the complete 256×224 playfield at 4:3 with horizontal pixel aspect correction, centered with black borders on other screen shapes. **Square pixels** shows it at 8:7 instead. **Integer scaling** rounds its height down to a whole multiple of 224. Where the side borders fit the original 72-pixel Status panels at 2× or more, the panels dock there at a whole-number scale, as in the original 16:9 game, and Status starts open. Elsewhere they open over the playfield at 75% scale and 90% opacity.
 

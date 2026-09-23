@@ -20,6 +20,7 @@ The 4:3 edition becomes **Dungeons of Infinity and Beyond** and adapts to the sc
 - The project, launcher and install folder are renamed. The game installs to `zeldadoi-beyond` and appears in Ports as **Zelda Dungeons of Infinity and Beyond**.
 - The installer moves an existing `zeldadoi-43` installation, including saves and backups, to the new folder. It restores an interrupted 4:3 update first and removes the old launcher and installer. It stops if both folders exist.
 - In-game updates from 1.x cannot find this release. Install it manually once; later updates work in the game again.
+- The launcher selects the Freedreno graphics driver only on Qualcomm GPUs, so devices with other GPUs are no longer forced onto it.
 
 ## [1.8.0](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/tag/v1.8.0) - 2026-09-23
 

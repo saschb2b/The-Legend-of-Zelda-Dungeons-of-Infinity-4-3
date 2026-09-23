@@ -32,8 +32,11 @@ $ESUDO chmod +x -R $GAMEDIR/*
 
 # Exports
 export LD_LIBRARY_PATH="$GAMEDIR/libs.${DEVICE_ARCH}:$GAMEDIR/lib:$LD_LIBRARY_PATH"
-export MESA_LOADER_DRIVER_OVERRIDE=msm
-export GALLIUM_DRIVER=freedreno
+# Freedreno drives Qualcomm Adreno GPUs only; Mali devices keep Mesa's own driver choice.
+if [ -d /sys/module/msm ]; then
+  export MESA_LOADER_DRIVER_OVERRIDE=msm
+  export GALLIUM_DRIVER=freedreno
+fi
 export SDL_JOYSTICK_HIDAPI=0
 export SDL_GAMECONTROLLERCONFIG="$(printf '%s' "$sdl_controllerconfig" | python3 "$GAMEDIR/controller.py")"
 # SDL's mapping file overrides the per-game mapping above.
