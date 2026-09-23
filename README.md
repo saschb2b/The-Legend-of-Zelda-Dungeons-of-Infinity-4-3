@@ -2,25 +2,21 @@
 
 **The full dungeon on your handheld, whatever its screen.**
 
-Play Dungeons of Infinity fullscreen on ROCKNIX, with a classic Zelda HUD and a layout that adapts to 4:3, 16:9 and other displays. Keep health, magic, your active item, and supplies in view. On wide screens, equipment, the map and dungeon progress sit beside the playfield. On 4:3 screens, click the right stick to show them.
+Play Dungeons of Infinity fullscreen on ROCKNIX handhelds, with a classic Zelda HUD and a layout that fits 4:3, 16:9 and other screens. Health, magic, your active item and supplies stay in view. Equipment, the map and dungeon progress sit beside the playfield on wide screens and open over it on 4:3 screens.
 
-This project was the 4:3 edition for the Retroid Nova until version 2.0.0.
-
-[**Download the installer**](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/latest) · [Installation](#install) · [Controls](#controls) · [What's changed](CHANGELOG.md)
-
-![Dungeons of Infinity on the Nova, with the classic HUD and Status button hint](docs/screenshots/playfield.png)
+[**Download the installer**](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/latest) · [Installation](#install) · [Screens](#screens) · [Controls](#controls) · [What's changed](CHANGELOG.md)
 
 ![Dungeons of Infinity on a 16:9 Retroid Pocket Flip 2, with equipment, pendants and crystals left of the playfield and the minimap and floor progress to its right](docs/screenshots/widescreen.png)
 
-- The complete playfield keeps its SNES shape on any screen. The title and menus widen to fill 16:9 displays.
-- Health and supplies stay visible. Status panels dock beside the playfield where they fit and open over it where they don't.
-- Options for square pixels and integer scaling.
+- The complete playfield keeps its SNES shape on every screen. The title and menus fill wide screens.
+- Status panels sit beside the playfield where they fit, as in the original 16:9 game.
+- Display options for a CRT effect, square pixels and integer scaling.
 - Selected updates from the newer game include inventory bags, sword poke and spin, Topaz, adjustable challenges, and Wallmaster mode.
 - Visit the village arcade for the claw machine, or play Mothula's Money in the pub.
 
 ## Install
 
-You need ROCKNIX, PortMaster, Wi-Fi, and about 300 MiB of free space. The patch is tested on the Retroid Nova (4:3) and Retroid Pocket Flip 2 (16:9).
+You need a ROCKNIX handheld with at least 4 GB of RAM, PortMaster, Wi-Fi, and about 300 MiB of free space. The game is tested on the Retroid Nova (4:3) and Retroid Pocket Flip 2 (16:9); other Qualcomm-based ROCKNIX handhelds share their graphics driver.
 
 1. Download the **patch installer ZIP** from the [latest release](https://github.com/saschb2b/The-Legend-of-Zelda-Dungeons-of-Infinity-and-Beyond/releases/latest).
 2. Extract the ZIP and copy both items into `/storage/roms/ports/`:
@@ -38,13 +34,30 @@ The installer downloads the official PortMaster package and applies the patch au
 
 **Updating:** close the game, replace the installer files with the newer download, and run the installer again. Your saves stay in `zeldadoi-beyond/savedata/`. The installer preserves them and keeps migration backups in `zeldadoi-beyond/save-backups/`.
 
-**Coming from the 4:3 edition (1.x):** install 2.0.0 manually once; the in-game updater of 1.x cannot find the renamed release. The installer moves `zeldadoi-43` with all saves to `zeldadoi-beyond` and removes the old launcher and installer.
+An installation in `zeldadoi-43`, from a release before 2.0.0, cannot update in the game. Run this installer once: it moves the game and all saves to `zeldadoi-beyond` and removes the old launcher and installer.
 
 For updates over Wi-Fi, choose **Options > About > Updates** from the adventure menu. It shows the installed and available patch versions and the changes since your version. Use L/R to page through the notes. Choose **Install update** to download the update and restart the game. Press **B** to close or cancel a download.
 
 The updater checks stable releases only when you open Updates or choose Check again. It verifies downloads before installation and preserves your saves. If installation fails, the previous version remains available. Keep the device powered on during installation.
 
 If installation fails, check `zeldadoi-beyond-installer/install.log`. For another attempt, run the installer again.
+
+## Screens
+
+The playfield always shows the full 256×224 picture in the SNES's 4:3 shape. On other screen shapes it is centered with black borders, and the HUD and button hints stay on the playfield.
+
+| Screen | Examples | Status panels |
+| --- | --- | --- |
+| 4:3 | Retroid Nova, Retroid Pocket Mini | Open over the playfield with the right stick |
+| Taller than 4:3 | AYANEO Pocket DMG, Retroid Pocket Mini V2 | Open over the playfield; borders above and below |
+| 3:2 | AYANEO Pocket ACE | Open over the playfield; narrow side borders |
+| 16:9 and 5:3 | Retroid Pocket 5, Flip 2 and 6, AYN Odin 2, RG552 | Beside the playfield, shown from the start; the right stick hides them |
+
+![Dungeons of Infinity on a 4:3 Retroid Nova, with the classic HUD and Status button hint](docs/screenshots/playfield.png)
+
+The title shows its full scene on wide screens, and the menus extend their landscape to the edges. The title and adventure menu show the installed version at the bottom left.
+
+Under **Options > Display**, **Square pixels** draws game pixels square instead of slightly wide, which narrows the playfield. **Integer scaling** gives every pixel row the same height, with wider borders. Both apply to the whole device. **CRT effect** adds scanlines, a phosphor grille and soft bloom to the playfield and is saved for each player.
 
 ## Controls
 
@@ -85,13 +98,13 @@ Input hints sit together at the bottom right, with each action label followed by
 | --- | --- |
 | ![Compact bag inventory below health and counters, with Switch 2 button hints below the frame](docs/screenshots/inventory.png) | ![Item action list with a confirm hint that names the highlighted Info action](docs/screenshots/inventory-actions.png) |
 
-Inventory and menu screenshots use test saves to show progress and full inventories. The screenshots come from the game running on a Nova.
+Inventory and menu screenshots use test saves to show progress and full inventories. They come from a Retroid Nova (4:3); the wide-screen view comes from a Retroid Pocket Flip 2.
 
-| Status at a stick-click | Continue your adventure |
+| Status on a 4:3 screen | Continue your adventure |
 | --- | --- |
 | ![Equipment, map, and dungeon progress over the playfield](docs/screenshots/overlay.png) | ![Adventure menu with the saved name and floor beneath Continue](docs/screenshots/profile.png) |
 
-The centered title screen leads into an adventure menu with your last selected player. Their name and floor sit beneath **Continue**, which resumes the saved run in one press. **New adventure** shows your character beside the bonus and challenges, with a line below explaining the highlighted choice. Press **A** on any row except Challenges to begin, and **Begin adventure** is selected by default. **Random** picks another character. Each player's last setup is remembered. A fresh player starts as Link, with no required name entry.
+The title screen leads into an adventure menu with your last selected player. Their name and floor sit beneath **Continue**, which resumes the saved run in one press. **New adventure** shows your character beside the bonus and challenges, with a line below explaining the highlighted choice. Press **A** on any row except Challenges to begin, and **Begin adventure** is selected by default. **Random** picks another character. Each player's last setup is remembered. A fresh player starts as Link, with no required name entry.
 
 ![New adventure with a character preview, Wooden Shield bonus, the Second Quest challenge preset with its level meter and icons, and Begin adventure](docs/screenshots/adventure-setup.png)
 
@@ -116,16 +129,16 @@ Press Start or confirm to skip the opening title animation. To require the full 
 This is an unofficial patch of the PortMaster **1.1.6 VM** build with selected 1.2.x backports. It does not include every change from 1.2.1. Read the [backport audit](docs/BACKPORTS.md) for coverage and the [changelog](CHANGELOG.md) for changes between patch releases.
 
 <details>
-<summary>Save migration and returning to an older patch</summary>
+<summary>Save format and backups</summary>
 
-Existing inventory migrates on load. Excess items remain available on overflow pages.
+Saves from earlier save formats convert when loaded. Items beyond the inventory's capacity remain available on overflow pages.
 
-The installer preserves saves before each format change:
+Before converting a save format, the installer keeps a copy of the saves in `save-backups/`:
 
-- `save-backups/before-inventory-v1.zip`: before the inventory update.
-- `save-backups/before-content-v3.zip`: before Topaz and variable challenges.
+- `before-inventory-v1.zip`: saves in the format before inventory bags.
+- `before-content-v3.zip`: saves in the format before Topaz and adjustable challenges.
 
-Reinstallation preserves both backups. Keep them if you plan to return to an earlier patch, which may require the matching older saves.
+Reinstallation keeps these backups. An earlier patch release can only read the saves in its own format.
 
 </details>
 
@@ -154,17 +167,17 @@ GitHub Actions runs the unit suite and build checks on pushes and pull requests.
 <details>
 <summary>Rendering and device support</summary>
 
-Testing covers the Retroid Nova (1280×960) and Retroid Pocket Flip 2 (1920×1080) on ROCKNIX. The layout is also checked against the other screens of ROCKNIX devices that meet the port's 4 GB requirement: 1240×1080, 1620×1080, 1920×1152 and 2560×1440. On Qualcomm Adreno GPUs the launcher selects Freedreno; other GPUs keep Mesa's default. It also selects SDL's evdev controller backend.
+Device tests run on the Retroid Nova (1280×960) and Retroid Pocket Flip 2 (1920×1080). Layout tests also cover the other screens of ROCKNIX devices that meet the port's 4 GB requirement: 1240×1080, 1620×1080, 1920×1152 and 2560×1440. On Qualcomm Adreno GPUs the launcher selects Freedreno; other GPUs keep Mesa's default. It also selects SDL's evdev controller backend.
 
-Gameplay presents the complete 256×224 playfield at 4:3 with horizontal pixel aspect correction, centered with black borders on other screen shapes. **Square pixels** shows it at 8:7 instead. **Integer scaling** rounds its height down to a whole multiple of 224. Where the side borders fit the original 72-pixel Status panels at 2× or more, the panels dock there at a whole-number scale, as in the original 16:9 game, and Status starts open. Elsewhere they open over the playfield at 75% scale and 90% opacity.
+Gameplay presents the complete 256×224 playfield at 4:3 with horizontal pixel aspect correction. **Square pixels** shows it at 8:7. **Integer scaling** rounds its height down to a whole multiple of 224. Where the side borders fit the original 72-pixel Status panels at 2× or more, the panels sit there at a whole-number scale. Elsewhere they open over the playfield at 75% scale and 90% opacity.
 
-The title widens from a 300×225 view on 4:3 screens to the original 400×225 scene on 16:9. Menus keep their 400×300 layout; wider screens extend the landscape at both sides and move the button hints to the corner.
+The title view is 300×225 on 4:3 screens and widens to the full 400×225 scene at 16:9. Menus keep their 400×300 layout; wider screens extend the landscape at both sides and move the button hints to the corner.
 
-The HUD renders after the playfield at its own integer scale, with square pixels and a smaller footprint. On the Nova's 1280×960 screen, it uses 3× scaling; on a 1920×1080 screen, 4×. Equipment and counters sit at the playfield's left edge, with hearts at the right. The CRT option affects the world while the HUD and gameplay hints stay crisp.
+The HUD renders after the playfield at its own integer scale, with square pixels and a smaller footprint: 3× on a 1280×960 screen and 4× at 1920×1080. Equipment and counters sit at the playfield's left edge, with hearts at the right. The CRT option affects the world while the HUD and gameplay hints stay crisp.
 
 Inventory, map and arcade hints share the HUD scale, footer baseline and right margin. Smaller L/R glyphs stay beside the inventory heading. Item artwork and descriptions retain their larger scale for browsing.
 
-Enable **CRT** for shaped scanlines, a phosphor grille and soft bloom. The CRT-Lottes port keeps the full playfield visible and preserves dark detail. Arcade machines use their original effect.
+The CRT effect is a port of CRT-Lottes. It keeps the full playfield visible and preserves dark detail. Arcade machines use their original effect.
 
 </details>
 
