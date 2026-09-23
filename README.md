@@ -56,6 +56,10 @@ These are the default controller bindings. Change them under **Options > Control
 | L / R | | Previous / next inventory page |
 | Select + Start | Exit to Ports | Exit to Ports |
 
+![Pause menu with Resume, Options and Controls above Start over and the quit options, a run summary with floor, hearts, bonus, challenges and an active curse, and the Save Tent warning](docs/screenshots/pause.png)
+
+The pause menu (Select) shows your run: floor, time, hearts, bosses, bonus, challenges and any curse. **Resume**, **Options** and **Controls** come first; **Start over**, **Quit to title** and **Quit to desktop** sit below a divider and ask before acting. The game saves only at Save Tents, so quitting says that progress since the last tent is lost. **Controls** opens your current button mapping directly.
+
 Press **B** to close the map, menus, item information, or inventory. Closing an action list or item information returns to the inventory. Closing a pause submenu returns to the pause menu. In name entry, B closes without saving. Choose **Erase letter** to delete a character. On a keyboard, Escape closes or cancels the current view.
 
 At a shop counter, press **A** to inspect an item. In its dialog, A confirms the highlighted choice and **B** closes without buying. Closing also works while reading item information or a purchase refusal.

@@ -65,35 +65,96 @@ function MenuTests() {
     oMenu.NovaOptions.page = "list";
     global.StartingGear = 0;
 }
-function PauseTests() {
+function PauseOpen() {
     var pause = instance_create_layer(0, 0, "System", oMenu_Game);
     pause.Open = false;
-    pause.Index = 2;
-    pause.SelectorPos = 1;
-    PressEvent(pause, global.NovaCloseVerb(), oMenu_Game, ev_step, ev_step_normal);
-    Record("pause confirmation cancels", pause.Index == 0 && !pause.Close && !pause.Quitting);
-    pause.SelectorPos = 2;
-    PressEvent(pause, "menu_input", oMenu_Game, ev_step, ev_step_normal);
-    Record("pause Options opens the shared screen", pause.NovaOptionsOpen && pause.NovaOptions.context == "pause" && pause.Index == 0);
+    return pause;
+}
+function PausePress(pause, verb) {
+    PressEvent(pause, verb, oMenu_Game, ev_step, ev_step_normal);
+}
+function PauseTests() {
+    var pause = PauseOpen();
+    Record("pause opens on Resume", pause.NovaPauseFocus == 0 && !pause.NovaPauseDialog && !pause.NovaOptionsOpen);
+    PausePress(pause, "up");
+    Record("pause rows wrap to Quit to desktop", pause.NovaPauseFocus == 5);
+    PausePress(pause, "down");
+    PausePress(pause, "down");
+    Record("pause rows wrap back to Resume and Options", pause.NovaPauseFocus == 1);
+    PausePress(pause, "menu_input");
+    var trail = global.NovaOptionsTrail(pause.NovaOptions);
+    Record("pause Options opens the shared screen under Paused", pause.NovaOptionsOpen && pause.NovaOptions.context == "pause" && trail[0] == "Paused" && trail[1] == "Options");
+    var pause_footer = global.NovaOptionsFooter(pause.NovaOptions);
+    Record("pause Options labels B as Back", pause_footer[array_length(pause_footer) - 1].label == "Back");
     Record("pause Options omits title-only About", array_length(pause.NovaOptions.tabs) == 4 && array_get_index(pause.NovaOptions.tabs, "About") == -1);
-    PressEvent(pause, "escape", oMenu_Game, ev_step, ev_step_normal);
-    Record("Escape backs out of Options without closing pause", !pause.NovaOptionsOpen && !pause.Close && pause.SelectorPos == 2);
-    PressEvent(pause, "menu_input", oMenu_Game, ev_step, ev_step_normal);
-    PressEvent(pause, global.NovaCloseVerb(), oMenu_Game, ev_step, ev_step_normal);
-    Record("Close returns to the pause Options row", !pause.NovaOptionsOpen && !pause.Close && pause.SelectorPos == 2);
-    PressEvent(pause, "menu_input", oMenu_Game, ev_step, ev_step_normal);
+    PausePress(pause, "escape");
+    Record("Escape backs out of Options to the pause list", !pause.NovaOptionsOpen && !pause.Close && pause.NovaPauseFocus == 1);
+    pause.NovaPauseFocus = 2;
+    PausePress(pause, "menu_input");
+    trail = global.NovaOptionsTrail(pause.NovaOptions);
+    Record("Controls opens the current device's mapping", pause.NovaOptionsOpen && pause.NovaOptions.page == "device" && pause.NovaOptions.device == (input_profile_get() == "keyboard" ? 1 : 0) && trail[0] == "Paused" && trail[1] == "Controls");
     var keyboard_before = input_profile_export("keyboard");
-    pause.NovaOptions.page = "device";
     pause.NovaOptions.device = 1;
     pause.NovaOptions.bind_focus = 1;
-    PressEvent(pause, "menu_input", oMenu_Game, ev_step, ev_step_normal);
+    PausePress(pause, "menu_input");
     Record("pause remaps one action without the adventure menu", global.NovaRemapping && pause.NovaOptions.capture && !instance_exists(oMenu));
-    PressEvent(pause, global.NovaCloseVerb(), oMenu_Game, ev_step, ev_step_normal);
+    PausePress(pause, global.NovaCloseVerb());
     Record("Back during a pause remap keeps Options open", pause.NovaOptionsOpen && pause.NovaOptions.capture && !pause.Close);
-    PressEvent(pause, "menu_access", oMenu_Game, ev_step, ev_step_normal);
+    PausePress(pause, "menu_access");
     Record("Select cancels a pause remap without leaving pause", pause.NovaOptionsOpen && !pause.NovaOptions.capture && !global.NovaRemapping && !pause.Close && input_profile_export("keyboard") == keyboard_before);
-    pause.NovaOptions.page = "list";
-    PressEvent(pause, "menu_access", oMenu_Game, ev_step, ev_step_normal);
+    PausePress(pause, global.NovaCloseVerb());
+    Record("Back from Controls returns to its pause row", !pause.NovaOptionsOpen && pause.NovaPauseFocus == 2 && !pause.Close);
+    for (var row = 3; row <= 5; row++) {
+        pause.NovaPauseFocus = row;
+        PausePress(pause, "menu_input");
+        var text = global.NovaPauseDialogText(row);
+        Record("pause row " + string(row) + " asks first on Cancel", pause.NovaPauseDialog && pause.NovaPauseDialogFocus == 0 && text.confirm != "OK");
+        PausePress(pause, "menu_input");
+        Record("Cancel keeps the run " + string(row), !pause.NovaPauseDialog && !pause.Quitting && !pause.Close);
+        PausePress(pause, "menu_input");
+        PausePress(pause, global.NovaCloseVerb());
+        Record("Back closes the dialog, not the pause " + string(row), !pause.NovaPauseDialog && !pause.Quitting && !pause.Close);
+    }
+    Record("quitting explains lost progress", string_pos("Save Tent", global.NovaPauseHelp(4)) > 0 && string_pos("Save Tent", global.NovaPauseDialogText(5).detail) > 0 && string_pos("floor 1", global.NovaPauseHelp(3)) > 0);
+    var summary = global.NovaPauseSummary(pause);
+    Record("the run summary reads the live run", summary.floor == global.Level.Index && summary.hearts == global.Inventory_ItemData[18].Amount && summary.character == global.LinkCharacterIndex);
+    draw_set_font(global.MenuFont_Innactive);
+    var layout = global.NovaPauseLayout();
+    var widest = 0;
+    for (var i = 0; i < array_length(global.NovaPauseRows); i++) widest = max(widest, string_width(global.NovaPauseRows[i]) * 0.9);
+    Record("pause rows clear the run summary", layout.rows_x + widest + 8 < layout.panel_x && layout.rows_y[5] + 14 < layout.rule_y && layout.panel_y + layout.panel_h < layout.rule_y);
+    var line = string_height("A") + 4;
+    var help_ok = true;
+    for (var i = 0; i < 6; i++) help_ok = help_ok && string_height_ext(global.NovaPauseHelp(i), line, global.NovaOptionsLayout().help_width / 0.6) / line <= 2.01;
+    Record("pause help fits in two lines", help_ok);
+    var footer = global.NovaPauseFooter(pause);
+    Record("pause footer offers Select and Resume", footer[0].label == "Select" && footer[1].label == "Resume");
+    pause.NovaPauseFocus = 5;
+    PausePress(pause, "menu_input");
+    PausePress(pause, "down");
+    PausePress(pause, "menu_input");
+    Record("confirming a quit starts it with the right destination", pause.Quitting && pause.QuitTo == 2);
+    with (pause) instance_destroy();
+    pause = PauseOpen();
+    PausePress(pause, "escape");
+    Record("Escape resumes from the pause list", pause.Close && !pause.Quitting);
+    with (pause) instance_destroy();
+    pause = PauseOpen();
+    PausePress(pause, global.NovaCloseVerb());
+    Record("Back resumes from the pause list", pause.Close);
+    with (pause) instance_destroy();
+    pause = PauseOpen();
+    PausePress(pause, "menu_access");
+    Record("Select resumes from the pause list", pause.Close);
+    with (pause) instance_destroy();
+    pause = PauseOpen();
+    PausePress(pause, "menu_input");
+    Record("confirming Resume closes pause", pause.Close);
+    with (pause) instance_destroy();
+    pause = PauseOpen();
+    PausePress(pause, "down");
+    PausePress(pause, "menu_input");
+    PausePress(pause, "menu_access");
     Record("Select leaves pause from Options", !pause.NovaOptionsOpen && pause.Close && !pause.Quitting);
     with (pause) instance_destroy();
 }

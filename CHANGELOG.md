@@ -18,6 +18,7 @@ These versions identify the 4:3 patch, independently of the original game's vers
 - Show players as cards with their character, floor, play time, hearts, wins, deaths and challenge level. Players opens on the current player and says when each one last played. An empty slot reads New player.
 - Replace Manage with a Details page: the current run, lifetime records with the best time highlighted, and Play, Rename and Delete player. Deleting opens a dialog that starts on Cancel and names the run it erases.
 - Rename shows a letter counter, explains a blank name, and adds L to erase and R for a space.
+- Redesign the pause menu in the Options style. It shows the run's floor, time, hearts, bosses, bonus, challenges and curse. Resume, Options and a new Controls shortcut come first; Start over, Quit to title and Quit to desktop sit below a divider. Each quit explains that progress since the last Save Tent is lost and asks in a dialog that starts on Cancel.
 - Remember each player's last character, bonus and challenges. Saves started with challenges show their level beside the floor.
 - Keep menu Confirm (A), Back (B) and Pause (Select) fixed. Remapping Sword or Interact no longer moves the menu buttons, so a remap cannot lock players out. Select or Esc cancels a remap, and an unanswered remap stops after ten seconds.
 - Remove the pause menu's HUD toggle. The Status button still shows and hides the panels.

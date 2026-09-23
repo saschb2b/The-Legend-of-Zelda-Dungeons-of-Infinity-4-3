@@ -1,7 +1,7 @@
 Capture = "";
 CaptureTick = 0;
 CaptureIndex = 0;
-CaptureNames = ["inventory-gear", "inventory-items", "inventory-bags", "inventory-treasure", "inventory-food", "inventory-pendants", "inventory-overflow", "inventory-actions", "inventory-info", "inventory-keyboard", "inventory-crt", "inventory-overflowextra", "status-default", "status-crt", "status-remapped", "status-keyboard", "inventory-cursed", "map-default", "options-pause"];
+CaptureNames = ["inventory-gear", "inventory-items", "inventory-bags", "inventory-treasure", "inventory-food", "inventory-pendants", "inventory-overflow", "inventory-actions", "inventory-info", "inventory-keyboard", "inventory-crt", "inventory-overflowextra", "status-default", "status-crt", "status-remapped", "status-keyboard", "inventory-cursed", "map-default", "pause-menu", "pause-quit", "options-pause"];
 function CaptureStart() {
     global.ItemData[1].Type = 3;
     global.ItemData[5].Type = 3;
@@ -63,14 +63,34 @@ function CaptureStep() {
     }
     if (CaptureIndex == 18) {
         with (oMap) instance_destroy();
-        // CRT stays on behind the pause Options to show the live preview.
-        global.Users[global.UserIndex].Prefs[3] = true;
+        // A curse and a challenge preset give the run summary its full content.
+        global.Cursed = true;
+        global.CurseEffectStr = "MAGIC DRAIN";
+        global.CurseTaskStr = "DEFEAT ENEMIES";
+        global.CurseTaskCount = 12;
+        global.StartingGear = 4;
+        global.NovaChallengeOptions = [1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0];
         var pause = instance_create_layer(0, 0, "System", oMenu_Game);
         pause.Open = false;
         pause.Alpha = 1;
-        pause.NovaOptionsOpen = true;
-        pause.NovaOptions = global.NovaOptionsState("pause");
-        pause.NovaOptions.tab = 1;
+        pause.NovaPauseFocus = 4;
+        return;
+    }
+    if (CaptureIndex == 19) {
+        oMenu_Game.NovaPauseDialog = true;
+        oMenu_Game.NovaPauseDialogFocus = 0;
+        return;
+    }
+    if (CaptureIndex == 20) {
+        // CRT stays on behind the pause Options to show the live preview.
+        global.Users[global.UserIndex].Prefs[3] = true;
+        global.Cursed = false;
+        global.StartingGear = 0;
+        global.NovaResetChallenges();
+        oMenu_Game.NovaPauseDialog = false;
+        oMenu_Game.NovaOptionsOpen = true;
+        oMenu_Game.NovaOptions = global.NovaOptionsState("pause");
+        oMenu_Game.NovaOptions.tab = 1;
         return;
     }
     if (CaptureIndex == 17) {

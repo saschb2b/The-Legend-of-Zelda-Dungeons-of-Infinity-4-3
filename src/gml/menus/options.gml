@@ -20,7 +20,7 @@ global.NovaOptionsState = function(context) {
     if (context == "title") array_push(tabs, "About");
     return {context: context, tabs: tabs, tab: 0, focus: 0, memory: array_create(array_length(tabs), 0),
         page: "list", device: 0, confirm: "", confirm_focus: 0,
-        bind_focus: 1, bind_scroll: 0, capture: false, notice: "", notice_time: 0};
+        bind_focus: 1, bind_scroll: 0, capture: false, notice: "", notice_time: 0, origin: "options", closed: false};
 };
 global.NovaOptionRows = function(tab) {
     switch (tab) {
@@ -276,6 +276,8 @@ global.NovaRemapStep = function(state, close, confirm, vertical, reset) {
         state.page = "list";
         audio_play_sound(Sound_Throw, 1, false);
         input_clear_momentary(true);
+        // Controls opened straight from pause returns to the pause list.
+        if (state.origin == "controls") state.closed = true;
     } else if (vertical != 0) {
         global.NovaRemapMove(state, vertical);
         state.notice = "";
@@ -329,8 +331,9 @@ global.NovaOptionsStep = function(state, close) {
         return "";
     }
     if (state.page == "device") {
+        state.closed = false;
         global.NovaRemapStep(state, close, confirm, vertical, defaults);
-        return "";
+        return state.closed ? "close" : "";
     }
     if (close) {
         audio_play_sound(Sound_Throw, 1, false);
@@ -418,9 +421,10 @@ global.NovaMenuTitle = function(trail) {
     draw_set_alpha(alpha);
 };
 global.NovaOptionsTrail = function(state) {
+    var device = state.device == 0 ? "Gamepad" : "Keyboard";
     if (state.page == "device" || (state.page == "confirm" && state.confirm == "device"))
-        return ["Options", "Controls", state.device == 0 ? "Gamepad" : "Keyboard"];
-    return ["Options"];
+        return state.origin == "controls" ? ["Paused", "Controls", device] : ["Options", "Controls", device];
+    return state.context == "pause" ? ["Paused", "Options"] : ["Options"];
 };
 // Menus show the D-pad for left and right; stick direction glyphs are hard to tell apart.
 global.NovaDirectionBinding = function(verb) {
@@ -452,7 +456,7 @@ global.NovaOptionsFooter = function(state) {
             array_push(prompts, {binding: global.NovaMenuConfirmBinding(), label: item.kind == "reset" ? "Select" : "Remap"});
         }
     } else array_push(prompts, select);
-    if (!(state.page == "device" && state.capture)) array_push(prompts, {binding: global.NovaBinding(global.NovaCloseVerb()), label: state.page == "list" ? "Close" : "Back"});
+    if (!(state.page == "device" && state.capture)) array_push(prompts, {binding: global.NovaBinding(global.NovaCloseVerb()), label: state.page == "list" && state.context == "title" ? "Close" : "Back"});
     var layout = global.NovaMenuLayout();
     var font = draw_get_font();
     draw_set_font(global.MenuFont_Innactive);
@@ -702,21 +706,4 @@ global.NovaOptionsDraw = function(state, selector) {
     draw_set_color(c_white);
     draw_set_halign(fa_left);
     draw_set_valign(fa_top);
-};
-// Pause renders the menu at the adventure menu's 4x canvas, then scales it like that menu.
-global.NovaOptionsOverlay = function(state, alpha, width, height) {
-    if (!surface_exists(global.NovaOptionsSurface)) global.NovaOptionsSurface = surface_create(1600, 1200);
-    surface_set_target(global.NovaOptionsSurface);
-    draw_clear_alpha(c_black, 0);
-    var world = matrix_get(matrix_world);
-    matrix_set(matrix_world, matrix_build(0, 152, 0, 0, 0, 0, 4, 4, 1));
-    global.NovaOptionsDraw(state, (current_time div 133) mod 2);
-    matrix_set(matrix_world, world);
-    surface_reset_target();
-    draw_set_color(c_black);
-    draw_set_alpha(0.35 * alpha);
-    draw_rectangle(0, 0, width, height, false);
-    draw_set_color(c_white);
-    draw_surface_stretched_ext(global.NovaOptionsSurface, 0, 0, width, height, c_white, alpha);
-    draw_set_alpha(1);
 };

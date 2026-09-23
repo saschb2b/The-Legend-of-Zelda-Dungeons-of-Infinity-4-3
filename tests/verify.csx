@@ -25,8 +25,9 @@ Check(Code("gml_Object_oTitle_Step_0").Contains("global.CanSkipTitle"), "Title s
 var menuDraw = Code("gml_Object_oMenu_Draw_0");
 var menuCreate = Code("gml_Object_oMenu_Create_0");
 Check(menuDraw.Contains("NovaAdventureDraw()") && menuCreate.Contains("NovaDraft") && menuCreate.Contains("global.NovaOptionsStep(NovaOptions") && Code("gml_GlobalScript___Input").Contains("Previous bag"), "Adventure, challenge and control paths must coexist");
-Check(Code("gml_Object_oMenu_Game_Step_0").Contains("global.NovaOptionsStep(NovaOptions") && Code("gml_Object_oMenu_Game_Draw_0").Contains("if (NovaOptionsOpen)"), "Pause must open the shared Options screen");
-Check(Code("gml_Object_oRender_Draw_64").Contains("global.NovaOptionsOverlay("), "Pause Options must draw after the CRT pass");
+Check(Code("gml_Object_oMenu_Game_Step_0").Contains("global.NovaOptionsStep(NovaOptions") && Code("gml_Object_oMenu_Game_Step_0").Contains("NovaPauseDialog"), "Pause must use the redesigned menu and shared Options screen");
+Check(!Code("gml_Object_oMenu_Game_Draw_0").Contains("draw_text(TextPosX"), "The original pause list must not draw");
+Check(Code("gml_Object_oRender_Draw_64").Contains("global.NovaPauseOverlay("), "Pause must draw after the CRT pass");
 foreach (var name in new[] { "gml_Object_oInputRemap_Create_0", "gml_GlobalScript___Input" })
     Check(!Code(name).Contains("oMenu.Bindings_Remap") && Code(name).Contains("global.NovaRemapping"), "Remapping must not require the adventure menu: " + name);
 Check(Code("gml_Object_oMenu_Step_0").Contains("keyboard_check_pressed(vk_escape)"), "Menu cancel missing");

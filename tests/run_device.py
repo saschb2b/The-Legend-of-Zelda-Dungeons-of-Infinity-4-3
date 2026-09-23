@@ -116,12 +116,12 @@ print(urllib.request.urlopen(r,timeout=10).read().decode())
                     break
                 capture = report.get('capture', '')
                 if (args.capture or args.capture_updates or args.capture_profiles or args.capture_context or args.capture_arcade) and capture and capture not in captures:
-                    if not re.fullmatch(r'(inventory|status|updates|profiles|map|context|arcade|options)-[a-z]+', capture):
+                    if not re.fullmatch(r'(inventory|status|updates|profiles|map|context|arcade|options|pause)-[a-z]+', capture):
                         raise RuntimeError('Invalid screenshot name in test report.')
                     path = stage + '/' + capture + '.png'
                     request('source /etc/profile; grim ' + shlex.quote(path))
                     (args.report_dir / (capture + '.png')).write_bytes(request('cat ' + shlex.quote(path)))
-                    if capture.startswith(('profiles-', 'updates-', 'arcade-', 'options-')):
+                    if capture.startswith(('profiles-', 'updates-', 'arcade-', 'options-', 'pause-')):
                         for sample in range(2):
                             request('source /etc/profile; grim ' + shlex.quote(path))
                             (args.report_dir / f'{capture}-sample{sample + 2}.png').write_bytes(request('cat ' + shlex.quote(path)))

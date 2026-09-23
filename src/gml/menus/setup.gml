@@ -1,15 +1,10 @@
 // New adventure: character preview, bonus, challenge presets and the remembered setup.
 // Drawing uses the adventure menu's view coordinates, whose top edge is y = -38.
-NovaBonusNames = ["None", "100 Rupees", "+1 Inventory slot", "+1 Heart", "Wooden Shield", "Rod of Stone", "10 Fire Orbs", "Antidote"];
+NovaBonusNames = global.NovaBonusNames;
 NovaBonusHelp = ["Start with the standard gear.", "Start with 100 rupees to spend in shops.", "Start with one more inventory slot.",
     "Start with an extra heart container.", "Start with a Wooden Shield that blocks weak projectiles.", "Start with the Rod of Stone.",
     "Start with 10 Fire Orbs.", "Start with an Antidote."];
-// Presets borrow Zelda's harder replays; each keeps a plain description.
-NovaPresets = [
-    {name: "Hero's Path", help: "The standard adventure, with no extra challenges.", values: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]},
-    {name: "Second Quest", help: "A tougher run: fewer hearts, more enemies and curses, darker rooms and higher prices.", values: [1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0]},
-    {name: "Master Quest", help: "For veterans: scarce hearts, dark dungeons, crowds of enemies and the Wall Master.", values: [2, 2, 1, 2, 1, 1, 2, 2, 2, 0, 0, 1]}
-];
+NovaPresets = global.NovaPresets;
 NovaChallengeHelp = ["Hearts at the start of the run. Standard: 4.", "The most heart containers you can hold. Standard: 16.",
     "Caps how much armor protects you. Standard: no cap.", "More dark rooms. Higher settings force darkness and limit lights.",
     "Inventory slots at the start. Standard: 5.", "The most rupees your wallet holds. Standard: no limit.",
@@ -23,18 +18,8 @@ NovaChallengeDialog = false;
 NovaChallengeDialogFocus = 0;
 NovaSetupChanged = make_color_rgb(248, 208, 96);
 
-function NovaChallengeLevel(values) {
-    var level = 0;
-    for (var i = 0; i < array_length(values); i++) level += values[i];
-    return level;
-}
-// Returns the matching preset index, or -1 for a custom mix.
-function NovaPresetIndex(values) {
-    for (var p = 0; p < array_length(NovaPresets); p++) {
-        if (json_stringify(NovaPresets[p].values) == json_stringify(values)) return p;
-    }
-    return -1;
-}
+function NovaChallengeLevel(values) { return global.NovaChallengeLevel(values); }
+function NovaPresetIndex(values) { return global.NovaPresetIndex(values); }
 function NovaPresetCycle(delta) {
     var current = NovaPresetIndex(NovaDraft.challenges);
     // A custom mix stays reachable as the entry after the presets.

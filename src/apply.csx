@@ -74,10 +74,9 @@ edits["gml_Object_oMenu_Create_0"] += "\n" + File.ReadAllText(Path.Combine(patch
 edits["gml_Object_oMenu_Create_0"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "src/gml/menus/profiles.gml"));
 edits["gml_Object_oMenu_Create_0"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "src/gml/menus/setup.gml"));
 edits["gml_Object_oMenu_Create_0"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "src/gml/menus/players.gml"));
-group.QueueAppend("gml_Object_oMenu_Game_Create_0", "NovaOptionsOpen = false; NovaOptions = undefined;");
-Edit("gml_Object_oMenu_Game_Step_0", "Index = 1;", "NovaOptionsOpen = true; NovaOptions = global.NovaOptionsState(\"pause\");");
-Edit("gml_Object_oMenu_Game_Draw_0", "draw_sprite_stretched(sprite_index, 0, FrameX, FrameY, FrameW, FrameH);",
-    "if (NovaOptionsOpen) { draw_set_alpha(1); exit; }\ndraw_sprite_stretched(sprite_index, 0, FrameX, FrameY, FrameW, FrameH);");
+group.QueueAppend("gml_Object_oMenu_Game_Create_0", "NovaOptionsOpen = false; NovaOptions = undefined; NovaPauseFocus = 0; NovaPauseDialog = false; NovaPauseDialogFocus = 0; NovaPauseTime = Time_PlayingTotal();");
+// The pause panel draws after the CRT pass in the compositor; the event keeps only the dimming.
+edits["gml_Object_oMenu_Game_Draw_0"] = "draw_set_alpha(Alpha / 2.2);\ndraw_set_color(c_black);\ndraw_rectangle(oCamera.X, oCamera.Y, (oCamera.X + oCamera.W) - 1, (oCamera.Y + oCamera.H) - 1, false);\ndraw_set_alpha(1);\ndraw_set_color(c_white);";
 // Remapping also runs from the pause menu, where the adventure menu does not exist.
 Edit("gml_Object_oInputRemap_Create_0", "oMenu.Bindings_Remap = true;\noMenu.Menu_Active = false;",
     "global.NovaRemapping = true;\nwith (oMenu) { Bindings_Remap = true; Menu_Active = false; }");
@@ -256,6 +255,7 @@ Edit("gml_GlobalScript___Input", "function GetInputVerbStr(arg0)\n{",
     "function GetInputVerbStr(arg0)\n{\n    if (arg0 == 12) return \"nova_bag_previous\";\n    if (arg0 == 13) return \"nova_bag_next\";");
 edits["gml_GlobalScript___Input"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "src/gml/input/controls.gml"));
 edits["gml_GlobalScript___Input"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "src/gml/menus/options.gml"));
+edits["gml_GlobalScript___Input"] += "\n" + File.ReadAllText(Path.Combine(patchDir, "src/gml/menus/pause.gml"));
 ApplyContent();
 ApplyArcade();
 ApplyContextHints();
